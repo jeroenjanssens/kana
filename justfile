@@ -62,6 +62,10 @@ audio:
 voice-preview:
     npx tsx scripts/generate-audio.ts --preview
 
+# Build voice-preview/styles.html to compare how single kana are spoken (needs `just voicevox`)
+voice-preview-styles:
+    npx tsx scripts/generate-audio.ts --preview-styles
+
 # Re-process sound effects from scripts/sfx-sources
 sfx:
     npx tsx scripts/process-sfx.ts
