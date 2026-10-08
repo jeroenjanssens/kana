@@ -25,6 +25,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # The pronunciation clarity test decodes audio with ffmpeg.
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: npm run lint
       - run: npm run check
       - run: npm test

@@ -77,7 +77,8 @@ export interface KanaStyle {
   minWeakVowel: number
 }
 
-export const KANA_STYLE: KanaStyle = { speed: 0.9, stretch: 1.7, minWeakVowel: 0 }
+/** Natural speed and length, with the weak u/i held long enough to be heard (chosen by ear). */
+export const KANA_STYLE: KanaStyle = { speed: 1, stretch: 1, minWeakVowel: 0.28 }
 
 const VOICELESS = new Set(['s', 'sh', 'k', 'ts', 'ch', 'h', 'f', 'p', 't'])
 
@@ -263,12 +264,15 @@ async function preview() {
 
 /** Candidate styles for single kana, to compare by ear. */
 const STYLES: { name: string; style: KanaStyle }[] = [
-  { name: 'A · current (slow, every vowel ×1.7)', style: KANA_STYLE },
+  {
+    name: 'A · previous (slow, every vowel ×1.7)',
+    style: { speed: 0.9, stretch: 1.7, minWeakVowel: 0 },
+  },
   {
     name: 'B · natural (normal speed, no stretch)',
     style: { speed: 1, stretch: 1, minWeakVowel: 0 },
   },
-  { name: 'C · natural, clear weak u/i', style: { speed: 1, stretch: 1, minWeakVowel: 0.28 } },
+  { name: 'C · natural, clear weak u/i (current)', style: KANA_STYLE },
   {
     name: 'D · slightly held (×1.2), clear weak u/i',
     style: { speed: 1, stretch: 1.2, minWeakVowel: 0.3 },
