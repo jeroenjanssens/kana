@@ -181,5 +181,11 @@
   .tools {
     display: flex;
     gap: 0.25rem;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-soft);
   }
 </style>
