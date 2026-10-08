@@ -8,9 +8,11 @@
   import { HEADING_FONT_ID } from './lib/data/fonts'
   import { loadFont } from './lib/ui/fontLoader'
   import { WASHI_VARIANTS, generateWashi } from './lib/ui/washi'
-  import { audio, settings, startPersistence } from './state/app.svelte'
+  import { dayKey } from './lib/srs/scheduler'
+  import { goalProgress } from './lib/study/goal'
+  import { audio, settings, startPersistence, store } from './state/app.svelte'
+  import { toast, ui } from './state/ui.svelte'
   import { route, startRouter } from './state/router.svelte'
-  import { ui } from './state/ui.svelte'
   import Home from './views/Home.svelte'
   import Study from './views/Study.svelte'
 
@@ -93,6 +95,16 @@
   }
 
   const view = $derived(route.segments[0] ?? '')
+
+  // Celebrate the daily goal once a day, whichever mode reaches it.
+  $effect(() => {
+    void store.data.log.length
+    const today = dayKey()
+    if (store.data.goalDay === today || !goalProgress(store.data).reached) return
+    store.data.goalDay = today
+    void audio.playSfx('milestone')
+    toast(`Daily goal reached: ${store.data.settings.dailyGoal} answers. おみごと!`)
+  })
 
   // A soft wooden tick when moving between pages (only if enabled in settings).
   let firstRoute = true

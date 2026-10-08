@@ -2,7 +2,7 @@
   import type { HeatmapDay } from '../../lib/study/stats'
 
   /** GitHub-style calendar of daily answers, drawn as ink-wash squares. */
-  let { days }: { days: HeatmapDay[] } = $props()
+  let { days, goalDays }: { days: HeatmapDay[]; goalDays?: Set<string> } = $props()
 
   const CELL = 12
   const GAP = 3
@@ -64,6 +64,7 @@
         height={CELL}
         rx="3"
         class="l{c.level}"
+        class:goal={goalDays?.has(c.key)}
       >
         <title>{c.count} answer{c.count === 1 ? '' : 's'} on {c.key}</title>
       </rect>
@@ -115,6 +116,12 @@
   .l4 {
     fill: var(--shu);
     background: var(--shu);
+  }
+
+  /* Days on which the daily goal was reached get a vermilion outline, like a small seal. */
+  rect.goal {
+    stroke: var(--shu);
+    stroke-width: 1.5;
   }
 
   .legend {

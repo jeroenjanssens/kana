@@ -5,6 +5,7 @@
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import MasteryBar from '../components/MasteryBar.svelte'
   import { STUDY_DECKS } from '../lib/storage/schema'
+  import { goalProgress } from '../lib/study/goal'
   import { streak } from '../lib/study/stats'
   import { DECK_INFO, deckSummary } from '../lib/study/summary'
   import { store } from '../state/app.svelte'
@@ -17,6 +18,7 @@
 
   const summaries = $derived(STUDY_DECKS.map((d) => deckSummary(store.data, d, now)))
   const s = $derived(streak(store.data.log, now))
+  const goal = $derived(goalProgress(store.data, now))
   const firstVisit = $derived(store.data.log.length === 0)
   const mastered = $derived(summaries.reduce((n, d) => n + d.mastery.mature, 0))
 
@@ -37,11 +39,28 @@
     </p>
   {:else}
     <div class="badges">
+      <span
+        class="badge goal"
+        class:reached={goal.reached}
+        title="Daily goal: {goal.goal} answers"
+        aria-label="Daily goal: {goal.done} of {goal.goal}"
+      >
+        <svg class="ring" viewBox="0 0 36 36" aria-hidden="true">
+          <circle cx="18" cy="18" r="15" />
+          <circle
+            cx="18"
+            cy="18"
+            r="15"
+            class="fill"
+            style:stroke-dasharray="{goal.fraction * 94.25} 94.25"
+          />
+        </svg>
+        {goal.done}/{goal.goal} today
+      </span>
       <span class="badge" title="Days in a row"
         ><Icon name="flame" size={16} /> {s.current} day{s.current === 1 ? '' : 's'} streak</span
       >
       <span class="badge"><Hanko size={18} /> {mastered} mastered</span>
-      {#if !s.studiedToday}<span class="badge soft">Not studied yet today</span>{/if}
     </div>
   {/if}
 </section>
@@ -149,8 +168,26 @@
     text-shadow: none;
   }
 
-  .badge.soft {
-    opacity: 0.85;
+  .ring {
+    width: 20px;
+    height: 20px;
+    transform: rotate(-90deg);
+  }
+
+  .ring circle {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.3);
+    stroke-width: 5;
+  }
+
+  .ring .fill {
+    stroke: #fff;
+    stroke-linecap: round;
+    transition: stroke-dasharray 0.6s var(--ease);
+  }
+
+  .goal.reached {
+    background: color-mix(in srgb, var(--shu) 75%, transparent);
   }
 
   .decks {

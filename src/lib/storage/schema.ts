@@ -73,6 +73,10 @@ export interface Settings {
   leechThreshold: number
   /** Show an introduction (sound, strokes, memory hint) before a new kana is first quizzed. */
   introduce: boolean
+  /** Answers per day to aim for. */
+  dailyGoal: number
+  /** Time of the calendar reminder, "HH:MM". */
+  reminderTime: string
   groups: KanaGroup[]
   fontMode: 'fixed' | 'random'
   font: string
@@ -117,6 +121,8 @@ export const DEFAULT_SETTINGS: Settings = {
   reviewsPerDay: 200,
   leechThreshold: 6,
   introduce: true,
+  dailyGoal: 30,
+  reminderTime: '19:00',
   groups: ['basic', 'dakuten', 'yoon'],
   fontMode: 'fixed',
   font: DEFAULT_FONT_ID,
@@ -164,6 +170,8 @@ export interface SaveFile {
   daily: { day: string; newShown: Partial<Record<DeckId, number>> }
   /** Notes on special spellings (っ, ー, …) that have been shown in reading practice. */
   seenNotes: string[]
+  /** Day the daily goal was last celebrated. */
+  goalDay: string
   /** One-minute sprint results per script (most recent last). */
   sprints: Partial<Record<'hiragana' | 'katakana', { score: number; at: number }[]>>
   /** Kana ids whose "mature" seal has been celebrated, per deck. */
@@ -181,6 +189,7 @@ export function emptySave(now = Date.now()): SaveFile {
     daily: { day: '', newShown: {} },
     seenNotes: [],
     sprints: {},
+    goalDay: '',
     celebrated: {},
     createdAt: now,
   }

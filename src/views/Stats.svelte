@@ -15,6 +15,7 @@
     totalAnswers,
     weakest,
   } from '../lib/study/stats'
+  import { goalDays } from '../lib/study/goal'
   import { leeches } from '../lib/study/leeches'
   import { DECK_INFO, deckSummary } from '../lib/study/summary'
   import { buildHash } from '../lib/ui/hash'
@@ -127,7 +128,7 @@
 
 <section class="panel block">
   <h2>Activity</h2>
-  <Heatmap {days} />
+  <Heatmap {days} goalDays={goalDays(log, settings().dailyGoal)} />
 </section>
 
 <div class="two">

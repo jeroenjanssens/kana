@@ -112,6 +112,8 @@ export function migrate(raw: unknown): SaveFile {
     save.seenNotes = raw.seenNotes.filter((n): n is string => typeof n === 'string')
   }
 
+  if (typeof raw.goalDay === 'string') save.goalDay = raw.goalDay
+
   if (isObject(raw.sprints)) {
     for (const script of ['hiragana', 'katakana'] as const) {
       const list = raw.sprints[script]

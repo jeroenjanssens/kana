@@ -105,3 +105,27 @@ test('introductions can be switched off', async ({ page }) => {
   await expect(page.getByRole('button', { name: /Hiragana card/ })).toBeVisible()
   await expect(page.getByRole('article', { name: /New kana/ })).toHaveCount(0)
 })
+
+test('the daily goal fills up and is celebrated once', async ({ page }) => {
+  await quizOnly(page, { settings: { dailyGoal: 2 } })
+  await page.goto('./#/study/hiragana?mode=srs')
+  for (const label of ['Easy', 'Good']) {
+    await page.getByRole('button', { name: /Show answer/ }).click()
+    await page.getByRole('button', { name: new RegExp(label) }).click()
+  }
+  await expect(page.getByText(/Daily goal reached/)).toBeVisible()
+  await page.getByRole('button', { name: 'Leave session (Esc)' }).click()
+  await expect(page.getByLabel('Daily goal: 2 of 2')).toHaveClass(/reached/)
+  expect((await savedData(page)).goalDay).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+})
+
+test('a calendar reminder can be downloaded', async ({ page }) => {
+  await page.goto('./#/settings')
+  await page.getByLabel('Reminder time').fill('08:15')
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Add to calendar' }).click()
+  const file = await download
+  expect(file.suggestedFilename()).toBe('kana-reminder.ics')
+  const text = await (await file.createReadStream()).toArray()
+  expect(Buffer.concat(text).toString()).toMatch(/DTSTART:\d{8}T081500/)
+})

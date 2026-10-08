@@ -7,6 +7,7 @@
   import { pickVoice, type VoiceSetting } from '../lib/audio/voices'
   import { exportFileName, exportJson, importJson } from '../lib/storage/persistence'
   import { resetProgress } from '../lib/study/actions'
+  import { reminderIcs } from '../lib/study/goal'
   import { loadFont } from '../lib/ui/fontLoader'
   import type { PhotoMode } from '../lib/ui/photos'
   import { install, isStandalone, onInstallAvailable } from '../lib/ui/pwa'
@@ -80,6 +81,17 @@
     if (next.length) s.randomFonts = next
   }
 
+  function downloadReminder() {
+    const url = new URL(import.meta.env.BASE_URL, location.origin).href
+    const ics = reminderIcs({ time: s.reminderTime || '19:00', url })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }))
+    a.download = 'kana-reminder.ics'
+    a.click()
+    URL.revokeObjectURL(a.href)
+    toast('Open the downloaded file to add the reminder to your calendar')
+  }
+
   function download() {
     const blob = new Blob([exportJson($state.snapshot(store.data))], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -132,6 +144,17 @@
       <span>Maximum reviews per day <small class="muted">per deck</small></span>
       <input type="number" min="0" max="2000" bind:value={s.reviewsPerDay} />
     </label>
+    <label class="field">
+      <span>Daily goal <small class="muted">answers per day</small></span>
+      <input type="number" min="5" max="500" step="5" bind:value={s.dailyGoal} />
+    </label>
+    <div class="field">
+      <span>Daily reminder <small class="muted">adds an event to your calendar</small></span>
+      <span class="reminder">
+        <input type="time" bind:value={s.reminderTime} aria-label="Reminder time" />
+        <button class="btn small" onclick={downloadReminder}>Add to calendar</button>
+      </span>
+    </div>
     <label class="field">
       <span>Mark as tricky after <small class="muted">times forgotten</small></span>
       <input type="number" min="2" max="20" bind:value={s.leechThreshold} />
@@ -591,6 +614,12 @@
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
+  }
+
+  .reminder {
+    display: inline-flex;
+    gap: 0.4rem;
+    align-items: center;
   }
 
   .danger {
