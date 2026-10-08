@@ -148,9 +148,16 @@ export class AudioEngine {
    * Play a sound effect. `semitones` shifts the pitch (used for the koto streak melody);
    * otherwise a small random variation keeps repeated effects from sounding mechanical.
    */
-  async playSfx(event: SfxEvent, options: { semitones?: number; gain?: number } = {}) {
-    if (this.settings.silent || !this.settings.sfx || this.settings.sfxVolume <= 0) return
-    if (event === 'tick' && !this.settings.uiTicks) return
+  async playSfx(
+    event: SfxEvent,
+    options: { semitones?: number; gain?: number; preview?: boolean } = {},
+  ) {
+    // Previews (from settings) play even when effects are switched off, but not in silent mode.
+    const preview = options.preview === true
+    if (this.settings.silent) return
+    if (!preview && (!this.settings.sfx || this.settings.sfxVolume <= 0)) return
+    if (!preview && event === 'tick' && !this.settings.uiTicks) return
+    this.unlock()
     const manifest = await this.loadManifest()
     const files = manifest?.events[event]
     if (!files?.length) return
@@ -166,8 +173,9 @@ export class AudioEngine {
         ? semitonesToRate(options.semitones)
         : 1 + (this.rand() - 0.5) * 0.06
     const gain = ctx.createGain()
-    gain.gain.value = (options.gain ?? 1) * (0.9 + this.rand() * 0.1)
-    source.connect(gain).connect(this.sfxBus)
+    const level = preview ? Math.max(0.3, this.settings.sfxVolume) : 1
+    gain.gain.value = level * (options.gain ?? 1) * (0.9 + this.rand() * 0.1)
+    source.connect(gain).connect(preview ? this.master! : this.sfxBus)
     source.start()
   }
 

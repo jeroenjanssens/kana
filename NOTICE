@@ -1,0 +1,31 @@
+kana — third-party material
+===========================
+
+The source code of kana is licensed under the MIT License (see LICENSE).
+The following bundled assets are third-party works under their own licences.
+
+Pronunciation recordings — public/audio/
+  Recordings of the basic and dakuten kana by Hakatanoshio117117 on
+  Wikimedia Commons (https://commons.wikimedia.org/wiki/User:Hakatanoshio117117).
+  Public domain. Trimmed and re-encoded by scripts/fetch-audio.ts.
+  Per-file sources: public/audio/SOURCES.json
+
+Stroke-order data — src/lib/data/kanjivg/
+  Derived from KanjiVG (https://kanjivg.tagaini.net), copyright (C) Ulrich Apel
+  and contributors. Licensed under CC BY-SA 3.0
+  (https://creativecommons.org/licenses/by-sa/3.0/). See src/lib/data/kanjivg/LICENSE.
+
+Fonts — public/fonts/
+  Japanese fonts from the Google Fonts repository (https://github.com/google/fonts),
+  subsetted to kana by scripts/subset-fonts.ts. Licensed under the SIL Open Font
+  License 1.1, except Kosugi Maru (Apache License 2.0). Licence texts are in
+  public/fonts/licenses/. Interface font: Inter (SIL OFL 1.1, via @fontsource-variable/inter).
+
+Photos — public/photos/
+  From Unsplash (https://unsplash.com), used under the Unsplash License
+  (https://unsplash.com/license). Photographer credits: public/photos/credits.json
+  and the in-app Credits page.
+
+Sound effects — public/sfx/
+  From Freesound (https://freesound.org), CC0 1.0, plus a few effects generated
+  for kana (also CC0). Per-file sources: public/sfx/manifest.json and scripts/sfx.json.

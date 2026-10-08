@@ -1,16 +1,74 @@
 # kana
 
-Learn hiragana and katakana in the browser with spaced repetition.
+**Learn to read hiragana and katakana in your browser** — with spaced repetition, real pronunciation,
+stroke-order animations and flashcards that look like ink on washi paper.
 
-Live at **https://jeroenjanssens.github.io/kana/**.
+**→ https://jeroenjanssens.github.io/kana/**
+
+![kana: a flashcard on washi paper in front of Mount Fuji](docs/screenshot-study.png)
+
+## Features
+
+- **Spaced repetition** (FSRS, the algorithm Anki uses) for three decks: hiragana, katakana, and
+  both side by side. Self-grade like Anki, or type the romaji and get a suggested grade.
+- **In-order mode** to go through rows one by one without touching your schedule.
+- **Kana table** with separate or combined layouts, a romaji toggle, click-to-hear, and a
+  mastery overlay that shows how well you know each kana.
+- **Pronunciation** for all basic and dakuten kana (public-domain recordings).
+- **Fonts**: pick one of 15 Japanese fonts, or let every card use a random one so you learn to
+  recognise kana in any style. A font gallery shows the same kana in every font.
+- **Stroke-order animations** for every kana (KanjiVG).
+- **Confusable pairs**: compare look-alikes (シ/ツ, ソ/ン, ぬ/め, …) and quiz yourself; sets are
+  also built from your own mistakes.
+- **Listening**: hear a sound, pick the kana — with its own spaced-repetition schedule.
+- **Reading practice**: ~300 real words that unlock as you learn their kana, with short notes on
+  っ, ー, long vowels and yōon.
+- **Stats**: activity heatmap, streaks, due forecast, mastery per deck, weakest and most-confused kana.
+- **Look & feel**: washi-paper cards with ink, rotating photos of Japan, hanko seals for mastered
+  cards, subtle traditional sound effects (koto, wood, bells), light and dark themes.
+- **Works offline** and can be installed as an app. Progress stays in your browser; export and
+  import it as JSON.
 
 ## Development
+
+You need Node.js 22+ and [just](https://github.com/casey/just).
 
 ```sh
 just install   # install dependencies
 just dev       # start the dev server at http://localhost:5173/kana/
-just test      # run unit tests
-just ci        # lint, type-check, test, build and run e2e tests
+just test      # unit tests (Vitest)
+just e2e       # end-to-end tests (Playwright)
+just ci        # lint, type-check, unit tests, build and e2e — what CI runs
 ```
 
-See [PLAN.md](PLAN.md) for the design.
+Run `just` to see all tasks. The asset pipelines (`just audio`, `just fonts`, `just kanjivg`,
+`just photos`, `just sfx`, `just icons`) regenerate the files in `public/` and
+`src/lib/data/kanjivg/` from their sources; their output is committed, so you only need them
+when changing assets.
+
+### Project layout
+
+```
+src/
+  lib/        plain TypeScript: kana data, SRS, storage, audio engine, stats (unit-tested)
+  state/      reactive Svelte state (*.svelte.ts)
+  components/ reusable UI (paper card, stroke order, font gallery, charts, …)
+  views/      one component per page
+scripts/      asset pipelines (audio, fonts, photos, sound effects, stroke data, icons)
+tests/        unit/ (Vitest) and e2e/ (Playwright)
+```
+
+Pushing to `main` runs the full test suite and deploys to GitHub Pages.
+
+See [PLAN.md](PLAN.md) for the design and decisions.
+
+## Credits
+
+kana builds on the generous work of others — see [NOTICE](NOTICE) and the in-app credits page:
+pronunciation by Hakatanoshio117117 (Wikimedia Commons, public domain), stroke data from
+KanjiVG (CC BY-SA 3.0), fonts from Google Fonts (OFL), photos from Unsplash, and sound effects
+from Freesound (CC0).
+
+## License
+
+The code is MIT licensed. Bundled assets keep their own licences, listed in [NOTICE](NOTICE).

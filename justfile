@@ -69,3 +69,7 @@ fonts:
 # Re-process background photos from scripts/photo-sources
 photos:
     npx tsx scripts/process-photos.ts
+
+# Regenerate the app icons
+icons:
+    npx tsx scripts/make-icons.ts

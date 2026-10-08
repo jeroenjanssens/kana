@@ -26,6 +26,8 @@ export default ts.config(
   {
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      // Flags local, non-reactive Date/Map/URLSearchParams values too; we only use them as temporaries.
+      'svelte/prefer-svelte-reactivity': 'off',
     },
   },
 )

@@ -161,7 +161,8 @@ export const SYSTEM_FONT_STACK =
   '"Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "Noto Sans CJK JP", sans-serif'
 
 /** Kanji used in the UI (logo, headings, seals). Included in every font subset. */
-export const UI_KANJI = '仮名平片習熟学練読聞書字日本語音覚新復終完了合格対組'
+export const UI_KANJI =
+  '仮名平片習熟学練読聞書字日本語音覚新復終完了合格対組感謝似結果取迷子設定記録清濁半拗外来五十図'
 
 const FONTS_BY_ID = new Map(FONTS.map((f) => [f.id, f]))
 

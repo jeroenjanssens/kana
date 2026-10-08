@@ -161,6 +161,16 @@ describe('AudioEngine', () => {
     expect(audio.played).toHaveLength(1)
   })
 
+  test('previews play even when effects are off, but not in silent mode', async () => {
+    const { engine, audio } = makeEngine()
+    engine.configure({ ...settings, sfx: false })
+    await engine.playSfx('tick', { preview: true })
+    expect(audio.played).toHaveLength(1)
+    engine.configure({ ...settings, silent: true })
+    await engine.playSfx('tick', { preview: true })
+    expect(audio.played).toHaveLength(1)
+  })
+
   test('ignores events without files', async () => {
     const { engine, audio } = makeEngine()
     await engine.playSfx('milestone')
