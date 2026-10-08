@@ -1,5 +1,7 @@
 # Improvements, round 1: plan
 
+> **Status (2026-10-08): implemented.** Voices: female 春日部つむぎ (id 8), male 青山龍星 (id 13).
+
 This plan covers the ten issues and requests from your feedback. For each one it gives the cause (where there is a bug), the change, how it will be tested, and any open design decision, with a **default** and an **alternative**.
 
 Guiding rule: reuse what's already there (settings, the audio engine, the washi generator, the photo list) and avoid new abstractions unless they remove code elsewhere.

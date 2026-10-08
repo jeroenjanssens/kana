@@ -26,8 +26,9 @@ stroke-order animations and flashcards that look like ink on washi paper.
 - **Reading practice**: ~300 real words that unlock as you learn their kana, with short notes on
   っ, ー, long vowels and yōon.
 - **Stats**: activity heatmap, streaks, due forecast, mastery per deck, weakest and most-confused kana.
-- **Look & feel**: washi-paper cards with ink, rotating photos of Japan, hanko seals for mastered
-  cards, subtle traditional sound effects (koto, wood, bells), light and dark themes.
+- **Look & feel**: washi-paper cards with ink (every card on its own sheet), photos of Japan
+  that rotate by cards, by time, daily or stay fixed, hanko seals for mastered cards, subtle
+  traditional sound effects whose pitch follows your answer, light and dark themes.
 - **Works offline** and can be installed as an app. Progress stays in your browser; export and
   import it as JSON.
 

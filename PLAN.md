@@ -10,8 +10,8 @@ Each design decision below lists a **default** (what I'll build unless you say o
 > https://jeroenjanssens.github.io/kana/. Where the build differs from this plan:
 >
 > - **Fonts (D10):** instead of `@fontsource` packages (≈124 files per font), `scripts/subset-fonts.ts` downloads the fonts from the google/fonts repository and cuts each one down to kana, Latin and the UI kanji. That's one file per font, 1.7 MB for all 15, and all of them are pre-cached for offline use.
-> - **Pronunciation (D5):** each Commons recording says the syllable three times. The fetch script keeps only the first utterance, which comes to about 0.25–0.55 s per clip.
-> - **Sound effects (D18):** 13 effects, all CC0. 10 are from Freesound and 3 were generated with ffmpeg. No clean CC0 koto note was available, so the streak melody uses a single *kayageum* (Korean zither) pluck, pitch-shifted along the miyako-bushi scale.
+> - **Pronunciation (D5), revised in round 1:** the Commons recordings were replaced by audio generated with VOICEVOX: every kana (yōon included) and every word, in a female (春日部つむぎ) and a male (青山龍星) voice, with a Female / Male / Random setting. See [docs/plan-improvements-1.md](docs/plan-improvements-1.md).
+> - **Sound effects (D18):** 13 effects, all CC0. 10 are from Freesound and 3 were generated with ffmpeg. The koto note is a *kayageum* (Korean zither) pluck. Since round 1 its pitch follows the grade (Hard low, Good middle, Easy high) instead of a streak melody.
 > - **Reading practice (§2.8):** 392 hand-written words. Accepted typed spellings and tags are generated from the kana, and a test checks every word's Hepburn romaji against its kana.
 > - **Tooling (D12):** ESLint + Prettier + svelte-check, Vitest (≈1,050 unit tests), and Playwright (≈70 e2e tests on desktop and mobile, including offline use).
 > - **Lighthouse:** desktop scores 99 / 100 / 100 / 100 (performance, accessibility, best practices, SEO). Mobile scores 79 for performance (simulated slow 4G) and 100 for accessibility.
