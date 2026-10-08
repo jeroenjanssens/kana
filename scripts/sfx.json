@@ -1,0 +1,149 @@
+[
+  {
+    "id": "flip-1",
+    "event": "flip",
+    "title": "turn_paper_sheet2.wav",
+    "author": "vibe_crc",
+    "sourceUrl": "https://freesound.org/people/vibe_crc/sounds/59880/",
+    "downloadUrl": "https://cdn.freesound.org/previews/59/59880_333536-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 0.85 },
+    "gainDb": 0
+  },
+  {
+    "id": "flip-2",
+    "event": "flip",
+    "title": "Paper Rustle",
+    "author": "BenjaminNelan",
+    "sourceUrl": "https://freesound.org/people/BenjaminNelan/sounds/353125/",
+    "downloadUrl": "https://cdn.freesound.org/previews/353/353125_1196020-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 0.85 },
+    "gainDb": 0
+  },
+  {
+    "id": "flip-3",
+    "event": "flip",
+    "title": "Rustling Paper",
+    "author": "HarpyHarpHarp",
+    "sourceUrl": "https://freesound.org/people/HarpyHarpHarp/sounds/449127/",
+    "downloadUrl": "https://cdn.freesound.org/previews/449/449127_8895476-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 0.65 },
+    "gainDb": 0
+  },
+  {
+    "id": "correct-1",
+    "event": "correct",
+    "title": "kayageum1_A2.wav",
+    "author": "spt3125",
+    "sourceUrl": "https://freesound.org/people/spt3125/sounds/24551/",
+    "downloadUrl": "https://cdn.freesound.org/previews/24/24551_164315-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 2.5 },
+    "gainDb": 0,
+    "rootHz": 110
+  },
+  {
+    "id": "wrong-1",
+    "event": "wrong",
+    "title": "Wood block hit",
+    "author": "thomasjaunism",
+    "sourceUrl": "https://freesound.org/people/thomasjaunism/sounds/218460/",
+    "downloadUrl": "https://cdn.freesound.org/previews/218/218460_3344538-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 0.3 },
+    "gainDb": 0
+  },
+  {
+    "id": "wrong-2",
+    "event": "wrong",
+    "title": "Wood block hit 2",
+    "author": "thomasjaunism",
+    "sourceUrl": "https://freesound.org/people/thomasjaunism/sounds/218461/",
+    "downloadUrl": "https://cdn.freesound.org/previews/218/218461_3344538-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 0.5 },
+    "gainDb": 0
+  },
+  {
+    "id": "stamp-1",
+    "event": "stamp",
+    "title": "es-stamp.wav",
+    "author": "eddies2000",
+    "sourceUrl": "https://freesound.org/people/eddies2000/sounds/448474/",
+    "downloadUrl": "https://cdn.freesound.org/previews/448/448474_9090982-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 0.5 },
+    "gainDb": 0
+  },
+  {
+    "id": "stamp-2",
+    "event": "stamp",
+    "title": "es-stamp.wav (second hit)",
+    "author": "eddies2000",
+    "sourceUrl": "https://freesound.org/people/eddies2000/sounds/448474/",
+    "downloadUrl": "https://cdn.freesound.org/previews/448/448474_9090982-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 1.0, "duration": 0.5 },
+    "gainDb": 0
+  },
+  {
+    "id": "bell-1",
+    "event": "bell",
+    "title": "Small Bell #2",
+    "author": "steffcaffrey",
+    "sourceUrl": "https://freesound.org/people/steffcaffrey/sounds/452379/",
+    "downloadUrl": "https://cdn.freesound.org/previews/452/452379_1844073-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 2.0 },
+    "gainDb": 0
+  },
+  {
+    "id": "complete-1",
+    "event": "complete",
+    "title": "Small bell (long decay)",
+    "author": "Throndronis",
+    "sourceUrl": "https://freesound.org/people/Throndronis/sounds/799520/",
+    "downloadUrl": "https://cdn.freesound.org/previews/799/799520_14610131-hq.mp3",
+    "license": "CC0",
+    "trim": { "start": 0.0, "duration": 4.0 },
+    "gainDb": 0
+  },
+  {
+    "id": "milestone-1",
+    "event": "milestone",
+    "title": "Synthesized hyoshigi wooden clappers",
+    "author": "generated",
+    "sourceUrl": "",
+    "downloadUrl": "",
+    "license": "CC0 (generated)",
+    "trim": { "start": 0.0, "duration": 0.7 },
+    "gainDb": 0,
+    "generate": "aevalsrc='sin(2*PI*1400*t)*exp(-t*50)+0.4*(random(0)-0.5)*exp(-t*40)+(sin(2*PI*1300*(t-0.25))*exp(-max(t-0.25,0)*50)+0.4*(random(1)-0.5)*exp(-max(t-0.25,0)*40))*gt(t,0.25)':s=44100:d=0.7,highpass=f=300"
+  },
+  {
+    "id": "tick-1",
+    "event": "tick",
+    "title": "Synthesized wooden tick",
+    "author": "generated",
+    "sourceUrl": "",
+    "downloadUrl": "",
+    "license": "CC0 (generated)",
+    "trim": { "start": 0.0, "duration": 0.08 },
+    "gainDb": 0,
+    "generate": "aevalsrc='sin(2*PI*700*t)*exp(-t*120)+0.3*(random(0)-0.5)*exp(-t*100)':s=44100:d=0.08,highpass=f=300"
+  },
+  {
+    "id": "tick-2",
+    "event": "tick",
+    "title": "Synthesized wooden tick 2",
+    "author": "generated",
+    "sourceUrl": "",
+    "downloadUrl": "",
+    "license": "CC0 (generated)",
+    "trim": { "start": 0.0, "duration": 0.08 },
+    "gainDb": 0,
+    "generate": "aevalsrc='sin(2*PI*950*t)*exp(-t*130)+0.3*(random(0)-0.5)*exp(-t*110)':s=44100:d=0.08,highpass=f=300"
+  }
+]

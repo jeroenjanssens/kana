@@ -30,3 +30,4 @@ dev-dist
 coverage
 scripts/audio-sources/
 scripts/photo-sources/
+scripts/sfx-sources/

@@ -1,0 +1,129 @@
+{
+  "events": {
+    "flip": [
+      "flip-1.mp3",
+      "flip-2.mp3",
+      "flip-3.mp3"
+    ],
+    "correct": [
+      "correct-1.mp3"
+    ],
+    "wrong": [
+      "wrong-1.mp3",
+      "wrong-2.mp3"
+    ],
+    "stamp": [
+      "stamp-1.mp3",
+      "stamp-2.mp3"
+    ],
+    "bell": [
+      "bell-1.mp3"
+    ],
+    "complete": [
+      "complete-1.mp3"
+    ],
+    "milestone": [
+      "milestone-1.mp3"
+    ],
+    "tick": [
+      "tick-1.mp3",
+      "tick-2.mp3"
+    ]
+  },
+  "rootHz": {
+    "correct-1": 110
+  },
+  "credits": [
+    {
+      "id": "flip-1",
+      "title": "turn_paper_sheet2.wav",
+      "author": "vibe_crc",
+      "sourceUrl": "https://freesound.org/people/vibe_crc/sounds/59880/",
+      "license": "CC0"
+    },
+    {
+      "id": "flip-2",
+      "title": "Paper Rustle",
+      "author": "BenjaminNelan",
+      "sourceUrl": "https://freesound.org/people/BenjaminNelan/sounds/353125/",
+      "license": "CC0"
+    },
+    {
+      "id": "flip-3",
+      "title": "Rustling Paper",
+      "author": "HarpyHarpHarp",
+      "sourceUrl": "https://freesound.org/people/HarpyHarpHarp/sounds/449127/",
+      "license": "CC0"
+    },
+    {
+      "id": "correct-1",
+      "title": "kayageum1_A2.wav",
+      "author": "spt3125",
+      "sourceUrl": "https://freesound.org/people/spt3125/sounds/24551/",
+      "license": "CC0"
+    },
+    {
+      "id": "wrong-1",
+      "title": "Wood block hit",
+      "author": "thomasjaunism",
+      "sourceUrl": "https://freesound.org/people/thomasjaunism/sounds/218460/",
+      "license": "CC0"
+    },
+    {
+      "id": "wrong-2",
+      "title": "Wood block hit 2",
+      "author": "thomasjaunism",
+      "sourceUrl": "https://freesound.org/people/thomasjaunism/sounds/218461/",
+      "license": "CC0"
+    },
+    {
+      "id": "stamp-1",
+      "title": "es-stamp.wav",
+      "author": "eddies2000",
+      "sourceUrl": "https://freesound.org/people/eddies2000/sounds/448474/",
+      "license": "CC0"
+    },
+    {
+      "id": "stamp-2",
+      "title": "es-stamp.wav (second hit)",
+      "author": "eddies2000",
+      "sourceUrl": "https://freesound.org/people/eddies2000/sounds/448474/",
+      "license": "CC0"
+    },
+    {
+      "id": "bell-1",
+      "title": "Small Bell #2",
+      "author": "steffcaffrey",
+      "sourceUrl": "https://freesound.org/people/steffcaffrey/sounds/452379/",
+      "license": "CC0"
+    },
+    {
+      "id": "complete-1",
+      "title": "Small bell (long decay)",
+      "author": "Throndronis",
+      "sourceUrl": "https://freesound.org/people/Throndronis/sounds/799520/",
+      "license": "CC0"
+    },
+    {
+      "id": "milestone-1",
+      "title": "Synthesized hyoshigi wooden clappers",
+      "author": "generated",
+      "sourceUrl": "",
+      "license": "CC0 (generated)"
+    },
+    {
+      "id": "tick-1",
+      "title": "Synthesized wooden tick",
+      "author": "generated",
+      "sourceUrl": "",
+      "license": "CC0 (generated)"
+    },
+    {
+      "id": "tick-2",
+      "title": "Synthesized wooden tick 2",
+      "author": "generated",
+      "sourceUrl": "",
+      "license": "CC0 (generated)"
+    }
+  ]
+}
