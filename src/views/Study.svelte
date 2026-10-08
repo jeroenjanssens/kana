@@ -460,7 +460,7 @@
             />
             <button class="btn primary" type="submit">Check</button>
           </form>
-        {:else if !flipped}
+        {:else if mode === 'srs' && !flipped}
           <button class="btn primary wide" onclick={reveal}>Show answer <kbd>Space</kbd></button>
         {:else if mode === 'srs'}
           <div class="grades" role="group" aria-label="How well did you know it?">
@@ -489,14 +489,22 @@
             >
               <Icon name="left" />
             </button>
-            {#if !typed}
+            {#if !flipped}
+              <button class="btn primary wide" onclick={reveal}>Show answer <kbd>Space</kbd></button
+              >
+            {:else if !typed}
               <button class="btn missed" onclick={() => selfCheck(false)}
                 >Missed <kbd>1</kbd></button
               >
               <button class="btn got" onclick={() => selfCheck(true)}>Got it <kbd>2</kbd></button>
             {/if}
-            <button class="btn primary" onclick={() => move(1)} aria-label="Next (→)">
-              Next <Icon name="right" />
+            <button
+              class="btn"
+              class:primary={flipped}
+              onclick={() => move(1)}
+              aria-label="Next (→)"
+            >
+              <Icon name="right" />
             </button>
           </div>
         {/if}

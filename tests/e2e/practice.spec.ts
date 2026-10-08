@@ -38,7 +38,7 @@ test('reading practice unlocks words from known kana', async ({ page }) => {
   await seed(page, {
     cards: { hiragana: Object.fromEntries(known.map((id) => [id, youngCard()])) },
   })
-  await page.goto('./#/reading')
+  await page.reload()
   await expect(page.getByText(/^[1-9]\d* of \d+ words unlocked/)).toBeVisible()
   await page.getByRole('button', { name: 'Start reading' }).click()
   await page.getByRole('button', { name: /Show reading/ }).click()

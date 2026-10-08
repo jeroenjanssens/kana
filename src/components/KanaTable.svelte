@@ -45,13 +45,13 @@
   }
 </script>
 
-<div class="table" style:--cols={columns.length} role="grid" aria-label="{script} {group}">
-  <div class="head" role="row">
-    <span role="columnheader"></span>
-    {#each columns as c (c)}<span class="col-label" role="columnheader">{c}</span>{/each}
+<div class="table" style:--cols={columns.length} role="group" aria-label="{script} {group}">
+  <div class="head" aria-hidden="true">
+    <span></span>
+    {#each columns as c (c)}<span class="col-label">{c}</span>{/each}
   </div>
   {#each rows as r (r.row)}
-    <div class="row" role="row">
+    <div class="row">
       <span class="row-label" role="rowheader"
         >{r.cells.find(Boolean)?.romaji.replace(/[aiueo]$/, '') || '·'}</span
       >
@@ -59,7 +59,6 @@
         {#if k}
           {@const level = cards ? masteryLevel(cards[k.id]) : 'new'}
           <button
-            role="gridcell"
             class="cell washi level-{level}"
             class:selected={selected === k.id}
             class:pair={script === 'combined'}
@@ -80,7 +79,7 @@
             {#if cards && level === 'mature'}<span class="seal"><Hanko size={18} /></span>{/if}
           </button>
         {:else}
-          <span class="cell empty" role="gridcell" aria-hidden="true"></span>
+          <span class="cell empty" aria-hidden="true"></span>
         {/if}
       {/each}
     </div>
