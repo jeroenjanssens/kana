@@ -26,7 +26,6 @@ export interface Kana {
   audio: boolean
 }
 
-
 const VOWELS = ['a', 'i', 'u', 'e', 'o']
 
 /** Basic rows in gojūon order. `null` marks an empty cell. */
