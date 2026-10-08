@@ -162,7 +162,7 @@ export const SYSTEM_FONT_STACK =
 
 /** Kanji used in the UI (logo, headings, seals). Included in every font subset. */
 export const UI_KANJI =
-  '仮名平片習熟学練読聞書字日本語音覚新復終完了合格対組感謝似結果取迷子設定記録清濁半拗外来五十図方'
+  '仮名平片習熟学練読聞書字日本語音覚新復終完了合格対組感謝似結果取迷子設定記録清濁半拗外来五十図方早'
 
 const FONTS_BY_ID = new Map(FONTS.map((f) => [f.id, f]))
 

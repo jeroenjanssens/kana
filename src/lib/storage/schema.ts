@@ -164,6 +164,8 @@ export interface SaveFile {
   daily: { day: string; newShown: Partial<Record<DeckId, number>> }
   /** Notes on special spellings (っ, ー, …) that have been shown in reading practice. */
   seenNotes: string[]
+  /** One-minute sprint results per script (most recent last). */
+  sprints: Partial<Record<'hiragana' | 'katakana', { score: number; at: number }[]>>
   /** Kana ids whose "mature" seal has been celebrated, per deck. */
   celebrated: Partial<Record<DeckId, string[]>>
   createdAt: number
@@ -178,6 +180,7 @@ export function emptySave(now = Date.now()): SaveFile {
     log: [],
     daily: { day: '', newShown: {} },
     seenNotes: [],
+    sprints: {},
     celebrated: {},
     createdAt: now,
   }

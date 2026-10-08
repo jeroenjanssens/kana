@@ -136,5 +136,6 @@ export function resetProgress(save: SaveFile): void {
   save.log = []
   save.daily = { day: '', newShown: {} }
   save.seenNotes = []
+  save.sprints = {}
   save.celebrated = {}
 }

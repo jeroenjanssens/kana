@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { referenceStrokes, resample, type Point } from '../../src/lib/study/handwriting'
+import { KANA } from '../../src/lib/data/kana'
 import { strokesFor } from '../../src/lib/data/strokes'
 import { quizOnly, savedData } from './helpers'
 
@@ -66,4 +67,46 @@ test('choosing instead of drawing', async ({ page }) => {
   await expect(page.locator('.option.right')).toBeVisible()
   const data = await savedData(page)
   expect(data.log[0]).toMatchObject({ mode: 'write', deck: 'write-hiragana', correct: true })
+})
+
+test('a one-minute sprint counts correct answers and keeps the best score', async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, 'typing version')
+  await page.clock.install()
+  await page.goto('./#/sprint/hiragana')
+  await page.getByRole('button', { name: /Start/ }).click()
+  const input = page.getByRole('textbox', { name: 'Romaji' })
+  for (let i = 0; i < 3; i++) {
+    const kana = (await page.locator('.question .glyph').textContent())!.trim()
+    await input.pressSequentially(ROMAJI[kana])
+    await expect(page.getByLabel('Score')).toHaveText(String(i + 1))
+  }
+  await input.pressSequentially('q')
+  await page.clock.runFor(61_000)
+  await expect(page.getByRole('heading', { name: '3 kana in one minute' })).toBeVisible()
+  const data = await savedData(page)
+  expect(data.sprints.hiragana[0].score).toBe(3)
+  expect(data.log.filter((e: { mode: string }) => e.mode === 'sprint')).toHaveLength(4)
+})
+
+/** Romaji of the basic hiragana, for the sprint test (the pool is the basic kana). */
+const ROMAJI: Record<string, string> = Object.fromEntries(
+  KANA.filter((k) => k.group === 'basic').map((k) => [k.hiragana, k.romaji]),
+)
+
+test('on phones the sprint is answered with buttons', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'touch version')
+  await page.goto('./#/sprint/katakana')
+  await page.getByRole('button', { name: /Start/ }).click()
+  const options = page.getByRole('group', { name: 'Which romaji?' }).getByRole('button')
+  await expect(options).toHaveCount(4)
+  const kana = (await page.locator('.question .glyph').textContent())!.trim()
+  const romaji = KANA.find((k) => k.katakana === kana)!.romaji
+  await options
+    .filter({ hasText: new RegExp(`^${romaji}`) })
+    .first()
+    .click()
+  await expect(page.getByLabel('Score')).toHaveText('1')
 })

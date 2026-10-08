@@ -41,6 +41,11 @@
     <h2>Writing</h2>
     <p>See the romaji, write the kana — stroke order and direction are checked.</p>
   </a>
+  <a class="card panel" href="#/sprint">
+    <span class="art" lang="ja">60</span>
+    <h2>One-minute sprint</h2>
+    <p>Read as many kana as you can in 60 seconds, and beat your best.</p>
+  </a>
   <a class="card panel" href="#/reading">
     <span class="art" lang="ja">ねこ</span>
     <h2>Reading practice</h2>

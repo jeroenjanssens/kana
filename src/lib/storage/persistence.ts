@@ -112,6 +112,18 @@ export function migrate(raw: unknown): SaveFile {
     save.seenNotes = raw.seenNotes.filter((n): n is string => typeof n === 'string')
   }
 
+  if (isObject(raw.sprints)) {
+    for (const script of ['hiragana', 'katakana'] as const) {
+      const list = raw.sprints[script]
+      if (Array.isArray(list)) {
+        save.sprints[script] = list.filter(
+          (s): s is { score: number; at: number } =>
+            isObject(s) && typeof s.score === 'number' && typeof s.at === 'number',
+        )
+      }
+    }
+  }
+
   if (isObject(raw.celebrated)) {
     for (const deck of DECK_IDS) {
       const ids = raw.celebrated[deck]
