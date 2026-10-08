@@ -167,3 +167,47 @@ test('intervals can be personalised with the FSRS optimiser', async ({ page }) =
   await page.getByRole('button', { name: 'Reset', exact: true }).click()
   expect((await savedData(page)).settings.fsrsWeights).toEqual([])
 })
+
+test('progress syncs through a GitHub gist', async ({ page }) => {
+  const gists = new Map<
+    string,
+    { id: string; description: string; files: Record<string, { content: string }> }
+  >()
+  await page.route('https://api.github.com/**', async (route) => {
+    const req = route.request()
+    if (req.headers()['authorization'] !== 'Bearer ghp_test')
+      return route.fulfill({ status: 401, body: '' })
+    const url = new URL(req.url())
+    if (url.pathname === '/gists' && req.method() === 'GET') {
+      return route.fulfill({ json: [...gists.values()] })
+    }
+    if (url.pathname === '/gists' && req.method() === 'POST') {
+      const body = req.postDataJSON()
+      const gist = { id: 'g1', description: body.description, files: body.files }
+      gists.set('g1', gist)
+      return route.fulfill({ status: 201, json: gist })
+    }
+    const gist = gists.get(url.pathname.split('/').pop()!)
+    if (!gist) return route.fulfill({ status: 404, body: '' })
+    if (req.method() === 'PATCH') gist.files = { ...gist.files, ...req.postDataJSON().files }
+    return route.fulfill({ json: gist })
+  })
+  await quizOnly(page)
+  await page.goto('./#/study/hiragana?mode=srs')
+  await page.getByRole('button', { name: /Show answer/ }).click()
+  await page.getByRole('button', { name: /Easy/ }).click()
+  await page.goto('./#/settings')
+  await page.getByLabel('GitHub token').fill('wrong')
+  await page.getByRole('button', { name: 'Connect' }).click()
+  await expect(page.getByRole('alert')).toHaveText('GitHub rejected the token')
+  await page.getByLabel('GitHub token').fill('ghp_test')
+  await page.getByRole('button', { name: 'Connect' }).click()
+  await expect(page.getByText(/Last synced/)).toBeVisible()
+  const synced = JSON.parse(gists.get('g1')!.files['kana-progress.json'].content)
+  expect(Object.keys(synced.cards.hiragana)).toEqual(['a'])
+  expect(await page.evaluate(() => localStorage.getItem('kana:gist-token'))).toBe('ghp_test')
+  await page.getByRole('button', { name: 'Sync now' }).click()
+  await expect(page.getByRole('button', { name: 'Sync now' })).toBeEnabled()
+  await page.getByRole('button', { name: 'Disconnect' }).click()
+  expect(await page.evaluate(() => localStorage.getItem('kana:gist-token'))).toBeNull()
+})

@@ -187,6 +187,8 @@ export interface SaveFile {
   daily: { day: string; newShown: Partial<Record<DeckId, number>> }
   /** Notes on special spellings (っ, ー, …) that have been shown in reading practice. */
   seenNotes: string[]
+  /** When the settings last changed (for merging synced copies). */
+  settingsUpdatedAt: number
   /** Day the daily goal was last celebrated. */
   goalDay: string
   /** One-minute sprint results per script (most recent last). */
@@ -207,6 +209,7 @@ export function emptySave(now = Date.now()): SaveFile {
     seenNotes: [],
     sprints: {},
     goalDay: '',
+    settingsUpdatedAt: 0,
     celebrated: {},
     createdAt: now,
   }

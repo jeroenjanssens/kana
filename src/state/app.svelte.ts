@@ -44,6 +44,14 @@ export function startPersistence(): () => void {
       return () => clearTimeout(handle)
     })
 
+    // Remember when the settings last changed, so synced copies keep the newest settings.
+    let first = true
+    $effect(() => {
+      $state.snapshot(store.data.settings)
+      if (first) first = false
+      else store.data.settingsUpdatedAt = Date.now()
+    })
+
     // Personalised FSRS weights and desired retention apply to every new grade.
     $effect(() => {
       const s = store.data.settings

@@ -14,6 +14,7 @@
   import type { PhotoMode } from '../lib/ui/photos'
   import { install, isStandalone, onInstallAvailable } from '../lib/ui/pwa'
   import { choosePhoto, gallery, loadPhotos } from '../state/photos.svelte'
+  import { connect, disconnect, sync, syncNow } from '../state/sync.svelte'
   import { audio, replaceData, settings, store } from '../state/app.svelte'
   import { toast } from '../state/ui.svelte'
 
@@ -21,6 +22,7 @@
   let fileInput = $state<HTMLInputElement>()
   let confirmReset = $state(false)
   let persisted = $state<boolean | undefined>()
+  let token = $state('')
   let canInstall = $state(false)
   const standalone = typeof window !== 'undefined' && isStandalone()
 
@@ -492,6 +494,53 @@
   </section>
 
   <section class="panel block">
+    <h2>Sync between devices</h2>
+    {#if sync.connected}
+      <p class="small">
+        Your progress syncs through a secret gist on your GitHub account.
+        {#if sync.lastSync}Last synced {new Date(sync.lastSync).toLocaleString()}.{/if}
+      </p>
+      <div class="row">
+        <button class="btn" onclick={() => syncNow()} disabled={sync.syncing}>
+          {sync.syncing ? 'Syncing…' : 'Sync now'}
+        </button>
+        <button class="btn ghost" onclick={() => disconnect()}>Disconnect</button>
+      </div>
+    {:else}
+      <p class="small">
+        Keep your progress in sync across devices with a secret GitHub gist. Create a
+        <a
+          href="https://github.com/settings/tokens/new?scopes=gist&description=kana%20sync"
+          target="_blank"
+          rel="noopener">token with only the “gist” permission</a
+        >, and paste it here. It's stored only in this browser.
+      </p>
+      <form
+        class="row"
+        onsubmit={async (e) => {
+          e.preventDefault()
+          if (await connect(token)) {
+            token = ''
+            toast('Connected — your progress is synced')
+          }
+        }}
+      >
+        <input
+          type="password"
+          bind:value={token}
+          placeholder="GitHub token"
+          aria-label="GitHub token"
+          autocomplete="off"
+        />
+        <button class="btn primary" type="submit" disabled={!token.trim() || sync.syncing}>
+          {sync.syncing ? 'Connecting…' : 'Connect'}
+        </button>
+      </form>
+    {/if}
+    {#if sync.error}<p class="small error" role="alert">{sync.error}</p>{/if}
+  </section>
+
+  <section class="panel block">
     <h2>Install</h2>
     {#if standalone}
       <p class="small">kana is installed and works offline.</p>
@@ -692,6 +741,10 @@
     display: inline-flex;
     gap: 0.4rem;
     align-items: center;
+  }
+
+  .error {
+    color: var(--shu);
   }
 
   .danger {

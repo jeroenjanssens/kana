@@ -114,6 +114,7 @@ export function migrate(raw: unknown): SaveFile {
   }
 
   if (typeof raw.goalDay === 'string') save.goalDay = raw.goalDay
+  if (typeof raw.settingsUpdatedAt === 'number') save.settingsUpdatedAt = raw.settingsUpdatedAt
 
   if (isObject(raw.sprints)) {
     for (const script of ['hiragana', 'katakana'] as const) {

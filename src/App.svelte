@@ -11,6 +11,7 @@
   import { dayKey } from './lib/srs/queue'
   import { goalProgress } from './lib/study/goal'
   import { audio, settings, startPersistence, store } from './state/app.svelte'
+  import { startSync } from './state/sync.svelte'
   import { toast, ui } from './state/ui.svelte'
   import { route, startRouter } from './state/router.svelte'
   import Home from './views/Home.svelte'
@@ -38,6 +39,7 @@
   onMount(() => {
     const stopRouter = startRouter()
     const stopPersistence = startPersistence()
+    const stopSync = startSync(() => ui.focus)
     void loadFont(HEADING_FONT_ID)
     // The card font is large; load it once the page is up so it doesn't compete with the first paint.
     const idle = window.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 300))
@@ -54,6 +56,7 @@
     return () => {
       stopRouter()
       stopPersistence()
+      stopSync()
       dark.removeEventListener('change', onDark)
       reduce.removeEventListener('change', onReduce)
     }
