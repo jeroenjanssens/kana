@@ -59,6 +59,8 @@ export interface ReviewEntry {
 export interface Settings {
   newPerDay: number
   reviewsPerDay: number
+  /** Lapses after which a card counts as a leech. */
+  leechThreshold: number
   groups: KanaGroup[]
   fontMode: 'fixed' | 'random'
   font: string
@@ -99,6 +101,7 @@ export interface Settings {
 export const DEFAULT_SETTINGS: Settings = {
   newPerDay: 10,
   reviewsPerDay: 200,
+  leechThreshold: 6,
   groups: ['basic', 'dakuten', 'yoon'],
   fontMode: 'fixed',
   font: DEFAULT_FONT_ID,

@@ -132,6 +132,10 @@
       <span>Maximum reviews per day <small class="muted">per deck</small></span>
       <input type="number" min="0" max="2000" bind:value={s.reviewsPerDay} />
     </label>
+    <label class="field">
+      <span>Mark as tricky after <small class="muted">times forgotten</small></span>
+      <input type="number" min="2" max="20" bind:value={s.leechThreshold} />
+    </label>
     <fieldset>
       <legend>Kana to learn</legend>
       {#each GROUPS as g (g.id)}

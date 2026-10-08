@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { confusableSets } from '../lib/data/confusables'
   import { displayRomaji, glyph, type Kana } from '../lib/data/kana'
   import { FONT_STYLES, fontById } from '../lib/data/fonts'
   import type { DeckId } from '../lib/storage/schema'
@@ -17,6 +18,7 @@
     tilt = 0,
     paper = 0,
     isNew = false,
+    tricky = false,
     celebrate = false,
     verdict,
     onflip,
@@ -31,6 +33,8 @@
     tilt?: number
     paper?: number
     isNew?: boolean
+    /** The card is a leech: offer extra help. */
+    tricky?: boolean
     celebrate?: boolean
     /** Result of a typed answer, shown on the back. */
     verdict?: { correct: boolean; typed: string }
@@ -50,6 +54,12 @@
     deck === 'hiragana' ? kana.katakana : deck === 'katakana' ? kana.hiragana : '',
   )
   const fontInfo = $derived(fontById(font))
+  /** A confusable-pairs drill containing this kana, offered for tricky cards. */
+  const drill = $derived(
+    confusableSets.find(
+      (set) => set.chars.includes(kana.hiragana) || set.chars.includes(kana.katakana),
+    ),
+  )
   const frontSize = $derived(
     deck === 'combined'
       ? kana.hiragana.length > 1
@@ -100,6 +110,16 @@
           <Icon name="check" size={16} /> Correct
         {:else}
           You typed <strong>{verdict.typed || '—'}</strong>
+        {/if}
+      </p>
+    {/if}
+    {#if tricky}
+      <p class="tricky">
+        <span class="chip">Tricky</span>
+        {#if drill}
+          <a href="#/drills/{drill.id}" onclick={(e) => e.stopPropagation()}
+            >Compare {drill.title}</a
+          >
         {/if}
       </p>
     {/if}
@@ -210,6 +230,19 @@
       filter: blur(0);
       letter-spacing: 0.02em;
     }
+  }
+
+  .tricky {
+    margin: 0.4rem 0 0;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-size: 0.8rem;
+  }
+
+  .tricky .chip {
+    color: var(--shu);
+    border-color: var(--shu-soft);
   }
 
   .verdict {

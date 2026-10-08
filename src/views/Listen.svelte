@@ -11,6 +11,7 @@
   import type { VoiceId } from '../lib/audio/voices'
   import type { DeckId } from '../lib/storage/schema'
   import { recordReview } from '../lib/study/actions'
+  import { UndoStack } from '../lib/study/undo'
   import { LISTEN_ADVANCE_MS, listenGrade } from '../lib/study/listen'
   import { chooseOptions } from '../lib/study/distractors'
   import { deckSummary, queueFor } from '../lib/study/summary'
@@ -30,8 +31,15 @@
   let options = $state<Kana[]>([])
   let picked = $state<Kana | undefined>()
   let done = $state(false)
-  let total = $state(0)
-  let remaining = $state(0)
+  let counts = $state({ progress: 0, unseen: 0, repeating: 0 })
+  const undoStack = new UndoStack()
+  let canUndo = $state(false)
+
+  function syncCounts() {
+    if (session) {
+      counts = { progress: session.progress, unseen: session.unseen, repeating: session.repeating }
+    }
+  }
   let answered = $state(0)
   let correctCount = $state(0)
   let startedAt = 0
@@ -43,7 +51,7 @@
     if (!deck) return
     ui.focus = true
     session = new Session(queueFor(store.data, deck))
-    total = session.total
+    syncCounts()
     void next()
   })
 
@@ -64,7 +72,7 @@
     advance = undefined
     if (!session || !deck) return
     const id = session.next()
-    remaining = session.remaining
+    syncCounts()
     if (!id) {
       done = true
       current = undefined
@@ -90,6 +98,8 @@
     const correct = k.id === current.id
     const ms = performance.now() - startedAt
     const grade = listenGrade(correct, ms)
+    undoStack.record(store.data, session, deck, current.id)
+    canUndo = true
     const result = recordReview(store.data, {
       deck,
       id: current.id,
@@ -115,7 +125,27 @@
     }
   }
 
+  /** Undo the last answer and show that card again. */
+  function undoLast() {
+    if (!session || !undoStack.size) return
+    const last = store.data.log.at(-1)
+    if (!undoStack.undo(store.data, session)) return
+    canUndo = undoStack.size > 0
+    answered = Math.max(0, answered - 1)
+    if (last?.correct) correctCount = Math.max(0, correctCount - 1)
+    done = false
+    void next()
+  }
+
   function onKeydown(e: KeyboardEvent) {
+    if (
+      (e.key === 'u' && !e.metaKey && !e.ctrlKey) ||
+      (e.key === 'z' && (e.metaKey || e.ctrlKey))
+    ) {
+      e.preventDefault()
+      undoLast()
+      return
+    }
     if (!current) return
     const key = e.key.toLowerCase()
     if (key === 'escape') navigate('/practice')
@@ -170,8 +200,19 @@
         <Icon name="close" />
       </button>
       <strong>Listening · {script === 'katakana' ? 'Katakana' : 'Hiragana'}</strong>
-      <span class="bar" style:--p={total ? (total - remaining) / total : 1}></span>
-      <span class="muted">{remaining} left</span>
+      <span class="bar" style:--p={counts.progress}></span>
+      <button
+        class="btn icon ghost"
+        onclick={undoLast}
+        disabled={!canUndo}
+        aria-label="Undo last answer (U)"
+        title="Undo (U)"
+      >
+        <Icon name="undo" />
+      </button>
+      <span class="muted"
+        >{counts.unseen} left{counts.repeating ? ` · ${counts.repeating} again` : ''}</span
+      >
     </div>
 
     {#if current}

@@ -206,6 +206,15 @@ export function startOfNextDay(now: number): number {
   return d.getTime()
 }
 
+export interface SessionSnapshot {
+  reviews: string[]
+  fresh: string[]
+  pending: { id: string; due: number }[]
+  sinceNew: number
+  seen: string[]
+  done: number
+}
+
 /**
  * A study session over a queue. Reviews and new cards are interleaved (one new card after every
  * few reviews), and cards that come back in learning are shown again once they're due.
@@ -293,6 +302,27 @@ export class Session {
     if (inLearning && record.due < startOfNextDay(now)) {
       this.pending.push({ id, due: record.due })
     }
+  }
+
+  /** A copy of the session's internal state, for undo. */
+  snapshot(): SessionSnapshot {
+    return {
+      reviews: [...this.reviews],
+      fresh: [...this.fresh],
+      pending: this.pending.map((p) => ({ ...p })),
+      sinceNew: this.sinceNew,
+      seen: [...this.seen],
+      done: this.done,
+    }
+  }
+
+  restore(s: SessionSnapshot): void {
+    this.reviews = [...s.reviews]
+    this.fresh = [...s.fresh]
+    this.pending = s.pending.map((p) => ({ ...p }))
+    this.sinceNew = s.sinceNew
+    this.seen = new Set(s.seen)
+    this.done = s.done
   }
 
   /** Time until the next learning card is due, when only learning cards remain. */

@@ -18,6 +18,8 @@
   } from '../lib/srs/scheduler'
   import { STUDY_DECKS, type Grade, type StudyDeckId } from '../lib/storage/schema'
   import { logPractice, recordReview } from '../lib/study/actions'
+  import { becameLeech, isLeech } from '../lib/study/leeches'
+  import { UndoStack } from '../lib/study/undo'
   import { isStreakMilestone, rowMastered } from '../lib/study/milestones'
   import { streak as dayStreak } from '../lib/study/stats'
   import { GRADE_LABELS, checkKana, kanaForAnswer, suggestGrade } from '../lib/study/answer'
@@ -64,6 +66,8 @@
 
   // SRS
   let session: Session | undefined
+  const undoStack = new UndoStack()
+  let canUndo = $state(false)
   let intervals = $state<Record<Grade, number> | undefined>()
   /** Session counters for the progress bar: share seen, cards not seen yet, cards coming back. */
   let counts = $state({ progress: 0, unseen: 0, repeating: 0 })
@@ -223,6 +227,8 @@
     const ms = performance.now() - startedAt
     const typedWrong = verdict && !verdict.correct
     const answerKana = typedWrong ? kanaForAnswer(verdict!.typed, pool) : undefined
+    undoStack.record(store.data, session, deck, current.id)
+    canUndo = true
     const result = recordReview(store.data, {
       deck,
       id: current.id,
@@ -236,6 +242,11 @@
     if (g > 1) correctCount++
     void audio.playGrade(g)
     cardDone()
+    if (becameLeech(result.before, result.after, settings().leechThreshold)) {
+      toast(
+        `You keep forgetting ${frontOf(current)} — it's marked as tricky. Try the hint or a drill.`,
+      )
+    }
     if (result.becameMature) {
       celebrate = true
       setTimeout(() => void audio.playSfx('stamp'), 120)
@@ -252,6 +263,27 @@
       await new Promise((r) => setTimeout(r, 160))
     }
     await showNext()
+  }
+
+  /** Undo the last grade: the card and the session go back exactly as they were. */
+  async function undoLast() {
+    if (!session || busy || !undoStack.size) return
+    const last = store.data.log.at(-1)
+    const id = undoStack.undo(store.data, session)
+    if (!id) return
+    canUndo = undoStack.size > 0
+    answered = Math.max(0, answered - 1)
+    if (last?.correct) correctCount = Math.max(0, correctCount - 1)
+    syncCounts()
+    await show(kanaById(id), session.isNew(id))
+  }
+
+  function frontOf(k: Kana): string {
+    return deck === 'katakana'
+      ? k.katakana
+      : deck === 'combined'
+        ? k.hiragana + k.katakana
+        : k.hiragana
   }
 
   /** Log an in-order answer. Without a grade (self-check), right sounds like Good, wrong like Again. */
@@ -296,6 +328,19 @@
   }
 
   function onKeydown(e: KeyboardEvent) {
+    const isUndo =
+      (e.key === 'z' && (e.metaKey || e.ctrlKey)) || (e.key === 'u' && !e.metaKey && !e.ctrlKey)
+    if (
+      isUndo &&
+      mode === 'srs' &&
+      !strokesOpen &&
+      !fontsOpen &&
+      (e.target as HTMLElement).tagName !== 'INPUT'
+    ) {
+      e.preventDefault()
+      void undoLast()
+      return
+    }
     if (phase !== 'card' || strokesOpen || fontsOpen) {
       if (e.key === 'Escape' && phase !== 'card') exit()
       return
@@ -385,6 +430,17 @@
     >
       <span style:width="{progress * 100}%"></span>
     </div>
+    {#if mode === 'srs'}
+      <button
+        class="btn icon ghost"
+        onclick={undoLast}
+        disabled={!canUndo}
+        aria-label="Undo last answer (U)"
+        title="Undo (U)"
+      >
+        <Icon name="undo" />
+      </button>
+    {/if}
     <span class="count">
       {#if mode === 'srs'}{counts.unseen} left{#if counts.repeating}
           · <span title="Cards you're still learning come back in a few minutes"
@@ -446,6 +502,8 @@
             {tilt}
             {paper}
             isNew={currentIsNew}
+            tricky={mode === 'srs' &&
+              isLeech(store.data.cards[deck]?.[current.id], settings().leechThreshold)}
             {celebrate}
             {verdict}
             onflip={() => (typed ? inputEl?.focus() : reveal())}

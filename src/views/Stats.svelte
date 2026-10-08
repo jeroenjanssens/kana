@@ -15,9 +15,10 @@
     totalAnswers,
     weakest,
   } from '../lib/study/stats'
+  import { leeches } from '../lib/study/leeches'
   import { DECK_INFO, deckSummary } from '../lib/study/summary'
   import { buildHash } from '../lib/ui/hash'
-  import { store } from '../state/app.svelte'
+  import { settings, store } from '../state/app.svelte'
 
   const now = Date.now()
   const log = $derived(store.data.log)
@@ -59,6 +60,20 @@
       ? `${k.hiragana}${k.katakana}`
       : glyph(k, scriptFor(deck)) || k.katakana
   }
+
+  const tricky = $derived(leeches(store.data, settings().leechThreshold))
+  const trickyLinks = $derived.by(() => {
+    const byDeck = new Map<string, string[]>()
+    for (const t of tricky) {
+      const deck =
+        t.deck.startsWith('listen') || t.deck.startsWith('write') ? scriptFor(t.deck) : t.deck
+      byDeck.set(deck, [...(byDeck.get(deck) ?? []), t.id])
+    }
+    return [...byDeck].map(([deck, ids]) => ({
+      deck,
+      href: buildHash(`/study/${deck}`, { mode: 'order', ids: [...new Set(ids)].join(',') }),
+    }))
+  })
 
   /** In-order drill link for the weakest kana, grouped by deck. */
   const drillLinks = $derived.by(() => {
@@ -154,6 +169,28 @@
       <p class="muted">Study a little and your trickiest kana will show up here.</p>
     {/if}
   </section>
+
+  {#if tricky.length}
+    <section class="panel block">
+      <h2>Tricky kana</h2>
+      <p class="muted small">
+        Forgotten {settings().leechThreshold} times or more. Drill them in order, with their hints.
+      </p>
+      <ul class="mixups">
+        {#each tricky as t (t.deck + t.id)}
+          <li>
+            <span class="glyph" lang="ja">{label(t.deck, t.id)}</span>
+            <span class="muted small">{DECK_INFO[t.deck].title} · forgotten {t.lapses}×</span>
+          </li>
+        {/each}
+      </ul>
+      <div class="row">
+        {#each trickyLinks as l (l.deck)}
+          <a class="btn primary small" href={l.href}>Drill tricky kana ({l.deck})</a>
+        {/each}
+      </div>
+    </section>
+  {/if}
 
   <section class="panel block">
     <h2>Most confused</h2>
