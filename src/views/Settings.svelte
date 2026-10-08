@@ -8,7 +8,9 @@
   import { exportFileName, exportJson, importJson } from '../lib/storage/persistence'
   import { resetProgress } from '../lib/study/actions'
   import { loadFont } from '../lib/ui/fontLoader'
+  import type { PhotoMode } from '../lib/ui/photos'
   import { install, isStandalone, onInstallAvailable } from '../lib/ui/pwa'
+  import { choosePhoto, gallery, loadPhotos } from '../state/photos.svelte'
   import { audio, replaceData, settings, store } from '../state/app.svelte'
   import { toast } from '../state/ui.svelte'
 
@@ -27,6 +29,7 @@
 
   $effect(() => {
     for (const f of FONTS) void loadFont(f.id)
+    void loadPhotos()
   })
 
   const GROUPS: { id: KanaGroup; label: string; example: string }[] = [
@@ -45,6 +48,14 @@
     { id: 'complete', label: 'Session complete' },
     { id: 'milestone', label: 'Milestone' },
     { id: 'tick', label: 'UI tick' },
+  ]
+
+  const base = import.meta.env.BASE_URL
+  const PHOTO_MODES: { id: PhotoMode; label: string }[] = [
+    { id: 'cards', label: 'Cards' },
+    { id: 'minutes', label: 'Timer' },
+    { id: 'daily', label: 'Daily' },
+    { id: 'fixed', label: 'Fixed' },
   ]
 
   const VOICE_OPTIONS: { id: VoiceSetting; label: string }[] = [
@@ -234,17 +245,50 @@
     <label class="switch"
       ><span>Photo backgrounds</span><input type="checkbox" bind:checked={s.photos} /></label
     >
-    <label class="field">
-      <span>Change the photo every <small class="muted">{s.photoEvery} cards</small></span>
-      <input
-        type="range"
-        min="3"
-        max="50"
-        step="1"
-        bind:value={s.photoEvery}
-        disabled={!s.photos}
-      />
-    </label>
+    <div class="field">
+      <span>Change the photo</span>
+      <div class="segmented" role="group" aria-label="Change the photo">
+        {#each PHOTO_MODES as m (m.id)}
+          <button aria-pressed={s.photoMode === m.id} onclick={() => (s.photoMode = m.id)}
+            >{m.label}</button
+          >
+        {/each}
+      </div>
+    </div>
+    {#if s.photoMode === 'cards'}
+      <label class="field">
+        <span>Every <small class="muted">{s.photoEvery} cards</small></span>
+        <input type="range" min="3" max="50" step="1" bind:value={s.photoEvery} />
+      </label>
+    {:else if s.photoMode === 'minutes'}
+      <label class="field">
+        <span>Every <small class="muted">{s.photoMinutes} minutes</small></span>
+        <input type="range" min="1" max="60" step="1" bind:value={s.photoMinutes} />
+      </label>
+    {/if}
+    <details class="picker">
+      <summary>Choose a photo</summary>
+      <ul class="thumbs">
+        {#each gallery.photos as p (p.slug)}
+          <li>
+            <button
+              class="thumb"
+              aria-pressed={s.photoSlug === p.slug}
+              aria-label={p.title}
+              title={p.title}
+              onclick={() => choosePhoto(p.slug)}
+            >
+              <img
+                src="{base}photos/{p.slug}-640.webp"
+                alt=""
+                loading="lazy"
+                style:background={p.color}
+              />
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </details>
     <label class="switch"
       ><span>Calm mode <small class="muted">plain paper, no photos</small></span><input
         type="checkbox"
@@ -500,6 +544,43 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+  }
+
+  .picker summary {
+    cursor: pointer;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .thumbs {
+    list-style: none;
+    margin: 0.25rem 0 0.5rem;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 0.4rem;
+  }
+
+  .thumb {
+    width: 100%;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    display: block;
+  }
+
+  .thumb[aria-pressed='true'] {
+    border-color: var(--shu);
+  }
+
+  .thumb img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
   }
 
   .danger {

@@ -1,47 +1,55 @@
 <script lang="ts">
   import { fade } from 'svelte/transition'
-  import { dayKey } from '../lib/srs/scheduler'
-  import { photoOfTheDay, prefersDataSaving, srcset, type Photo } from '../lib/ui/photos'
+  import { prefersDataSaving, srcset } from '../lib/ui/photos'
   import { settings } from '../state/app.svelte'
+  import { gallery, loadPhotos, showPhoto } from '../state/photos.svelte'
+  import { route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
+  import Icon from './Icon.svelte'
 
   const base = import.meta.env.BASE_URL
-  let photos = $state<Photo[]>([])
 
   $effect(() => {
-    fetch(`${base}photos/credits.json`)
-      .then((r) => r.json())
-      .then((list: Photo[]) => (photos = list))
-      .catch(() => (photos = []))
+    void loadPhotos()
   })
 
   const saving = typeof navigator !== 'undefined' && prefersDataSaving(navigator as never)
-  const show = $derived(
-    settings().photos && !settings().calm && !(settings().dataSaver && saving) && photos.length > 0,
-  )
+  const s = $derived(settings())
+  const photos = $derived(gallery.photos)
+  const show = $derived(s.photos && !s.calm && !(s.dataSaver && saving) && photos.length > 0)
   const index = $derived(
-    photos.length
-      ? (ui.pinnedPhoto ?? photoOfTheDay(dayKey(), photos.length) + ui.photoTick) % photos.length
-      : 0,
+    Math.max(
+      0,
+      photos.findIndex((p) => p.slug === s.photoSlug),
+    ),
   )
   const photo = $derived(photos[index])
-  const nextPhoto = $derived(photos.length ? photos[(index + 1) % photos.length] : undefined)
+  const upcoming = $derived(photos.length ? photos[(index + 1) % photos.length] : undefined)
   const width =
     typeof window === 'undefined' ? 1280 : window.innerWidth * (window.devicePixelRatio || 1)
   const size = width <= 700 ? 640 : width <= 1400 ? 1280 : 1920
+  /** On phones the arrows only show on Home and the Table, never during a session. */
+  const quietPage = $derived(ui.focus || !['', 'table'].includes(route.segments[0] ?? ''))
 
   // Warm the cache with the next photo so the cross-fade never waits for the network.
   $effect(() => {
-    if (!show || !nextPhoto) return
+    if (!show || !upcoming) return
     const timer = setTimeout(() => {
       const img = new Image()
-      img.src = `${base}photos/${nextPhoto.slug}-${size}.avif`
+      img.src = `${base}photos/${upcoming.slug}-${size}.avif`
     }, 4000)
     return () => clearTimeout(timer)
   })
+
+  // "Every N minutes" mode.
+  $effect(() => {
+    if (!show || s.photoMode !== 'minutes') return
+    const timer = setInterval(() => showPhoto(1), Math.max(1, s.photoMinutes) * 60_000)
+    return () => clearInterval(timer)
+  })
 </script>
 
-<div class="backdrop washi" aria-hidden="true">
+<div class="backdrop washi" aria-hidden="true" data-photo={show ? photo?.slug : undefined}>
   {#if show && photo}
     {#key photo.slug}
       <div class="layer" style:background-color={photo.color} transition:fade={{ duration: 1600 }}>
@@ -62,15 +70,30 @@
 </div>
 
 {#if show && photo}
-  <p class="credit">
-    <span class="title">{photo.title}</span>
-    <span>
-      Photo by <a href={photo.photographerUrl} target="_blank" rel="noopener"
-        >{photo.photographer}</a
+  <div class="corner" class:quiet={quietPage}>
+    <p class="credit">
+      <span class="title">{photo.title}</span>
+      <span>
+        Photo by <a href={photo.photographerUrl} target="_blank" rel="noopener"
+          >{photo.photographer}</a
+        >
+        on <a href={photo.sourceUrl} target="_blank" rel="noopener">Unsplash</a>
+      </span>
+    </p>
+    <div class="arrows">
+      <button
+        class="arrow"
+        onclick={() => showPhoto(-1)}
+        aria-label="Previous photo"
+        title="Previous photo"
       >
-      on <a href={photo.sourceUrl} target="_blank" rel="noopener">Unsplash</a>
-    </span>
-  </p>
+        <Icon name="left" size={16} />
+      </button>
+      <button class="arrow" onclick={() => showPhoto(1)} aria-label="Next photo" title="Next photo">
+        <Icon name="right" size={16} />
+      </button>
+    </div>
+  </div>
 {/if}
 
 <style>
@@ -127,11 +150,17 @@
       linear-gradient(to bottom, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.25) 30%, rgb(0 0 0 / 0.6));
   }
 
-  .credit {
+  .corner {
     position: fixed;
     right: 14px;
     bottom: 10px;
     z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    gap: 0.6rem;
+  }
+
+  .credit {
     margin: 0;
     font-size: 0.72rem;
     line-height: 1.35;
@@ -140,7 +169,6 @@
     text-align: right;
     display: flex;
     flex-direction: column;
-    pointer-events: auto;
   }
 
   .credit .title {
@@ -149,7 +177,7 @@
     transition: opacity 0.3s;
   }
 
-  .credit:hover .title {
+  .corner:hover .credit .title {
     opacity: 1;
   }
 
@@ -157,10 +185,48 @@
     color: inherit;
   }
 
-  /* On phones the credit would cover content; photographers are listed on the credits page. */
+  .arrows {
+    display: flex;
+    gap: 4px;
+  }
+
+  .arrow {
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.35);
+    background: rgb(20 15 10 / 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .arrow:hover {
+    background: rgb(20 15 10 / 0.55);
+  }
+
+  /* On phones the credit would cover content (photographers are listed on the credits page);
+     the arrows stay, small, on Home and the Table only. */
   @media (max-width: 720px) {
     .credit {
       display: none;
+    }
+
+    .corner {
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      right: 10px;
+    }
+
+    .corner.quiet {
+      display: none;
+    }
+
+    .arrow {
+      opacity: 0.75;
     }
   }
 </style>

@@ -37,6 +37,11 @@ describe('sanitizeSettings', () => {
     expect(s.groups).toEqual(DEFAULT_SETTINGS.groups)
     expect('bogus' in s).toBe(false)
   })
+  test('old saves get the new photo settings', () => {
+    const s = sanitizeSettings({ photoEvery: 20 })
+    expect(s).toMatchObject({ photoMode: 'cards', photoEvery: 20, photoMinutes: 5, photoSlug: '' })
+  })
+
   test('does not share arrays with the defaults', () => {
     const s = sanitizeSettings({})
     s.groups.push('extended')

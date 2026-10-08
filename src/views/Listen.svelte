@@ -17,7 +17,8 @@
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
-  import { nextPhoto, ui } from '../state/ui.svelte'
+  import { cardDone } from '../state/photos.svelte'
+  import { ui } from '../state/ui.svelte'
 
   const scriptParam = route.segments[1]
   const script =
@@ -36,7 +37,6 @@
   let startedAt = 0
   /** One voice per card, so replays don't switch speakers ("random" setting). */
   let voice: VoiceId = audio.pickVoice()
-  let sincePhoto = 0
   let advance: ReturnType<typeof setTimeout> | undefined
 
   onMount(() => {
@@ -107,10 +107,7 @@
     } else {
       setTimeout(() => current && audio.playVoice(current.id, voice), 450)
     }
-    if (++sincePhoto >= settings().photoEvery) {
-      sincePhoto = 0
-      nextPhoto()
-    }
+    cardDone()
     if (correct) {
       // Hear it once more, then move on (Enter, Space or Next skip the wait).
       setTimeout(() => current && picked && audio.playVoice(current.id, voice), 350)

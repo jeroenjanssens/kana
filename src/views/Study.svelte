@@ -25,7 +25,8 @@
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
-  import { nextPhoto, toast, ui } from '../state/ui.svelte'
+  import { cardDone } from '../state/photos.svelte'
+  import { toast, ui } from '../state/ui.svelte'
 
   const deckParam = route.segments[1] as StudyDeckId | undefined
   const deck: StudyDeckId = deckParam && STUDY_DECKS.includes(deckParam) ? deckParam : 'hiragana'
@@ -52,7 +53,6 @@
   let suggested = $state<Grade | undefined>()
   let celebrate = $state(false)
   let busy = false
-  let sincePhoto = 0
   let answered = $state(0)
   /** Cards seen in order mode, whether or not they were self-checked. */
   let viewed = $state(0)
@@ -217,14 +217,6 @@
     }
   }
 
-  function advancePhoto() {
-    sincePhoto++
-    if (sincePhoto >= settings().photoEvery) {
-      sincePhoto = 0
-      nextPhoto()
-    }
-  }
-
   async function grade(g: Grade) {
     if (!current || !session || !flipped || busy) return
     busy = true
@@ -243,7 +235,7 @@
     answered++
     if (g > 1) correctCount++
     void audio.playGrade(g)
-    advancePhoto()
+    cardDone()
     if (result.becameMature) {
       celebrate = true
       setTimeout(() => void audio.playSfx('stamp'), 120)
@@ -295,7 +287,7 @@
     if (next < 0) next = 0
     if (delta > 0 && flipped) viewed++
     orderIndex = next
-    advancePhoto()
+    cardDone()
     void show(orderList[next], false)
   }
 

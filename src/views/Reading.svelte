@@ -19,7 +19,8 @@
   } from '../lib/study/reading'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, settings, store } from '../state/app.svelte'
-  import { nextPhoto, ui } from '../state/ui.svelte'
+  import { cardDone } from '../state/photos.svelte'
+  import { ui } from '../state/ui.svelte'
 
   const ROUND = 15
 
@@ -108,7 +109,7 @@
     }
     // Right or wrong only: right sounds like Good, wrong like Again.
     void audio.playGrade(correct ? 3 : 1)
-    if ((index + 1) % s.photoEvery === 0) nextPhoto()
+    cardDone()
     if (index + 1 >= queue.length) {
       phase = 'done'
       ui.focus = false

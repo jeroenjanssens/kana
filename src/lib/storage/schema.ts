@@ -1,5 +1,6 @@
 import type { KanaGroup } from '../data/kana'
 import type { VoiceSetting } from '../audio/voices'
+import type { PhotoMode } from '../ui/photos'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1
@@ -73,8 +74,16 @@ export interface Settings {
   /** Which deck colours the combined table. */
   tableMasteryDeck: StudyDeckId
   photos: boolean
-  /** Rotate the background every N cards. */
+  /** How the background photo changes: every N cards, every N minutes, daily, or never. */
+  photoMode: PhotoMode
+  /** Rotate the background every N cards ('cards' mode). */
   photoEvery: number
+  /** Rotate the background every N minutes ('minutes' mode). */
+  photoMinutes: number
+  /** The photo currently shown (or kept, in 'fixed' mode). */
+  photoSlug: string
+  /** Day the photo of the day was last chosen ('daily' mode). */
+  photoDay: string
   calm: boolean
   dataSaver: boolean
   sfx: boolean
@@ -104,7 +113,11 @@ export const DEFAULT_SETTINGS: Settings = {
   tableMastery: true,
   tableMasteryDeck: 'combined',
   photos: true,
+  photoMode: 'cards',
   photoEvery: 10,
+  photoMinutes: 5,
+  photoSlug: '',
+  photoDay: '',
   calm: false,
   dataSaver: true,
   sfx: true,

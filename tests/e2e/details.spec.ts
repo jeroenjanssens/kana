@@ -100,7 +100,7 @@ test('a wrong listening answer can be compared and then skipped', async ({ page 
   await wrong.click()
   await expect(page.locator('.option.wrong')).toBeVisible()
   await expect(page.getByRole('button', { name: /Hear what you picked/ })).toBeVisible()
-  await page.getByRole('button', { name: /Next/ }).click()
+  await page.getByRole('button', { name: /^Next(?! photo)/ }).click()
   await expect(page.locator('.option.wrong')).toHaveCount(0)
   const data = await savedData(page)
   expect(data.log[0]).toMatchObject({ mode: 'listen', correct: false })
@@ -135,7 +135,7 @@ test('Next skips the wait after a correct listening answer', async ({ page }) =>
   await page.goto('./#/listen/hiragana')
   const group = page.getByRole('group', { name: 'Which kana did you hear?' })
   await group.getByRole('button').filter({ hasText: 'あ' }).click()
-  await page.getByRole('button', { name: /^Next/ }).click()
+  await page.getByRole('button', { name: /^Next(?! photo)/ }).click()
   await expect(page.locator('.option.right')).toHaveCount(0)
 })
 

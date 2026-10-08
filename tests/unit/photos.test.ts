@@ -5,6 +5,8 @@ import {
   photoOfTheDay,
   prefersDataSaving,
   srcset,
+  startPhoto,
+  stepPhoto,
   type Photo,
 } from '../../src/lib/ui/photos'
 import { hash } from '../../src/lib/ui/random'
@@ -62,5 +64,45 @@ describe('photo helpers', () => {
     expect(prefersDataSaving({ connection: { saveData: true } })).toBe(true)
     expect(prefersDataSaving({ connection: { effectiveType: '2g' } })).toBe(true)
     expect(prefersDataSaving({ connection: { effectiveType: '4g' } })).toBe(false)
+  })
+})
+
+describe('photo rotation', () => {
+  const list = [{ slug: 'a' }, { slug: 'b' }, { slug: 'c' }]
+
+  test('stepPhoto wraps around in both directions', () => {
+    expect(stepPhoto(list, 'a', 1)).toBe('b')
+    expect(stepPhoto(list, 'c', 1)).toBe('a')
+    expect(stepPhoto(list, 'a', -1)).toBe('c')
+    expect(stepPhoto(list, 'b', 5)).toBe('a')
+    expect(stepPhoto(list, 'unknown', 1)).toBe('b')
+    expect(stepPhoto([], 'x', 1)).toBe('x')
+  })
+
+  test('startPhoto keeps a saved photo in every mode but daily', () => {
+    for (const mode of ['cards', 'minutes', 'fixed'] as const) {
+      expect(startPhoto(list, { mode, slug: 'c', day: '2026-01-01' }, '2026-02-02')).toEqual({
+        slug: 'c',
+        day: '2026-01-01',
+      })
+    }
+  })
+
+  test('daily mode shows the photo of the day once the day changes', () => {
+    const today = '2026-02-02'
+    const daily = list[photoOfTheDay(today, list.length)].slug
+    expect(startPhoto(list, { mode: 'daily', slug: 'c', day: '2026-02-01' }, today)).toEqual({
+      slug: daily,
+      day: today,
+    })
+    // Later the same day, a photo chosen with the arrows is kept.
+    expect(startPhoto(list, { mode: 'daily', slug: 'b', day: today }, today).slug).toBe('b')
+  })
+
+  test('an unknown or empty saved photo falls back to the photo of the day', () => {
+    const today = '2026-03-03'
+    expect(startPhoto(list, { mode: 'cards', slug: '', day: '' }, today).slug).toBe(
+      list[photoOfTheDay(today, list.length)].slug,
+    )
   })
 })
