@@ -58,6 +58,10 @@ audio:
 sfx:
     npx tsx scripts/process-sfx.ts
 
+# Download stroke-order data from KanjiVG
+kanjivg:
+    npx tsx scripts/fetch-kanjivg.ts
+
 # Download and subset the Japanese fonts
 fonts:
     npx tsx scripts/subset-fonts.ts

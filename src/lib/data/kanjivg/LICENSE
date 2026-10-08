@@ -1,0 +1,9 @@
+The stroke-order data in strokes.json is derived from KanjiVG
+(https://kanjivg.tagaini.net), copyright (C) 2009–2024 Ulrich Apel and the
+KanjiVG contributors.
+
+It is distributed under the Creative Commons Attribution-Share Alike 3.0
+licence: https://creativecommons.org/licenses/by-sa/3.0/
+
+The derived data (only the stroke paths and stroke-number positions, extracted
+by scripts/fetch-kanjivg.ts) is shared under the same licence.
