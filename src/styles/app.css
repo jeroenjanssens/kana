@@ -74,6 +74,9 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  /* Always show the scrollbar, so pages don't shift sideways when one needs to scroll. */
+  overflow-y: scroll;
+  scrollbar-color: var(--paper-3) transparent;
 }
 
 body {

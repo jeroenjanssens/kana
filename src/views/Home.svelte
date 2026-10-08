@@ -277,5 +277,6 @@
     background: color-mix(in srgb, var(--ink) 6%, transparent);
     font-family: var(--font-kana);
     font-size: 1.3rem;
+    white-space: nowrap;
   }
 </style>

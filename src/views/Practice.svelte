@@ -45,7 +45,7 @@
     </p>
   </a>
   <a class="card panel" href="#/study/hiragana?mode=order">
-    <span class="art" lang="ja">あいう</span>
+    <span class="art" lang="ja">あ→ん</span>
     <h2>Study in order</h2>
     <p>Go through rows one by one, without affecting your schedule.</p>
   </a>
@@ -104,6 +104,7 @@
     place-items: center;
     font-family: var(--font-kana);
     font-size: 1.6rem;
+    white-space: nowrap;
     background: color-mix(in srgb, var(--ink) 6%, transparent);
   }
 </style>

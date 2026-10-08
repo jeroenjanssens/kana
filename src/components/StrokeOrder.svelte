@@ -167,7 +167,10 @@
     filter: url(#ink);
   }
 
+  /* Strokes that haven't started are fully invisible: with round line caps, the zero-length
+     dash left at dashoffset 1 would otherwise show up as a dot at the end of the stroke. */
   .ink path.animate {
+    opacity: 0;
     stroke-dashoffset: 1;
     animation-name: draw;
     animation-timing-function: cubic-bezier(0.45, 0.05, 0.4, 1);
@@ -175,11 +178,16 @@
   }
 
   .ink path.hidden {
-    stroke-dashoffset: 1;
+    opacity: 0;
   }
 
   @keyframes draw {
+    from {
+      opacity: 1;
+      stroke-dashoffset: 1;
+    }
     to {
+      opacity: 1;
       stroke-dashoffset: 0;
     }
   }

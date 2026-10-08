@@ -62,20 +62,16 @@
         />{/if}
       <KanaGlyph text={kana.katakana} font={settings().font} size="3.4rem" />
     </div>
-    <div>
-      <p class="romaji">{displayRomaji(kana, settings().romaji)}</p>
-      <div class="actions">
-        {#if kana.audio}
-          <button class="btn small" onclick={() => audio.playVoice(kana.id)}>
-            <Icon name="play" size={14} filled /> Listen
-          </button>
-        {/if}
-        <button class="btn small" onclick={onstrokes}
-          ><Icon name="brush" size={14} /> Strokes</button
-        >
-        <button class="btn small" onclick={onfonts}><Icon name="fonts" size={14} /> Fonts</button>
-      </div>
-    </div>
+    <p class="romaji">{displayRomaji(kana, settings().romaji)}</p>
+  </div>
+  <div class="actions">
+    {#if kana.audio}
+      <button class="btn small" onclick={() => audio.playVoice(kana.id)}>
+        <Icon name="play" size={14} filled /> Listen
+      </button>
+    {/if}
+    <button class="btn small" onclick={onstrokes}><Icon name="brush" size={14} /> Strokes</button>
+    <button class="btn small" onclick={onfonts}><Icon name="fonts" size={14} /> Fonts</button>
   </div>
   {#if !kana.audio}
     <p class="muted small">No recording is available for this sound yet.</p>
@@ -117,8 +113,10 @@
 
   .top {
     display: flex;
-    gap: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
     align-items: center;
+    padding-right: 2rem;
   }
 
   .glyphs {
@@ -140,6 +138,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
+    margin-top: 0.75rem;
   }
 
   .small {
