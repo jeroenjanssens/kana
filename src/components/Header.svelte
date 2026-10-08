@@ -19,7 +19,7 @@
 </script>
 
 <header class="header">
-  <a class="logo" href="#/" aria-label="kana home">
+  <a class="logo" href="#/" title="kana — home">
     <span class="mark" aria-hidden="true">仮名</span>
     <span class="word">kana</span>
   </a>
@@ -70,7 +70,8 @@
     font-family: var(--font-heading);
     font-size: 1.05rem;
     color: #fff8f0;
-    background: var(--shu);
+    /* A fixed, deep vermilion so the seal keeps its contrast in both themes. */
+    background: #b13a1c;
     padding: 0.2em 0.35em;
     border-radius: 6px;
     text-shadow: none;

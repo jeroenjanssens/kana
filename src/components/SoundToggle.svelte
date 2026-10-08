@@ -78,8 +78,8 @@
   }
 
   .more {
-    width: 22px;
-    margin-left: -10px;
+    width: 28px;
+    margin-left: -8px;
   }
 
   .backdrop {

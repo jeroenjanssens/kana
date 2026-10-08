@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, type Component } from 'svelte'
   import Background from './components/Background.svelte'
   import Header from './components/Header.svelte'
   import InkDefs from './components/InkDefs.svelte'
@@ -11,17 +11,21 @@
   import { audio, settings, startPersistence } from './state/app.svelte'
   import { route, startRouter } from './state/router.svelte'
   import { ui } from './state/ui.svelte'
-  import Credits from './views/Credits.svelte'
-  import Drills from './views/Drills.svelte'
   import Home from './views/Home.svelte'
-  import Listen from './views/Listen.svelte'
-  import NotFound from './views/NotFound.svelte'
-  import Practice from './views/Practice.svelte'
-  import Reading from './views/Reading.svelte'
-  import Settings from './views/Settings.svelte'
-  import Stats from './views/Stats.svelte'
   import Study from './views/Study.svelte'
-  import Table from './views/Table.svelte'
+
+  // Secondary pages are loaded on demand to keep the first load small.
+  const LAZY = {
+    table: () => import('./views/Table.svelte'),
+    practice: () => import('./views/Practice.svelte'),
+    drills: () => import('./views/Drills.svelte'),
+    listen: () => import('./views/Listen.svelte'),
+    reading: () => import('./views/Reading.svelte'),
+    stats: () => import('./views/Stats.svelte'),
+    settings: () => import('./views/Settings.svelte'),
+    credits: () => import('./views/Credits.svelte'),
+    notfound: () => import('./views/NotFound.svelte'),
+  } satisfies Record<string, () => Promise<{ default: Component }>>
 
   let systemDark = $state(false)
   let systemReduce = $state(false)
@@ -60,8 +64,13 @@
     const root = document.documentElement
     root.dataset.theme = theme
     root.dataset.motion = reduceMotion ? 'reduce' : 'full'
-    const texture = generateWashi({ dark: theme === 'dark' })
-    root.style.setProperty('--washi-texture', texture ? `url(${texture})` : 'none')
+    // The paper texture is generated when the browser is idle, so it never delays the first paint.
+    const dark = theme === 'dark'
+    const idle = window.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 200))
+    idle(() => {
+      const texture = generateWashi({ dark })
+      root.style.setProperty('--washi-texture', texture ? `url(${texture})` : 'none')
+    })
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'dark' ? '#2a2722' : '#f4efe6')
@@ -103,26 +112,13 @@
       {#key route.segments.join('/') + JSON.stringify(route.query)}
         <Study />
       {/key}
-    {:else if view === 'table'}
-      <Table />
-    {:else if view === 'practice'}
-      <Practice />
-    {:else if view === 'drills'}
-      <Drills />
-    {:else if view === 'listen'}
-      {#key route.segments.join('/')}
-        <Listen />
-      {/key}
-    {:else if view === 'reading'}
-      <Reading />
-    {:else if view === 'stats'}
-      <Stats />
-    {:else if view === 'settings'}
-      <Settings />
-    {:else if view === 'credits'}
-      <Credits />
     {:else}
-      <NotFound />
+      {@const key = (view in LAZY ? view : 'notfound') as keyof typeof LAZY}
+      {#key key === 'listen' ? route.segments.join('/') : key}
+        {#await LAZY[key]() then mod}
+          <mod.default />
+        {/await}
+      {/key}
     {/if}
   </main>
 </div>

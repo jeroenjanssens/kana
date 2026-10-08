@@ -6,6 +6,7 @@ import { registerPwa } from './lib/ui/pwa'
 import { toast } from './state/ui.svelte'
 
 const app = mount(App, { target: document.getElementById('app')! })
+document.getElementById('boot')?.remove()
 
 void registerPwa({
   onNeedRefresh: (update) =>

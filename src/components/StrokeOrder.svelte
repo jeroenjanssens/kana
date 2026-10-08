@@ -1,6 +1,6 @@
 <script lang="ts">
   import { untrack } from 'svelte'
-  import { GRID, strokesFor } from '../lib/data/strokes'
+  import type { StrokeGlyph } from '../lib/data/strokes'
   import Icon from './Icon.svelte'
 
   /** Animated stroke order for a kana, drawn in ink, stroke by stroke. */
@@ -13,7 +13,13 @@
   const STROKE_MS = 650
   const GAP_MS = 180
 
-  const glyphs = $derived(strokesFor(text))
+  const GRID = 109
+  // Stroke data (~50 KB) is only loaded when a stroke-order animation is first shown.
+  let lookup = $state<((text: string) => StrokeGlyph[]) | undefined>()
+  $effect(() => {
+    void import('../lib/data/strokes').then((m) => (lookup = m.strokesFor))
+  })
+  const glyphs = $derived(lookup ? lookup(text) : [])
   const strokes = $derived(
     glyphs.flatMap((g) =>
       g.strokes.map((d, i) => ({ d, x: g.x, number: g.numbers[i], small: false })),
