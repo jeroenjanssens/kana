@@ -51,7 +51,10 @@ export interface ReviewResult {
 export function recordReview(save: SaveFile, input: ReviewInput): ReviewResult {
   const now = input.now ?? Date.now()
   ensureDay(save, now)
-  const cards = (save.cards[input.deck] ??= {})
+  // Always read containers back from `save` after creating them: when `save` is reactive state,
+  // only the stored value is the tracked proxy, and changes to the original object would be lost.
+  save.cards[input.deck] ??= {}
+  const cards = save.cards[input.deck]!
   const before = cards[input.id]
   const wasNew = !before || before.state === 0
   const after = gradeCard(before, input.grade, now)
@@ -61,7 +64,8 @@ export function recordReview(save: SaveFile, input: ReviewInput): ReviewResult {
 
   const levelBefore = masteryLevel(before)
   const levelAfter = masteryLevel(after)
-  const celebrated = (save.celebrated[input.deck] ??= [])
+  save.celebrated[input.deck] ??= []
+  const celebrated = save.celebrated[input.deck]!
   const becameMature = levelAfter === 'mature' && !celebrated.includes(input.id)
   if (becameMature) celebrated.push(input.id)
 
@@ -86,7 +90,8 @@ export function logPractice(save: SaveFile, entry: Omit<ReviewEntry, 't'> & { t?
 }
 
 export function recordWord(save: SaveFile, word: string, correct: boolean, now = Date.now()) {
-  const p = (save.words[word] ??= { seen: 0, correct: 0, last: 0 })
+  save.words[word] ??= { seen: 0, correct: 0, last: 0 }
+  const p = save.words[word]
   p.seen++
   if (correct) p.correct++
   p.last = now
