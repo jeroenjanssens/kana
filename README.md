@@ -7,6 +7,8 @@ stroke-order animations and flashcards that look like ink on washi paper.
 
 ![kana: a flashcard on washi paper in front of Mount Fuji](docs/screenshot-study.png)
 
+![The kana table in dark mode, with stroke-order and pronunciation details](docs/screenshot-table.png)
+
 ## Features
 
 - **Spaced repetition** (FSRS, the algorithm Anki uses) for three decks: hiragana, katakana, and
