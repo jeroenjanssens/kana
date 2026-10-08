@@ -1,0 +1,365 @@
+/* ─── Design tokens ─────────────────────────────────────────────────────── */
+
+:root {
+  --paper: #f4efe6;
+  --paper-2: #ebe3d4;
+  --paper-3: #ddd2bf;
+  --ink: #1c1b19;
+  --ink-soft: #4a463f;
+  --ink-faint: #857e72;
+  --shu: #c73e1d;
+  --shu-soft: #e9b8a8;
+  --ai: #264a6e;
+  --matcha: #7a8b4f;
+
+  --level-new: #cfc6b6;
+  --level-learning: #d9a441;
+  --level-young: #a9b874;
+  --level-mature: #56722f;
+
+  --panel: color-mix(in srgb, var(--paper) 88%, transparent);
+  --panel-strong: color-mix(in srgb, var(--paper) 96%, transparent);
+  --line: color-mix(in srgb, var(--ink) 14%, transparent);
+  --shadow:
+    0 1px 2px rgb(40 30 10 / 0.08), 0 8px 24px rgb(40 30 10 / 0.12),
+    0 24px 60px rgb(40 30 10 / 0.12);
+  --shadow-soft: 0 1px 2px rgb(40 30 10 / 0.06), 0 4px 14px rgb(40 30 10 / 0.08);
+
+  --font-ui: 'Inter Variable', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: 'Kana Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+  --font-kana: 'Kana Klee One', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --washi-texture: none;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --paper: #2a2722;
+  --paper-2: #221f1b;
+  --paper-3: #3a362f;
+  --ink: #efe7d8;
+  --ink-soft: #cdc3b1;
+  --ink-faint: #9a9182;
+  --shu: #e0603c;
+  --shu-soft: #6e3324;
+  --ai: #8fb3d9;
+  --matcha: #a7b97a;
+
+  --level-new: #4a453c;
+  --level-learning: #b8862a;
+  --level-young: #8a9c56;
+  --level-mature: #a6c46b;
+
+  --panel: color-mix(in srgb, var(--paper) 86%, transparent);
+  --panel-strong: color-mix(in srgb, var(--paper) 95%, transparent);
+  --line: color-mix(in srgb, var(--ink) 16%, transparent);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 8px 24px rgb(0 0 0 / 0.35), 0 24px 60px rgb(0 0 0 / 0.35);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.25), 0 4px 14px rgb(0 0 0 / 0.3);
+
+  color-scheme: dark;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper-2);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  margin: 0 0 0.5em;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 1.2rem + 2vw, 2.6rem);
+}
+
+h2 {
+  font-size: 1.45rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+}
+
+p {
+  margin: 0 0 1em;
+}
+
+a {
+  color: var(--ai);
+  text-underline-offset: 0.2em;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ai);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ─── Surfaces ───────────────────────────────────────────────────────────── */
+
+/** A frosted panel that sits on top of the background photo. */
+.panel {
+  background: var(--panel);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border: 1px solid color-mix(in srgb, var(--paper) 60%, transparent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+}
+
+/** Washi paper: base colour + generated fibre texture. */
+.washi {
+  background-color: var(--paper);
+  background-image: var(--washi-texture);
+  background-size: 384px 384px;
+}
+
+/* ─── Controls ───────────────────────────────────────────────────────────── */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  min-height: 44px;
+  padding: 0.55em 1.15em;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+  color: var(--ink);
+  font-weight: 550;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    transform 0.15s var(--ease),
+    background-color 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.btn:hover {
+  border-color: color-mix(in srgb, var(--ink) 30%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn.primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.btn.shu {
+  background: var(--shu);
+  border-color: var(--shu);
+  color: #fff8f0;
+}
+
+.btn.ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.btn.ghost:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+  box-shadow: none;
+}
+
+.btn.icon {
+  padding: 0;
+  width: 44px;
+  border-radius: 50%;
+}
+
+.btn.small {
+  min-height: 34px;
+  padding: 0.3em 0.85em;
+  font-size: 0.85rem;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+kbd {
+  font-family: var(--font-ui);
+  font-size: 0.72em;
+  padding: 0.05em 0.45em;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  color: var(--ink-soft);
+  background: color-mix(in srgb, var(--paper) 70%, transparent);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.15em 0.7em;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+}
+
+.muted {
+  color: var(--ink-faint);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* Segmented control */
+.segmented {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+  gap: 2px;
+}
+
+.segmented button {
+  border: 0;
+  background: transparent;
+  padding: 0.4em 0.95em;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 550;
+  color: var(--ink-soft);
+  min-height: 36px;
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: var(--shadow-soft);
+}
+
+/* Switch */
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.switch input {
+  appearance: none;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--paper-3);
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 0;
+}
+
+.switch input::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform 0.2s var(--ease);
+}
+
+.switch input:checked {
+  background: var(--matcha);
+}
+
+.switch input:checked::after {
+  transform: translateX(18px);
+}
+
+input[type='range'] {
+  accent-color: var(--shu);
+  width: 100%;
+}
+
+input[type='text'],
+input[type='number'],
+select {
+  min-height: 44px;
+  padding: 0.4em 0.8em;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+}
+
+/* ─── Motion ─────────────────────────────────────────────────────────────── */
+
+:root[data-motion='reduce'] *,
+:root[data-motion='reduce'] *::before,
+:root[data-motion='reduce'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

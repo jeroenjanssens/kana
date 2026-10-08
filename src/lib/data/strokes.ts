@@ -10,7 +10,10 @@ export interface StrokeGlyph {
   scale: number
 }
 
-const STROKES = data as Record<string, { strokes: string[]; numbers: [number, number][] }>
+const STROKES = data as unknown as Record<
+  string,
+  { strokes: string[]; numbers: [number, number][] }
+>
 
 export const GRID = 109
 

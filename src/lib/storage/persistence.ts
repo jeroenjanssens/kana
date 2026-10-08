@@ -79,7 +79,7 @@ export function migrate(raw: unknown): SaveFile {
       if (!isObject(cards)) continue
       const clean: Record<string, CardRecord> = {}
       for (const [id, card] of Object.entries(cards)) {
-        if (isCardRecord(card)) clean[id] = sanitizeCard(card)
+        if (isCardRecord(card)) clean[id] = sanitizeCard(card as unknown as Json)
       }
       save.cards[deck] = clean
     }

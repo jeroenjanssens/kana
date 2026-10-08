@@ -49,7 +49,7 @@ async function fileInfo(name: string): Promise<FileInfo> {
   const res = await fetch(`https://commons.wikimedia.org/w/api.php?${params}`, {
     headers: { 'User-Agent': USER_AGENT },
   })
-  const data = await res.json()
+  const data = (await res.json()) as { query: { pages: Record<string, unknown> } }
   const page = Object.values(data.query.pages)[0] as {
     missing?: string
     imageinfo?: {

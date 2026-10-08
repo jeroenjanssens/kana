@@ -7,9 +7,9 @@ export function ensureDay(save: SaveFile, now: number = Date.now()): void {
   if (save.daily.day !== day) save.daily = { day, newShown: {} }
 }
 
+/** New cards introduced today in a deck. Pure: safe to call from derived state. */
 export function newShownToday(save: SaveFile, deck: DeckId, now: number = Date.now()): number {
-  ensureDay(save, now)
-  return save.daily.newShown[deck] ?? 0
+  return save.daily.day === dayKey(now) ? (save.daily.newShown[deck] ?? 0) : 0
 }
 
 /** SRS reviews of previously-seen cards done today in a deck. */
