@@ -47,14 +47,13 @@ test('shortcut help opens with ?', async ({ page, isMobile }) => {
   await expect(page.getByRole('heading', { name: 'Keyboard shortcuts' })).toBeVisible()
 })
 
-test('the background photo is visible behind the content', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'content covers the edges on phones')
+test('the background photo is visible behind the content', async ({ page }) => {
   await page.goto('./#/stats')
   await expect(page.locator('.backdrop img')).toBeVisible()
-  // Whatever is painted at the left edge must be the photo, not an opaque page background.
-  await expect
-    .poll(() =>
-      page.evaluate(() => !!document.elementFromPoint(8, innerHeight - 120)?.closest('.backdrop')),
-    )
-    .toBe(true)
+  // The photo layer sits at z-index -1. If <html> gets a background, <body>'s background is no
+  // longer propagated to the canvas and paints over the photo — so <html> must stay transparent.
+  const htmlBackground = await page.evaluate(
+    () => getComputedStyle(document.documentElement).backgroundColor,
+  )
+  expect(htmlBackground).toBe('rgba(0, 0, 0, 0)')
 })
