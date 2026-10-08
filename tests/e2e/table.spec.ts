@@ -21,7 +21,7 @@ test('clicking a kana shows its details', async ({ page }) => {
   await page.goto('./#/table')
   await page.getByRole('button', { name: /^か, ka/ }).click()
   const details = page.locator('.details')
-  await expect(details.getByText('ka', { exact: true })).toBeVisible()
+  await expect(details.locator('.romaji')).toHaveText('ka')
   await expect(details.getByText('Young')).toBeVisible()
   await expect(page.getByRole('button', { name: /^か, ka, young/ })).toHaveClass(/level-young/)
 })

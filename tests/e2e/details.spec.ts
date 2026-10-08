@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { savedData, seed } from './helpers'
+import { savedData, seed, quizOnly } from './helpers'
 
 const DAY = 86_400_000
 
@@ -37,7 +37,9 @@ test('a card that becomes mature gets a hanko seal', async ({ page }) => {
 })
 
 test('random font mode uses a font from the rotation', async ({ page }) => {
-  await seed(page, { settings: { fontMode: 'random', randomFonts: ['yuji-syuku', 'dotgothic16'] } })
+  await quizOnly(page, {
+    settings: { fontMode: 'random', randomFonts: ['yuji-syuku', 'dotgothic16'] },
+  })
   await page.goto('./#/study/hiragana?mode=srs')
   await page.getByRole('button', { name: /Show answer/ }).click()
   await expect(page.locator('.font-name')).toHaveText(/Yuji Syuku|DotGothic16/)
@@ -140,6 +142,7 @@ test('Next skips the wait after a correct listening answer', async ({ page }) =>
 })
 
 test('there are several paper textures and each card gets its own sheet', async ({ page }) => {
+  await quizOnly(page)
   await page.goto('./#/study/hiragana?mode=srs')
   // All four textures are generated (when the browser is idle) and differ.
   await expect

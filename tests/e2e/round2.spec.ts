@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test'
-import { savedData, seed } from './helpers'
+import { quizOnly, savedData, seed } from './helpers'
 
 const DAY = 86_400_000
 
 test('undo brings back the last card exactly as it was', async ({ page }) => {
+  await quizOnly(page)
   await page.goto('./#/study/hiragana?mode=srs')
   const card = page.getByRole('button', { name: /Hiragana card/ })
   await expect(page.getByText('10 left')).toBeVisible()
@@ -22,6 +23,7 @@ test('undo brings back the last card exactly as it was', async ({ page }) => {
 })
 
 test('undo works with the U key, several steps back', async ({ page, isMobile }) => {
+  await quizOnly(page)
   test.skip(isMobile, 'keyboard only')
   await page.goto('./#/study/hiragana?mode=srs')
   const card = page.getByRole('button', { name: /Hiragana card/ })
@@ -69,4 +71,37 @@ test('a card forgotten too often is marked as tricky', async ({ page }) => {
   await expect(page.locator('.tricky a')).toHaveAttribute('href', /#\/drills\//)
   await page.goto('./#/stats')
   await expect(page.getByRole('heading', { name: 'Tricky kana' })).toBeVisible()
+})
+
+test('a new kana is introduced first, then comes back as a quiz', async ({ page }) => {
+  await seed(page, { settings: { newPerDay: 1 } })
+  await page.goto('./#/study/hiragana?mode=srs')
+  const intro = page.getByRole('article', { name: 'New kana: a' })
+  await expect(intro).toBeVisible()
+  await expect(intro.getByRole('img', { name: /Stroke order for あ/ })).toBeVisible()
+  await expect(intro).toContainText('antenna')
+  await intro.getByRole('button', { name: /Got it/ }).click()
+  // Only that card is left: it comes back as a quiz (learning ahead).
+  await expect(page.getByRole('button', { name: /Hiragana card/ })).toBeVisible()
+  await page.getByRole('button', { name: /Show answer/ }).click()
+  await page.getByRole('button', { name: /Good/ }).click()
+  const data = await savedData(page)
+  expect(data.log.map((e: { mode: string }) => e.mode)).toEqual(['intro', 'srs'])
+})
+
+test('a dakuten note is shown with the first dakuten kana only', async ({ page }) => {
+  await seed(page, { settings: { groups: ['dakuten'], newPerDay: 2 } })
+  await page.goto('./#/study/hiragana?mode=srs')
+  await expect(page.getByRole('article', { name: 'New kana: ga' })).toContainText('dakuten')
+  await page.getByRole('button', { name: /Got it/ }).click()
+  const second = page.getByRole('article', { name: 'New kana: gi' })
+  await expect(second).toBeVisible()
+  await expect(second).not.toContainText('Two small marks')
+})
+
+test('introductions can be switched off', async ({ page }) => {
+  await quizOnly(page)
+  await page.goto('./#/study/hiragana?mode=srs')
+  await expect(page.getByRole('button', { name: /Hiragana card/ })).toBeVisible()
+  await expect(page.getByRole('article', { name: /New kana/ })).toHaveCount(0)
 })

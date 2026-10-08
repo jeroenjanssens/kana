@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import {
   ensureDay,
+  introduce,
   logPractice,
   markNoteSeen,
   newShownToday,
@@ -10,6 +11,7 @@ import {
   reviewedToday,
 } from '../../src/lib/study/actions'
 import { emptySave } from '../../src/lib/storage/schema'
+import { performance, totalAnswers } from '../../src/lib/study/stats'
 
 const NOW = new Date(2026, 5, 1, 12).getTime()
 const DAY = 86_400_000
@@ -135,5 +137,26 @@ describe('practice and words', () => {
     expect(s.log).toEqual([])
     expect(s.words).toEqual({})
     expect(s.settings.theme).toBe('dark')
+  })
+})
+
+describe('introduce', () => {
+  test('puts a new kana into learning, due in a minute, and counts it as new today', () => {
+    const s = emptySave()
+    const card = introduce(s, { deck: 'hiragana', id: 'a', now: NOW })
+    expect(card.state).toBe(1)
+    expect(card.due - NOW).toBe(60_000)
+    expect(s.cards.hiragana?.a).toEqual(card)
+    expect(newShownToday(s, 'hiragana', NOW)).toBe(1)
+    expect(s.log[0]).toMatchObject({ mode: 'intro', deck: 'hiragana', id: 'a', new: true })
+  })
+
+  test('introductions are not counted as answers or reviews', () => {
+    const s = emptySave()
+    introduce(s, { deck: 'hiragana', id: 'a', now: NOW })
+    recordReview(s, { deck: 'hiragana', id: 'a', grade: 1, ms: 1, now: NOW + 60_000 })
+    expect(totalAnswers(s.log)).toEqual({ total: 1, correct: 0 })
+    expect(performance(s.log, s.cards, NOW)[0]).toMatchObject({ answers: 1, correct: 0 })
+    expect(reviewedToday(s, 'hiragana', NOW)).toBe(1)
   })
 })

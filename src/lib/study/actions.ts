@@ -84,6 +84,33 @@ export function recordReview(save: SaveFile, input: ReviewInput): ReviewResult {
   return { before, after, wasNew, levelBefore, levelAfter, becameMature }
 }
 
+/**
+ * Introduce a new kana: it goes into learning, due in a minute, so it's quizzed shortly. It
+ * counts as a new card for today, and is logged as an introduction (not as a right or wrong answer).
+ */
+export function introduce(
+  save: SaveFile,
+  input: { deck: DeckId; id: string; ms?: number; now?: number },
+): CardRecord {
+  const now = input.now ?? Date.now()
+  ensureDay(save, now)
+  save.cards[input.deck] ??= {}
+  const cards = save.cards[input.deck]!
+  const card = gradeCard(cards[input.id], 1, now)
+  cards[input.id] = card
+  save.daily.newShown[input.deck] = (save.daily.newShown[input.deck] ?? 0) + 1
+  save.log.push({
+    t: now,
+    mode: 'intro',
+    deck: input.deck,
+    id: input.id,
+    correct: true,
+    ms: Math.round(input.ms ?? 0),
+    new: true,
+  })
+  return card
+}
+
 /** Log a practice answer that doesn't affect scheduling (in-order, drills, reading). */
 export function logPractice(save: SaveFile, entry: Omit<ReviewEntry, 't'> & { t?: number }): void {
   save.log.push({ ...entry, t: entry.t ?? Date.now(), ms: Math.round(entry.ms) })

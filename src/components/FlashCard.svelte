@@ -1,5 +1,7 @@
 <script lang="ts">
   import { confusableSets } from '../lib/data/confusables'
+  import { mnemonicFor } from '../lib/data/mnemonics'
+  import Hint from './Hint.svelte'
   import { displayRomaji, glyph, type Kana } from '../lib/data/kana'
   import { FONT_STYLES, fontById } from '../lib/data/fonts'
   import type { DeckId } from '../lib/storage/schema'
@@ -54,6 +56,11 @@
     deck === 'hiragana' ? kana.katakana : deck === 'katakana' ? kana.hiragana : '',
   )
   const fontInfo = $derived(fontById(font))
+  const hintScripts = $derived(
+    deck === 'combined'
+      ? (['hiragana', 'katakana'] as const)
+      : ([deck === 'katakana' ? 'katakana' : 'hiragana'] as const),
+  )
   /** A confusable-pairs drill containing this kana, offered for tricky cards. */
   const drill = $derived(
     confusableSets.find(
@@ -124,6 +131,10 @@
       </p>
     {/if}
     <p class="romaji" class:inked={flipped}>{displayRomaji(kana, s.romaji)}</p>
+    <p class="mnemonic">
+      {#each hintScripts as script (script)}<span><Hint text={mnemonicFor(kana, script)} /></span
+        >{/each}
+    </p>
     <div class="tools">
       <button
         class="btn small"
@@ -230,6 +241,17 @@
       filter: blur(0);
       letter-spacing: 0.02em;
     }
+  }
+
+  .mnemonic {
+    margin: -0.3rem 0 0.7rem;
+    max-width: 34ch;
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: var(--ink-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
   }
 
   .tricky {

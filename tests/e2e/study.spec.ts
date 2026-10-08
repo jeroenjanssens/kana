@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test'
-import { savedData, seed, trackErrors } from './helpers'
+import { quizOnly, savedData, trackErrors } from './helpers'
 
 test('SRS session: reveal, grade and persist progress', async ({ page }) => {
+  await quizOnly(page)
   const errors = trackErrors(page)
   await page.goto('./#/study/hiragana?mode=srs')
   await expect(page.getByText('10 left')).toBeVisible()
@@ -23,6 +24,7 @@ test('SRS session: reveal, grade and persist progress', async ({ page }) => {
 })
 
 test('keyboard: space reveals, number keys grade', async ({ page, isMobile }) => {
+  await quizOnly(page)
   test.skip(isMobile, 'keyboard only')
   await page.goto('./#/study/katakana?mode=srs')
   await expect(page.getByText('10 left')).toBeVisible()
@@ -37,6 +39,7 @@ test('keyboard: space reveals, number keys grade', async ({ page, isMobile }) =>
 })
 
 test('the progress bar moves on every grade, not only on Easy', async ({ page }) => {
+  await quizOnly(page)
   await page.goto('./#/study/hiragana?mode=srs')
   const bar = page.locator('.progress span')
   const width = () => bar.evaluate((el) => parseFloat((el as HTMLElement).style.width))
@@ -50,7 +53,7 @@ test('the progress bar moves on every grade, not only on Easy', async ({ page })
 })
 
 test('typed answers are checked and suggest a grade', async ({ page }) => {
-  await seed(page, { settings: { answerStyle: 'typed' } })
+  await quizOnly(page, { settings: { answerStyle: 'typed' } })
   await page.goto('./#/study/hiragana?mode=srs')
   const input = page.getByRole('textbox', { name: 'Your answer in romaji' })
   await input.fill('a')
@@ -65,6 +68,7 @@ test('typed answers are checked and suggest a grade', async ({ page }) => {
 })
 
 test('combined deck shows both scripts', async ({ page }) => {
+  await quizOnly(page)
   await page.goto('./#/study/combined?mode=srs')
   await expect(page.getByRole('button', { name: /Hiragana and katakana card/ })).toBeVisible()
   await expect(page.locator('.front-glyph .glyph')).toHaveCount(2)
@@ -96,6 +100,7 @@ test('in-order mode can start from a list of ids', async ({ page }) => {
 })
 
 test('stroke order and font gallery open from the card', async ({ page }) => {
+  await quizOnly(page)
   await page.goto('./#/study/hiragana?mode=srs')
   await page.getByRole('button', { name: /Show answer/ }).click()
   await page.getByRole('button', { name: 'Stroke order (S)' }).click()

@@ -9,7 +9,9 @@
   } from '../lib/srs/scheduler'
   import type { DeckId } from '../lib/storage/schema'
   import { audio, settings, store } from '../state/app.svelte'
+  import { mnemonicFor } from '../lib/data/mnemonics'
   import Hanko from './Hanko.svelte'
+  import Hint from './Hint.svelte'
   import Icon from './Icon.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
 
@@ -71,6 +73,10 @@
     <button class="btn small" onclick={onstrokes}><Icon name="brush" size={14} /> Strokes</button>
     <button class="btn small" onclick={onfonts}><Icon name="fonts" size={14} /> Fonts</button>
   </div>
+  <ul class="hints">
+    {#if kana.hiragana}<li><Hint text={mnemonicFor(kana, 'hiragana')} /></li>{/if}
+    <li><Hint text={mnemonicFor(kana, 'katakana')} /></li>
+  </ul>
   <ul class="decks">
     {#each decks as d (d.deck)}
       <li>
@@ -140,6 +146,16 @@
   .small {
     font-size: 0.82rem;
     margin: 0.75rem 0 0;
+  }
+
+  .hints {
+    list-style: none;
+    margin: 0.75rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: var(--ink-soft);
   }
 
   .decks {

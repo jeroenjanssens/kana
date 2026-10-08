@@ -131,7 +131,7 @@ export function performance(
 ): KanaPerformance[] {
   const byKey = new Map<string, { deck: DeckId; id: string; n: number; ok: number; ms: number[] }>()
   for (const e of log) {
-    if (!e.deck) continue
+    if (!e.deck || !isAnswer(e)) continue
     const key = `${e.deck}:${e.id}`
     const p = byKey.get(key) ?? { deck: e.deck, id: e.id, n: 0, ok: 0, ms: [] }
     p.n++
@@ -196,6 +196,12 @@ export function confusions(log: readonly ReviewEntry[], n = 10): Confusion[] {
   return [...counts.values()].sort((a, b) => b.count - a.count).slice(0, n)
 }
 
+/** Introductions are activity, but not answers: they don't count towards accuracy. */
+export function isAnswer(e: ReviewEntry): boolean {
+  return e.mode !== 'intro'
+}
+
 export function totalAnswers(log: readonly ReviewEntry[]): { total: number; correct: number } {
-  return { total: log.length, correct: log.filter((e) => e.correct).length }
+  const answers = log.filter(isAnswer)
+  return { total: answers.length, correct: answers.filter((e) => e.correct).length }
 }

@@ -3,6 +3,7 @@
   import { fly } from 'svelte/transition'
   import FlashCard from '../components/FlashCard.svelte'
   import FontGallery from '../components/FontGallery.svelte'
+  import KanaIntro from '../components/KanaIntro.svelte'
   import Icon from '../components/Icon.svelte'
   import Modal from '../components/Modal.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
@@ -17,7 +18,8 @@
     startOfNextDay,
   } from '../lib/srs/scheduler'
   import { STUDY_DECKS, type Grade, type StudyDeckId } from '../lib/storage/schema'
-  import { logPractice, recordReview } from '../lib/study/actions'
+  import { introduce, logPractice, markNoteSeen, recordReview } from '../lib/study/actions'
+  import { notesForKana, type KanaNote } from '../lib/data/mnemonics'
   import { becameLeech, isLeech } from '../lib/study/leeches'
   import { UndoStack } from '../lib/study/undo'
   import { isStreakMilestone, rowMastered } from '../lib/study/milestones'
@@ -63,6 +65,10 @@
   let strokesOpen = $state(false)
   let fontsOpen = $state(false)
   let inputEl = $state<HTMLInputElement>()
+
+  // Introductions of new kana
+  let introducing = $state(false)
+  let introNotes = $state<KanaNote[]>([])
 
   // SRS
   let session: Session | undefined
@@ -166,8 +172,15 @@
     paper = Math.floor(Math.random() * 2 ** 31)
     current = kana
     currentIsNew = isNew
+    // A brand-new kana is introduced first (sound, strokes, memory hint), then quizzed later.
+    introducing = mode === 'srs' && isNew && settings().introduce
+    introNotes = introducing
+      ? notesForKana(kana).filter((n) => !store.data.seenNotes.includes(n))
+      : []
     phase = 'card'
     startedAt = performance.now()
+    if (introducing && settings().autoplay)
+      setTimeout(() => current === kana && audio.playVoice(kana.id, voice), 350)
     if (mode === 'srs') {
       intervals = previewIntervals(store.data.cards[deck]?.[kana.id])
     }
@@ -265,6 +278,19 @@
     await showNext()
   }
 
+  /** Finish an introduction: the kana goes into learning and comes back as a quiz shortly. */
+  async function doneIntroducing() {
+    if (!current || !session || !introducing || busy) return
+    busy = true
+    undoStack.record(store.data, session, deck, current.id)
+    canUndo = true
+    const card = introduce(store.data, { deck, id: current.id, ms: performance.now() - startedAt })
+    for (const n of introNotes) markNoteSeen(store.data, n)
+    session.answer(current.id, card)
+    void audio.playSfx('flip')
+    await showNext()
+  }
+
   /** Undo the last grade: the card and the session go back exactly as they were. */
   async function undoLast() {
     if (!session || busy || !undoStack.size) return
@@ -343,6 +369,14 @@
     }
     if (phase !== 'card' || strokesOpen || fontsOpen) {
       if (e.key === 'Escape' && phase !== 'card') exit()
+      return
+    }
+    if (introducing) {
+      if (e.key === 'Escape') return exit()
+      if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault()
+        void doneIntroducing()
+      } else if (e.key.toLowerCase() === 'p' && current) void audio.playVoice(current.id, voice)
       return
     }
     const inInput = (e.target as HTMLElement).tagName === 'INPUT'
@@ -490,6 +524,21 @@
         </button>
       </div>
     </section>
+  {:else if phase === 'card' && current && introducing}
+    <div class="stage">
+      {#key current.id}
+        <div in:fly={{ y: 24, duration: 420 }}>
+          <KanaIntro
+            kana={current}
+            {deck}
+            {font}
+            notes={introNotes}
+            onplay={() => current && audio.playVoice(current.id, voice)}
+            ondone={doneIntroducing}
+          />
+        </div>
+      {/key}
+    </div>
   {:else if phase === 'card' && current}
     <div class="stage">
       {#key current.id + pass}

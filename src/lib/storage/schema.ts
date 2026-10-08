@@ -37,7 +37,8 @@ export interface CardRecord {
   last_review?: number
 }
 
-export type Mode = 'srs' | 'order' | 'confusable' | 'listen' | 'reading'
+export type Mode =
+  'srs' | 'order' | 'confusable' | 'listen' | 'reading' | 'intro' | 'write' | 'sprint'
 
 export interface ReviewEntry {
   /** Epoch ms. */
@@ -61,6 +62,8 @@ export interface Settings {
   reviewsPerDay: number
   /** Lapses after which a card counts as a leech. */
   leechThreshold: number
+  /** Show an introduction (sound, strokes, memory hint) before a new kana is first quizzed. */
+  introduce: boolean
   groups: KanaGroup[]
   fontMode: 'fixed' | 'random'
   font: string
@@ -102,6 +105,7 @@ export const DEFAULT_SETTINGS: Settings = {
   newPerDay: 10,
   reviewsPerDay: 200,
   leechThreshold: 6,
+  introduce: true,
   groups: ['basic', 'dakuten', 'yoon'],
   fontMode: 'fixed',
   font: DEFAULT_FONT_ID,

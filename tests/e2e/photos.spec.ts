@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { savedData, seed } from './helpers'
+import { quizOnly, savedData } from './helpers'
 
 /** The photo being shown (during a cross-fade the outgoing image is still in the DOM). */
 const currentPhoto = (page: Page) => page.locator('.backdrop').getAttribute('data-photo')
@@ -21,7 +21,7 @@ test('the arrows change the photo, and the choice survives a reload', async ({ p
 })
 
 test('in fixed mode studying does not change the photo', async ({ page }) => {
-  await seed(page, { settings: { photoMode: 'fixed', photoEvery: 3 } })
+  await quizOnly(page, { settings: { photoMode: 'fixed', photoEvery: 3 } })
   await page.goto('./#/study/hiragana?mode=srs')
   await expect(page.locator('.backdrop img').first()).toBeVisible()
   const before = await currentPhoto(page)
@@ -34,7 +34,7 @@ test('in fixed mode studying does not change the photo', async ({ page }) => {
 })
 
 test('in cards mode the photo changes after N cards', async ({ page }) => {
-  await seed(page, { settings: { photoMode: 'cards', photoEvery: 3 } })
+  await quizOnly(page, { settings: { photoMode: 'cards', photoEvery: 3 } })
   await page.goto('./#/study/hiragana?mode=srs')
   await expect(page.locator('.backdrop img').first()).toBeVisible()
   const before = await currentPhoto(page)

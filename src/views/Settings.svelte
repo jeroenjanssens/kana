@@ -173,6 +173,12 @@
       </div>
     </div>
     <label class="switch"
+      ><span
+        >Introduce new kana <small class="muted">sound, strokes and a memory hint first</small
+        ></span
+      ><input type="checkbox" bind:checked={s.introduce} /></label
+    >
+    <label class="switch"
       ><span>Play pronunciation when revealing a card</span><input
         type="checkbox"
         bind:checked={s.autoplay}

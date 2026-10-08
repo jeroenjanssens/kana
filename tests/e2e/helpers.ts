@@ -28,6 +28,12 @@ export async function seed(page: Page, save: Record<string, unknown>) {
   }, save)
 }
 
+/** Start without introductions of new kana, for tests about the quiz itself. */
+export async function quizOnly(page: Page, save: Record<string, unknown> = {}) {
+  const settings = (save.settings as Record<string, unknown> | undefined) ?? {}
+  await seed(page, { ...save, settings: { introduce: false, ...settings } })
+}
+
 /** Fail the test on uncaught errors. */
 export function trackErrors(page: Page) {
   const errors: string[] = []
