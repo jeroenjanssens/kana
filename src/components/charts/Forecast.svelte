@@ -15,6 +15,11 @@
   )
 </script>
 
+{#if counts.every((c) => c === 0)}
+  <p class="empty">
+    Nothing scheduled yet — study a few cards and their reviews will show up here.
+  </p>
+{/if}
 <svg
   viewBox="0 0 {counts.length * W} {H + 30}"
   role="img"
@@ -39,6 +44,12 @@
 </svg>
 
 <style>
+  .empty {
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    margin: 0 0 0.5rem;
+  }
+
   svg {
     width: 100%;
     height: auto;

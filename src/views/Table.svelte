@@ -130,6 +130,7 @@
         kana={selected}
         onstrokes={() => (strokesOpen = true)}
         onfonts={() => (fontsOpen = true)}
+        onclose={() => (selected = undefined)}
       />
     {:else}
       <div class="panel hint">
@@ -324,11 +325,28 @@
       grid-template-columns: 1fr;
     }
 
+    /* The details float at the bottom of the screen while you scroll through the table. */
     .side {
       position: sticky;
       top: auto;
-      bottom: calc(80px + env(safe-area-inset-bottom));
-      order: -1;
+      bottom: 1rem;
+      z-index: 5;
+    }
+
+    .side :global(.details) {
+      max-height: 42vh;
+      overflow: auto;
+      box-shadow: var(--shadow);
+    }
+
+    .hint {
+      display: none;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .side {
+      bottom: calc(84px + env(safe-area-inset-bottom));
     }
   }
 

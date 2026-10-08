@@ -387,8 +387,13 @@
     flex-wrap: wrap;
   }
 
+  .field:has(input[type='number']) {
+    flex-wrap: nowrap;
+  }
+
   .field input[type='number'] {
     width: 6rem;
+    flex: none;
   }
 
   .field input[type='range'] {

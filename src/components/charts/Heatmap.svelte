@@ -6,8 +6,6 @@
 
   const CELL = 12
   const GAP = 3
-  const weeks = $derived(Math.ceil(days.length / 7))
-  const width = $derived(weeks * (CELL + GAP) + 24)
   const height = 7 * (CELL + GAP) + 18
 
   // Align the last column so that today is in its weekday row.
@@ -18,6 +16,9 @@
     const weekday = (new Date(y, m - 1, d).getDay() + 6) % 7 // Monday = 0
     return 6 - weekday
   })
+
+  const weeks = $derived(Math.ceil((days.length + offset) / 7))
+  const width = $derived(weeks * (CELL + GAP) + 24)
 
   const cells = $derived(
     days.map((day, i) => {

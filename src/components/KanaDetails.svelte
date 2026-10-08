@@ -12,8 +12,12 @@
   import Icon from './Icon.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
 
-  let { kana, onstrokes, onfonts }: { kana: Kana; onstrokes: () => void; onfonts: () => void } =
-    $props()
+  let {
+    kana,
+    onstrokes,
+    onfonts,
+    onclose,
+  }: { kana: Kana; onstrokes: () => void; onfonts: () => void; onclose?: () => void } = $props()
 
   const LEVEL_LABEL: Record<MasteryLevel, string> = {
     new: 'Not studied',
@@ -44,6 +48,11 @@
 </script>
 
 <article class="details panel" aria-live="polite">
+  {#if onclose}
+    <button class="btn icon ghost close" onclick={onclose} aria-label="Close details">
+      <Icon name="close" size={18} />
+    </button>
+  {/if}
   <div class="top">
     <div class="glyphs washi">
       {#if kana.hiragana}<KanaGlyph
@@ -96,7 +105,14 @@
 
 <style>
   .details {
+    position: relative;
     padding: 1.1rem 1.25rem;
+  }
+
+  .close {
+    position: absolute;
+    top: 0.3rem;
+    right: 0.3rem;
   }
 
   .top {
@@ -150,6 +166,33 @@
   .meta {
     grid-column: 2 / -1;
     font-size: 0.75rem;
+  }
+
+  @media (max-width: 720px) {
+    .details {
+      padding: 0.8rem 1rem;
+    }
+
+    .glyphs :global(.glyph) {
+      font-size: 2.4rem !important;
+    }
+
+    .romaji {
+      font-size: 1.7rem;
+    }
+
+    .decks {
+      gap: 0.15rem;
+      margin-top: 0.6rem;
+    }
+
+    .decks li {
+      font-size: 0.78rem;
+    }
+
+    .meta {
+      display: none;
+    }
   }
 
   .level {

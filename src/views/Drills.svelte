@@ -281,8 +281,11 @@
 
   .set .chars {
     font-family: var(--font-kana);
-    font-size: 2rem;
-    letter-spacing: 0.15em;
+    font-size: 1.9rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
   }
 
   .set .muted {

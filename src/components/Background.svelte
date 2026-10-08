@@ -143,11 +143,10 @@
     color: inherit;
   }
 
+  /* On phones the credit would cover content; photographers are listed on the credits page. */
   @media (max-width: 720px) {
     .credit {
-      bottom: calc(76px + env(safe-area-inset-bottom));
-      right: 10px;
-      font-size: 0.66rem;
+      display: none;
     }
   }
 </style>

@@ -141,5 +141,14 @@
     main {
       padding-bottom: calc(96px + env(safe-area-inset-bottom));
     }
+
+    /* Study sessions get the whole screen on phones. */
+    .shell.focus :global(.nav) {
+      display: none;
+    }
+
+    .shell.focus main {
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    }
   }
 </style>
