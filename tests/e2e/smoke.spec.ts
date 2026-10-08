@@ -36,7 +36,8 @@ test('unknown routes show a friendly page', async ({ page }) => {
 test('credits list photos and sources', async ({ page }) => {
   await page.goto('./#/credits')
   await expect(page.getByRole('heading', { name: 'Credits' })).toBeVisible()
-  await expect(page.getByText('Hakatanoshio117117')).toBeVisible()
+  await expect(page.getByText('VOICEVOX:春日部つむぎ')).toBeVisible()
+  await expect(page.getByText('VOICEVOX:青山龍星')).toBeVisible()
   await expect(page.locator('.photos li').first()).toBeVisible()
 })
 

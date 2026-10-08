@@ -3,6 +3,7 @@
   import { FONTS, FONT_STYLES, SYSTEM_FONT_ID } from '../lib/data/fonts'
   import type { KanaGroup } from '../lib/data/kana'
   import type { SfxEvent } from '../lib/audio/engine'
+  import { pickVoice, type VoiceSetting } from '../lib/audio/voices'
   import { exportFileName, exportJson, importJson } from '../lib/storage/persistence'
   import { resetProgress } from '../lib/study/actions'
   import { loadFont } from '../lib/ui/fontLoader'
@@ -44,6 +45,18 @@
     { id: 'milestone', label: 'Milestone' },
     { id: 'tick', label: 'UI tick' },
   ]
+
+  const VOICE_OPTIONS: { id: VoiceSetting; label: string }[] = [
+    { id: 'female', label: 'Female' },
+    { id: 'male', label: 'Male' },
+    { id: 'random', label: 'Random' },
+  ]
+
+  /** Switch voice and play a sample right away. */
+  function chooseVoice(voice: VoiceSetting) {
+    s.voice = voice
+    void audio.playVoice('a', pickVoice(voice))
+  }
 
   function toggleGroup(id: KanaGroup, on: boolean) {
     if (id === 'basic' && !on) return
@@ -272,6 +285,16 @@
       >
       <input type="range" min="0" max="1" step="0.05" bind:value={s.voiceVolume} />
     </label>
+    <div class="field">
+      <span>Voice <small class="muted">random: a different speaker per card</small></span>
+      <div class="segmented" role="group" aria-label="Voice">
+        {#each VOICE_OPTIONS as v (v.id)}
+          <button aria-pressed={s.voice === v.id} onclick={() => chooseVoice(v.id)}
+            >{v.label}</button
+          >
+        {/each}
+      </div>
+    </div>
     <label class="switch"
       ><span>Soft clicks in menus</span><input type="checkbox" bind:checked={s.uiTicks} /></label
     >

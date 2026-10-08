@@ -6,3 +6,4 @@ src/lib/data/kanjivg
 playwright-report
 test-results
 PLAN.md
+docs/*.md

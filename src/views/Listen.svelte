@@ -4,12 +4,13 @@
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import MasteryBar from '../components/MasteryBar.svelte'
-  import { streakSemitones } from '../lib/audio/engine'
   import { confusableSets } from '../lib/data/confusables'
   import { displayRomaji, glyph, kanaById, kanaByChar, type Kana } from '../lib/data/kana'
   import { Session, deckKana } from '../lib/srs/scheduler'
-  import type { DeckId, Grade } from '../lib/storage/schema'
+  import type { VoiceId } from '../lib/audio/voices'
+  import type { DeckId } from '../lib/storage/schema'
   import { recordReview } from '../lib/study/actions'
+  import { LISTEN_ADVANCE_MS, listenGrade } from '../lib/study/listen'
   import { chooseOptions } from '../lib/study/distractors'
   import { deckSummary, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
@@ -22,14 +23,6 @@
     scriptParam === 'katakana' ? 'katakana' : scriptParam === 'hiragana' ? 'hiragana' : undefined
   const deck: DeckId | undefined = script ? `listen-${script}` : undefined
 
-  /** Listening is slower than reading, so allow more time before suggesting Hard. */
-  function listenGrade(correct: boolean, ms: number): Grade {
-    if (!correct) return 1
-    if (ms <= 3000) return 4
-    if (ms <= 8000) return 3
-    return 2
-  }
-
   let session: Session | undefined
   let current = $state<Kana | undefined>()
   let options = $state<Kana[]>([])
@@ -40,7 +33,8 @@
   let answered = $state(0)
   let correctCount = $state(0)
   let startedAt = 0
-  let streak = 0
+  /** One voice per card, so replays don't switch speakers ("random" setting). */
+  let voice: VoiceId = audio.pickVoice()
   let sincePhoto = 0
   let advance: ReturnType<typeof setTimeout> | undefined
 
@@ -80,12 +74,13 @@
     await loadFontWithin(settings().font)
     picked = undefined
     current = k
+    voice = audio.pickVoice()
     options = chooseOptions(k, deckKana(deck, settings().groups), 6, {
       soundAlikes: true,
       lookAlikes: lookAlikes(k),
     })
     startedAt = performance.now()
-    void audio.playVoice(k.id)
+    void audio.playVoice(k.id, voice)
   }
 
   async function pick(k: Kana) {
@@ -93,10 +88,11 @@
     picked = k
     const correct = k.id === current.id
     const ms = performance.now() - startedAt
+    const grade = listenGrade(correct, ms)
     const result = recordReview(store.data, {
       deck,
       id: current.id,
-      grade: listenGrade(correct, ms),
+      grade,
       ms,
       mode: 'listen',
       correct,
@@ -104,26 +100,28 @@
     })
     session.answer(current.id, result.after)
     answered++
+    void audio.playGrade(grade)
     if (correct) {
       correctCount++
-      void audio.playSfx('correct', { semitones: streakSemitones(streak++) })
     } else {
-      streak = 0
-      void audio.playSfx('wrong')
-      setTimeout(() => current && audio.playVoice(current.id), 450)
+      setTimeout(() => current && audio.playVoice(current.id, voice), 450)
     }
     if (++sincePhoto >= settings().photoEvery) {
       sincePhoto = 0
       nextPhoto()
     }
-    if (correct) advance = setTimeout(next, 750)
+    if (correct) {
+      // Hear it once more, then move on (Enter, Space or Next skip the wait).
+      setTimeout(() => current && picked && audio.playVoice(current.id, voice), 350)
+      advance = setTimeout(next, LISTEN_ADVANCE_MS)
+    }
   }
 
   function onKeydown(e: KeyboardEvent) {
     if (!current) return
     const key = e.key.toLowerCase()
     if (key === 'escape') navigate('/practice')
-    else if (key === 'p' || key === 'r') void audio.playVoice(current.id)
+    else if (key === 'p' || key === 'r') void audio.playVoice(current.id, voice)
     else if ((key === 'enter' || key === ' ') && picked) {
       e.preventDefault()
       void next()
@@ -156,7 +154,7 @@
           <span class="icon"><Icon name="ear" size={28} /></span>
           <div>
             <h2>{isKata ? 'Katakana' : 'Hiragana'}</h2>
-            <p class="muted">{d.total} sounds with recordings</p>
+            <p class="muted">{d.total} sounds</p>
           </div>
         </div>
         <p class="counts"><strong>{d.due}</strong> due · <strong>{d.fresh}</strong> new today</p>
@@ -167,9 +165,6 @@
       </article>
     {/each}
   </div>
-  <p class="note panel">
-    Yōon (きゃ, しゅ, …) are not included yet because there are no recordings for them.
-  </p>
 {:else}
   <div class="listen">
     <div class="topbar panel">
@@ -186,7 +181,7 @@
         <section class="stage" in:fly={{ y: 14, duration: 300 }}>
           <button
             class="speaker washi"
-            onclick={() => current && audio.playVoice(current.id)}
+            onclick={() => current && audio.playVoice(current.id, voice)}
             aria-label="Play the sound again (P)"
           >
             <Icon name="speaker" size={56} />
@@ -214,10 +209,14 @@
           </div>
           {#if picked && picked.id !== current.id}
             <div class="after">
-              <button class="btn small" onclick={() => picked && audio.playVoice(picked.id)}>
+              <button class="btn small" onclick={() => picked && audio.playVoice(picked.id, voice)}>
                 <Icon name="play" size={14} filled /> Hear what you picked ({picked.romaji})
               </button>
               <button class="btn primary" onclick={next}>Next <kbd>Enter</kbd></button>
+            </div>
+          {:else if picked}
+            <div class="after">
+              <button class="btn" onclick={next}>Next <kbd>Enter</kbd></button>
             </div>
           {/if}
         </section>
@@ -289,13 +288,6 @@
 
   .counts {
     margin: 0;
-  }
-
-  .note {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
-    font-size: 0.85rem;
-    display: inline-block;
   }
 
   .listen {

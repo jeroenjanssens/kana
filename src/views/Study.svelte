@@ -6,7 +6,7 @@
   import Icon from '../components/Icon.svelte'
   import Modal from '../components/Modal.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
-  import { streakSemitones } from '../lib/audio/engine'
+  import type { VoiceId } from '../lib/audio/voices'
   import { FONTS, randomFontId } from '../lib/data/fonts'
   import { BASIC_ROWS, kanaById, rowsOf, type Kana, type KanaGroup } from '../lib/data/kana'
   import {
@@ -41,6 +41,8 @@
   let currentIsNew = $state(false)
   let flipped = $state(false)
   let font = $state(s.font)
+  /** Voice for the current card, picked once per card (matters for the "random" setting). */
+  let voice: VoiceId = audio.pickVoice()
   let tilt = $state(0)
   let startedAt = 0
   let input = $state('')
@@ -48,7 +50,6 @@
   let suggested = $state<Grade | undefined>()
   let celebrate = $state(false)
   let busy = false
-  let streak = 0
   let sincePhoto = 0
   let answered = $state(0)
   /** Cards seen in order mode, whether or not they were self-checked. */
@@ -62,8 +63,14 @@
   // SRS
   let session: Session | undefined
   let intervals = $state<Record<Grade, number> | undefined>()
-  let total = $state(0)
-  let remaining = $state(0)
+  /** Session counters for the progress bar: share seen, cards not seen yet, cards coming back. */
+  let counts = $state({ progress: 0, unseen: 0, repeating: 0 })
+
+  function syncCounts() {
+    if (session) {
+      counts = { progress: session.progress, unseen: session.unseen, repeating: session.repeating }
+    }
+  }
 
   // In order
   let orderList = $state<Kana[]>([])
@@ -114,8 +121,7 @@
   function startSrs() {
     const queue = queueFor(store.data, deck)
     session = new Session(queue)
-    total = session.total
-    remaining = session.remaining
+    syncCounts()
     void showNext()
   }
 
@@ -149,6 +155,7 @@
     celebrate = false
     input = ''
     font = nextFont
+    voice = audio.pickVoice()
     tilt = (Math.random() - 0.5) * 1.4
     current = kana
     currentIsNew = isNew
@@ -165,7 +172,7 @@
   async function showNext() {
     if (!session) return
     const id = session.next()
-    remaining = session.remaining
+    syncCounts()
     if (!id) return finish()
     await show(kanaById(id), session.isNew(id))
   }
@@ -190,8 +197,8 @@
     void audio.playSfx('flip')
     const id = current.id
     // Only play if the same card is still showing (a fast grade may already have moved on).
-    if (settings().autoplay && current.audio) {
-      setTimeout(() => current?.id === id && flipped && audio.playVoice(id), 280)
+    if (settings().autoplay) {
+      setTimeout(() => current?.id === id && flipped && audio.playVoice(id, voice), 280)
     }
   }
 
@@ -203,17 +210,7 @@
     suggested = suggestGrade(correct, ms)
     reveal()
     if (mode === 'order') {
-      recordPractice(correct)
-    }
-  }
-
-  function playFeedback(correct: boolean) {
-    if (correct) {
-      void audio.playSfx('correct', { semitones: streakSemitones(streak) })
-      streak++
-    } else {
-      void audio.playSfx('wrong')
-      streak = 0
+      recordPractice(correct, suggested)
     }
   }
 
@@ -242,7 +239,7 @@
     session.answer(current.id, result.after)
     answered++
     if (g > 1) correctCount++
-    playFeedback(g > 1)
+    void audio.playGrade(g)
     advancePhoto()
     if (result.becameMature) {
       celebrate = true
@@ -262,7 +259,8 @@
     await showNext()
   }
 
-  function recordPractice(correct: boolean) {
+  /** Log an in-order answer. Without a grade (self-check), right sounds like Good, wrong like Again. */
+  function recordPractice(correct: boolean, grade: Grade = correct ? 3 : 1) {
     if (!current) return
     logPractice(store.data, {
       mode: 'order',
@@ -274,7 +272,7 @@
     })
     answered++
     if (correct) correctCount++
-    playFeedback(correct)
+    void audio.playGrade(grade)
   }
 
   function selfCheck(correct: boolean) {
@@ -325,7 +323,7 @@
       else move(1)
       return
     }
-    if (key === 'p' && current?.audio) void audio.playVoice(current.id)
+    if (key === 'p' && current) void audio.playVoice(current.id, voice)
     else if (key === 's') strokesOpen = true
     else if (key === 'f') fontsOpen = true
     else if (mode === 'srs' && ['1', '2', '3', '4'].includes(key)) void grade(Number(key) as Grade)
@@ -349,9 +347,7 @@
 
   const progress = $derived(
     mode === 'srs'
-      ? total > 0
-        ? Math.min(1, (total - remaining) / total)
-        : 1
+      ? counts.progress
       : orderList.length
         ? (orderIndex + (flipped ? 1 : 0)) / orderList.length
         : 0,
@@ -395,7 +391,10 @@
       <span style:width="{progress * 100}%"></span>
     </div>
     <span class="count">
-      {#if mode === 'srs'}{remaining} left{:else if orderList.length}{orderIndex + 1} / {orderList.length}{/if}
+      {#if mode === 'srs'}{counts.unseen} left{#if counts.repeating}
+          · <span title="Cards you're still learning come back in a few minutes"
+            >{counts.repeating} again</span
+          >{/if}{:else if orderList.length}{orderIndex + 1} / {orderList.length}{/if}
     </span>
   </div>
 
@@ -454,7 +453,7 @@
             {celebrate}
             {verdict}
             onflip={() => (typed ? inputEl?.focus() : reveal())}
-            onplay={() => current && audio.playVoice(current.id)}
+            onplay={() => current && audio.playVoice(current.id, voice)}
             onstrokes={() => (strokesOpen = true)}
             onfonts={() => (fontsOpen = true)}
           />

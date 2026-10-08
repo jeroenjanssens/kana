@@ -156,10 +156,10 @@ describe('deckKana', () => {
     expect(deckKana('combined', groups)).toHaveLength(46)
     expect(deckKana('katakana', groups)).toHaveLength(65)
   })
-  test('listening decks only include kana with audio', () => {
+  test('listening decks include every kana, yōon too', () => {
     const all = ['basic', 'dakuten', 'yoon', 'extended'] as const
-    expect(deckKana('listen-hiragana', all)).toHaveLength(71)
-    expect(deckKana('listen-katakana', all)).toHaveLength(71)
+    expect(deckKana('listen-hiragana', all)).toHaveLength(104)
+    expect(deckKana('listen-katakana', all)).toHaveLength(123)
   })
 })
 
@@ -282,6 +282,35 @@ describe('Session', () => {
       s.answer(id, reviewed, T0)
     }
     expect(order).toEqual(['l1', 'l2', 'l3', 'r1', 'r2', 'r3', 'n1', 'r4'])
+  })
+
+  test('progress counts every first answer, whatever the grade', () => {
+    const s = new Session({ learning: [], review: [], fresh: ['a', 'i', 'u'] })
+    expect(s.progress).toBe(0)
+    // Good on a new card keeps it in learning, but it still counts as seen.
+    s.answer(s.next(T0)!, grade(undefined, 3, T0, f), T0)
+    expect(s.seenCount).toBe(1)
+    expect(s.progress).toBeCloseTo(1 / 3)
+    expect(s.unseen).toBe(2)
+    expect(s.repeating).toBe(1)
+    // Seeing the same card again doesn't count twice.
+    s.answer('a', grade(grade(undefined, 3, T0, f), 1, T0, f), T0)
+    expect(s.seenCount).toBe(1)
+    expect(s.repeating).toBe(1)
+    // Easy graduates the card: no longer repeating.
+    s.answer('i', grade(undefined, 4, T0, f), T0)
+    expect(s.repeating).toBe(1)
+    expect(s.unseen).toBe(1)
+  })
+
+  test('an empty session is complete', () => {
+    expect(new Session({ learning: [], review: [], fresh: [] }).progress).toBe(1)
+  })
+
+  test('learning cards from before the session count as unseen until answered', () => {
+    const s = new Session({ learning: ['l'], review: [], fresh: [] })
+    expect(s.unseen).toBe(1)
+    expect(s.repeating).toBe(0)
   })
 
   test('shows learning cards first', () => {

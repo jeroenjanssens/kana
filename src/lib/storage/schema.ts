@@ -1,4 +1,5 @@
 import type { KanaGroup } from '../data/kana'
+import type { VoiceSetting } from '../audio/voices'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1
@@ -79,6 +80,8 @@ export interface Settings {
   sfx: boolean
   sfxVolume: number
   voiceVolume: number
+  /** Pronunciation voice: female, male, or a random one for each card. */
+  voice: VoiceSetting
   uiTicks: boolean
   silent: boolean
   reducedMotion: 'system' | 'on' | 'off'
@@ -107,6 +110,7 @@ export const DEFAULT_SETTINGS: Settings = {
   sfx: true,
   sfxVolume: 0.5,
   voiceVolume: 1,
+  voice: 'female',
   uiTicks: false,
   silent: false,
   reducedMotion: 'system',

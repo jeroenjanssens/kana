@@ -16,7 +16,7 @@ stroke-order animations and flashcards that look like ink on washi paper.
 - **In-order mode** to go through rows one by one without touching your schedule.
 - **Kana table** with separate or combined layouts, a romaji toggle, click-to-hear, and a
   mastery overlay that shows how well you know each kana.
-- **Pronunciation** for all basic and dakuten kana (public-domain recordings).
+- **Pronunciation** for every kana and every reading word, in a female or male voice (or a random one per card), generated with VOICEVOX.
 - **Fonts**: pick one of 15 Japanese fonts, or let every card use a random one so you learn to
   recognise kana in any style. A font gallery shows the same kana in every font.
 - **Stroke-order animations** for every kana (KanjiVG).
@@ -43,7 +43,7 @@ just e2e       # end-to-end tests (Playwright)
 just ci        # lint, type-check, unit tests, build and e2e — what CI runs
 ```
 
-Run `just` to see all tasks. The asset pipelines (`just audio`, `just fonts`, `just kanjivg`,
+Run `just` to see all tasks. The asset pipelines (`just audio` with `just voicevox`, `just fonts`, `just kanjivg`,
 `just photos`, `just sfx`, `just icons`) regenerate the files in `public/` and
 `src/lib/data/kanjivg/` from their sources; their output is committed, so you only need them
 when changing assets.
@@ -67,7 +67,7 @@ See [PLAN.md](PLAN.md) for the design and decisions.
 ## Credits
 
 kana builds on the generous work of others — see [NOTICE](NOTICE) and the in-app credits page:
-pronunciation by Hakatanoshio117117 (Wikimedia Commons, public domain), stroke data from
+pronunciation generated with VOICEVOX (VOICEVOX:春日部つむぎ, VOICEVOX:青山龍星), stroke data from
 KanjiVG (CC BY-SA 3.0), fonts from Google Fonts (OFL), photos from Unsplash, and sound effects
 from Freesound (CC0).
 

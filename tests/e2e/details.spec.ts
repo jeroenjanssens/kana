@@ -116,3 +116,25 @@ test('a confusable-pairs quiz ends with a score', async ({ page }) => {
   }
   await expect(page.getByRole('heading', { name: /\/ 10 correct/ })).toBeVisible({ timeout: 5000 })
 })
+
+test('after a correct listening answer the next card waits a moment', async ({ page }) => {
+  await page.clock.install()
+  await page.goto('./#/listen/hiragana')
+  const group = page.getByRole('group', { name: 'Which kana did you hear?' })
+  await expect(group.getByRole('button')).toHaveCount(6)
+  // The first card is あ.
+  await group.getByRole('button').filter({ hasText: 'あ' }).click()
+  await expect(page.locator('.option.right')).toBeVisible()
+  await page.clock.runFor(1500)
+  await expect(page.locator('.option.right')).toBeVisible()
+  await page.clock.runFor(1000)
+  await expect(page.locator('.option.right')).toHaveCount(0)
+})
+
+test('Next skips the wait after a correct listening answer', async ({ page }) => {
+  await page.goto('./#/listen/hiragana')
+  const group = page.getByRole('group', { name: 'Which kana did you hear?' })
+  await group.getByRole('button').filter({ hasText: 'あ' }).click()
+  await page.getByRole('button', { name: /^Next/ }).click()
+  await expect(page.locator('.option.right')).toHaveCount(0)
+})

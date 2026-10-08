@@ -1,22 +1,24 @@
 import { describe, expect, test, vi } from 'vitest'
 import {
   AudioEngine,
-  MIYAKO_BUSHI,
+  GRADE_SEMITONES,
+  gradeSound,
   pickVariant,
   semitonesToRate,
-  streakSemitones,
   type AudioSettings,
 } from '../../src/lib/audio/engine'
 
-describe('streak melody', () => {
-  test('climbs the miyako-bushi scale from one octave up', () => {
-    expect([0, 1, 2, 3, 4, 5].map((n) => streakSemitones(n))).toEqual([12, 13, 17, 19, 20, 24])
+describe('grade sounds', () => {
+  test('Again is the wooden tock, without a note', () => {
+    expect(gradeSound(1)).toEqual({ event: 'wrong' })
   })
-  test('is capped', () => {
-    expect(streakSemitones(100)).toBe(streakSemitones(10))
-    expect(streakSemitones(-1)).toBe(12)
+  test('Hard, Good and Easy are koto notes from low to high', () => {
+    const [hard, good, easy] = ([2, 3, 4] as const).map((g) => gradeSound(g))
+    for (const s of [hard, good, easy]) expect(s.event).toBe('correct')
+    expect(hard.semitones!).toBeLessThan(good.semitones!)
+    expect(good.semitones!).toBeLessThan(easy.semitones!)
+    expect(easy.semitones! - hard.semitones!).toBe(12)
   })
-  test('scale has five notes', () => expect(MIYAKO_BUSHI).toHaveLength(5))
   test('semitonesToRate', () => {
     expect(semitonesToRate(0)).toBe(1)
     expect(semitonesToRate(12)).toBe(2)
@@ -74,7 +76,12 @@ function fakeAudio() {
 }
 
 const manifest = {
-  events: { flip: ['flip-1.mp3', 'flip-2.mp3'], correct: ['correct-1.mp3'], tick: ['t.mp3'] },
+  events: {
+    flip: ['flip-1.mp3', 'flip-2.mp3'],
+    correct: ['correct-1.mp3'],
+    wrong: ['wrong-1.mp3'],
+    tick: ['t.mp3'],
+  },
 }
 
 function makeEngine() {
@@ -95,6 +102,7 @@ function makeEngine() {
 }
 
 const settings: AudioSettings = {
+  voice: 'female',
   silent: false,
   sfx: true,
   sfxVolume: 0.5,
@@ -107,8 +115,31 @@ describe('AudioEngine', () => {
     const { engine, audio, requests } = makeEngine()
     engine.configure(settings)
     await engine.playVoice('shi')
-    expect(requests).toContain('/kana/audio/shi.mp3')
+    expect(requests).toContain('/kana/audio/female/shi.mp3')
     expect(audio.played).toHaveLength(1)
+  })
+
+  test('uses the configured voice, or the one passed for a card', async () => {
+    const { engine, requests } = makeEngine()
+    engine.configure({ ...settings, voice: 'male' })
+    await engine.playVoice('ka')
+    await engine.playVoice('ka', 'female')
+    await engine.playWord(7)
+    expect(requests).toEqual(
+      expect.arrayContaining([
+        '/kana/audio/male/ka.mp3',
+        '/kana/audio/female/ka.mp3',
+        '/kana/audio/male/words/007.mp3',
+      ]),
+    )
+  })
+
+  test('the random voice setting picks a voice per call', () => {
+    const { engine } = makeEngine()
+    engine.configure({ ...settings, voice: 'random' })
+    expect(['female', 'male']).toContain(engine.pickVoice())
+    engine.configure({ ...settings, voice: 'male' })
+    expect(engine.pickVoice()).toBe('male')
   })
 
   test('caches decoded buffers', async () => {
@@ -123,6 +154,23 @@ describe('AudioEngine', () => {
     engine.configure(settings)
     await engine.playSfx('correct', { semitones: 12 })
     expect(audio.played.at(-1)?.rate).toBe(2)
+  })
+
+  test('each grade always plays at the same pitch', async () => {
+    const { engine, audio } = makeEngine()
+    engine.configure(settings)
+    for (const g of [2, 3, 4, 3, 2] as const) await engine.playGrade(g)
+    expect(audio.played.map((p) => p.rate)).toEqual(
+      [2, 3, 4, 3, 2].map((g) => semitonesToRate(GRADE_SEMITONES[g as 2 | 3 | 4])),
+    )
+  })
+
+  test('Again plays the wooden tock', async () => {
+    const { engine, audio, requests } = makeEngine()
+    engine.configure(settings)
+    await engine.playGrade(1)
+    expect(audio.played).toHaveLength(1)
+    expect(requests.at(-1)).toMatch(/sfx\/wrong-1\.mp3$/)
   })
 
   test('adds a small random pitch variation by default', async () => {

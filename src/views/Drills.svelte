@@ -3,7 +3,6 @@
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
-  import { streakSemitones } from '../lib/audio/engine'
   import { confusableSets, type ConfusableSet } from '../lib/data/confusables'
   import { randomFontId } from '../lib/data/fonts'
   import { logPractice } from '../lib/study/actions'
@@ -32,7 +31,6 @@
   let score = $state(0)
   let font = $state(settings().font)
   let startedAt = 0
-  let streak = 0
 
   $effect(() => {
     void setId
@@ -44,7 +42,6 @@
     rounds = quizRounds(set, Math.max(10, set.chars.length * 4))
     index = 0
     score = 0
-    streak = 0
     step = 'quiz'
     await nextRound(0)
   }
@@ -66,11 +63,9 @@
     const correct = char === target
     if (correct) {
       score++
-      void audio.playSfx('correct', { semitones: streakSemitones(streak++) })
-    } else {
-      streak = 0
-      void audio.playSfx('wrong')
     }
+    // Right or wrong only: right sounds like Good, wrong like Again.
+    void audio.playGrade(correct ? 3 : 1)
     logPractice(store.data, {
       mode: 'confusable',
       deck: drillDeck(set, target),
@@ -167,11 +162,9 @@
             </p>
             <p class="hint">{set.hints[c]}</p>
             <div class="row">
-              {#if k.audio}
-                <button class="btn small" onclick={() => audio.playVoice(k.id)}>
-                  <Icon name="play" size={14} filled /> Listen
-                </button>
-              {/if}
+              <button class="btn small" onclick={() => audio.playVoice(k.id)}>
+                <Icon name="play" size={14} filled /> Listen
+              </button>
             </div>
             <StrokeOrder text={c} size={120} />
           </article>

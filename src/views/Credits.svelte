@@ -8,7 +8,13 @@
     { id: string; title: string; author: string; sourceUrl: string; license: string }[]
   >([])
 
+  let voices = $state<{ id: string; credit: string; terms: string }[]>([])
+
   $effect(() => {
+    fetch(`${base}audio/SOURCES.json`)
+      .then((r) => r.json())
+      .then((s) => (voices = Object.values(s.voices)))
+      .catch(() => {})
     fetch(`${base}photos/credits.json`)
       .then((r) => r.json())
       .then((p) => (photos = p))
@@ -30,14 +36,21 @@
   <section class="panel block">
     <h2>Pronunciation</h2>
     <p>
-      Recordings of the basic and dakuten kana by
-      <a
-        href="https://commons.wikimedia.org/wiki/User:Hakatanoshio117117"
-        target="_blank"
-        rel="noopener">Hakatanoshio117117</a
-      >
-      on Wikimedia Commons, released into the <strong>public domain</strong>.
+      Generated with <a href="https://voicevox.hiroshiba.jp" target="_blank" rel="noopener"
+        >VOICEVOX</a
+      >.
     </p>
+    <ul class="list">
+      {#each voices as v (v.id)}
+        <li>
+          {v.credit}
+          <span class="muted"
+            >· {v.id === 'female' ? 'female' : 'male'} voice ·
+            <a href={v.terms} target="_blank" rel="noopener">terms</a></span
+          >
+        </li>
+      {/each}
+    </ul>
   </section>
 
   <section class="panel block">

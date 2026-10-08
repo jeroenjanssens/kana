@@ -3,6 +3,9 @@
  * `sfx` for sound effects. Sound effects are ducked while a pronunciation clip plays.
  */
 
+import type { Grade } from '../storage/schema'
+import { kanaAudioPath, pickVoice, wordAudioPath, type VoiceId, type VoiceSetting } from './voices'
+
 export type SfxEvent =
   'flip' | 'correct' | 'wrong' | 'stamp' | 'bell' | 'complete' | 'milestone' | 'tick'
 
@@ -17,16 +20,15 @@ export interface AudioSettings {
   sfxVolume: number
   voiceVolume: number
   uiTicks: boolean
+  voice: VoiceSetting
 }
 
-/** Miyako-bushi scale (semitones above the root): the classic koto tuning. */
-export const MIYAKO_BUSHI = [0, 1, 5, 7, 8]
+/** Koto pitch per grade, in semitones above the sample's root: Hard low, Good middle, Easy high. */
+export const GRADE_SEMITONES = { 2: 12, 3: 17, 4: 24 } as const
 
-/** Semitone offset for the n-th note of a correct-answer streak, climbing the scale. */
-export function streakSemitones(step: number, startOctave = 1, maxSteps = 10): number {
-  const n = Math.min(Math.max(0, step), maxSteps)
-  const octave = Math.floor(n / MIYAKO_BUSHI.length)
-  return (startOctave + octave) * 12 + MIYAKO_BUSHI[n % MIYAKO_BUSHI.length]
+/** The sound for an answer: a wooden tock for Again, otherwise a koto note pitched by grade. */
+export function gradeSound(grade: Grade): { event: SfxEvent; semitones?: number } {
+  return grade === 1 ? { event: 'wrong' } : { event: 'correct', semitones: GRADE_SEMITONES[grade] }
 }
 
 export function semitonesToRate(semitones: number): number {
@@ -64,6 +66,7 @@ export class AudioEngine {
     sfxVolume: 0.5,
     voiceVolume: 1,
     uiTicks: false,
+    voice: 'female',
   }
 
   constructor(
@@ -125,11 +128,34 @@ export class AudioEngine {
     await Promise.all(files.map((f) => this.load(`sfx/${f}`)))
   }
 
+  /** Play the feedback sound for an answer with the given grade (1 = Again … 4 = Easy). */
+  playGrade(grade: Grade): Promise<void> {
+    const { event, semitones } = gradeSound(grade)
+    return this.playSfx(event, semitones === undefined ? {} : { semitones })
+  }
+
+  /**
+   * The voice for the next card. With the "random" setting this differs per call, so views pick
+   * once per card and pass it on, so a card never switches speakers halfway.
+   */
+  pickVoice(): VoiceId {
+    return pickVoice(this.settings.voice, this.rand)
+  }
+
   /** Play the pronunciation of a kana. Resolves when playback ends. */
-  async playVoice(kanaId: string): Promise<void> {
+  playVoice(kanaId: string, voice: VoiceId = this.pickVoice()): Promise<void> {
+    return this.playClip(kanaAudioPath(voice, kanaId))
+  }
+
+  /** Play the pronunciation of a reading-practice word (by its index in the word list). */
+  playWord(index: number, voice: VoiceId = this.pickVoice()): Promise<void> {
+    return this.playClip(wordAudioPath(voice, index))
+  }
+
+  private async playClip(path: string): Promise<void> {
     if (this.settings.silent || this.settings.voiceVolume <= 0) return
     this.unlock()
-    const buffer = await this.load(`audio/${kanaId}.mp3`)
+    const buffer = await this.load(path)
     const ctx = this.ctx
     if (!buffer || !ctx || !this.voiceBus) return
     this.currentVoice?.stop()

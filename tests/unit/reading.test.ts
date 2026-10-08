@@ -37,6 +37,7 @@ const word = (
   romaji: '',
   accept: [],
   meaning: '',
+  index: 0,
   script,
   tags,
 })

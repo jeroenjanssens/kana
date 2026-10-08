@@ -26,8 +26,9 @@ test('clicking a kana shows its details', async ({ page }) => {
   await expect(page.getByRole('button', { name: /^か, ka, young/ })).toHaveClass(/level-young/)
 })
 
-test('yōon have no audio and say so', async ({ page }) => {
+test('clicking a yōon plays its pronunciation', async ({ page }) => {
   await page.goto('./#/table')
+  const request = page.waitForRequest(/audio\/female\/kya\.mp3$/)
   await page.getByRole('button', { name: /^きゃ, kya/ }).click()
-  await expect(page.getByText('No recording is available for this sound yet.')).toBeVisible()
+  await request
 })

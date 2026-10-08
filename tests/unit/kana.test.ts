@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { describe, expect, test } from 'vitest'
 import {
   KANA,
@@ -10,6 +11,7 @@ import {
   scriptOf,
   segment,
 } from '../../src/lib/data/kana'
+import { VOICES, kanaAudioPath } from '../../src/lib/audio/voices'
 
 const count = (group: string) => KANA.filter((k) => k.group === group).length
 
@@ -51,9 +53,11 @@ describe('kana dataset', () => {
     }
   })
 
-  test('only basic and dakuten kana have audio', () => {
-    expect(KANA.filter((k) => k.audio)).toHaveLength(71)
-    for (const k of KANA) expect(k.audio).toBe(k.group === 'basic' || k.group === 'dakuten')
+  test('every kana has pronunciation audio in both voices', () => {
+    for (const voice of VOICES) {
+      for (const k of KANA)
+        expect(existsSync(`public/${kanaAudioPath(voice, k.id)}`), `${voice} ${k.id}`).toBe(true)
+    }
   })
 
   test('columns are within range', () => {

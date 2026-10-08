@@ -136,13 +136,11 @@ export function deckKana(deck: DeckId, groups: readonly KanaGroup[]): Kana[] {
     switch (deck) {
       case 'hiragana':
       case 'combined':
+      case 'listen-hiragana':
         return k.hiragana !== ''
       case 'katakana':
-        return true
-      case 'listen-hiragana':
-        return k.audio && k.hiragana !== ''
       case 'listen-katakana':
-        return k.audio
+        return true
     }
   })
 }
@@ -217,6 +215,7 @@ export class Session {
   private fresh: string[]
   private pending: { id: string; due: number }[] = []
   private sinceNew = 0
+  private seen = new Set<string>()
   readonly total: number
   done = 0
 
@@ -234,6 +233,26 @@ export class Session {
   /** Remaining cards, including ones waiting in learning. */
   get remaining(): number {
     return this.reviews.length + this.fresh.length + this.pending.length
+  }
+
+  /** Cards answered at least once this session; drives the progress bar. */
+  get seenCount(): number {
+    return this.seen.size
+  }
+
+  /** Cards not answered yet this session. */
+  get unseen(): number {
+    return this.total - this.seen.size
+  }
+
+  /** Cards answered already that will come back because they're still being learned. */
+  get repeating(): number {
+    return this.pending.filter((p) => this.seen.has(p.id)).length
+  }
+
+  /** Share of the session's cards seen at least once, from 0 to 1. */
+  get progress(): number {
+    return this.total ? this.seen.size / this.total : 1
   }
 
   isNew(id: string): boolean {
@@ -269,6 +288,7 @@ export class Session {
       }
     }
     this.done++
+    this.seen.add(id)
     const inLearning = record.state === State.Learning || record.state === State.Relearning
     if (inLearning && record.due < startOfNextDay(now)) {
       this.pending.push({ id, due: record.due })

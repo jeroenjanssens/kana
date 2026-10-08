@@ -37,7 +37,6 @@
       ] as [DeckId, string][]
     )
       .filter(([d]) => kana.hiragana || d === 'katakana')
-      .filter(([d]) => kana.audio || !d.startsWith('listen'))
       .map(([deck, label]) => {
         const card = store.data.cards[deck]?.[kana.id]
         const level = masteryLevel(card)
@@ -65,17 +64,12 @@
     <p class="romaji">{displayRomaji(kana, settings().romaji)}</p>
   </div>
   <div class="actions">
-    {#if kana.audio}
-      <button class="btn small" onclick={() => audio.playVoice(kana.id)}>
-        <Icon name="play" size={14} filled /> Listen
-      </button>
-    {/if}
+    <button class="btn small" onclick={() => audio.playVoice(kana.id)}>
+      <Icon name="play" size={14} filled /> Listen
+    </button>
     <button class="btn small" onclick={onstrokes}><Icon name="brush" size={14} /> Strokes</button>
     <button class="btn small" onclick={onfonts}><Icon name="fonts" size={14} /> Fonts</button>
   </div>
-  {#if !kana.audio}
-    <p class="muted small">No recording is available for this sound yet.</p>
-  {/if}
   <ul class="decks">
     {#each decks as d (d.deck)}
       <li>

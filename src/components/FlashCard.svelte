@@ -102,20 +102,14 @@
     {/if}
     <p class="romaji" class:inked={flipped}>{displayRomaji(kana, s.romaji)}</p>
     <div class="tools">
-      {#if kana.audio}
-        <button
-          class="btn small"
-          onclick={(e) => {
-            e.stopPropagation()
-            onplay()
-          }}
-          aria-label="Play pronunciation (P)"><Icon name="play" size={14} filled /> Listen</button
-        >
-      {:else}
-        <span class="chip" title="Recordings for this sound are not available yet"
-          >No recording yet</span
-        >
-      {/if}
+      <button
+        class="btn small"
+        onclick={(e) => {
+          e.stopPropagation()
+          onplay()
+        }}
+        aria-label="Play pronunciation (P)"><Icon name="play" size={14} filled /> Listen</button
+      >
       <button
         class="btn small"
         onclick={(e) => {

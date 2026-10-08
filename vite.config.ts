@@ -45,7 +45,8 @@ export default defineConfig({
         // App shell, pronunciation, sound effects, fonts and stroke data: everything needed offline.
         globPatterns: [
           '**/*.{js,css,html,svg,woff2}',
-          'audio/*.mp3',
+          // Kana for both voices; word audio is cached as you hear it (see runtimeCaching).
+          'audio/*/*.mp3',
           'sfx/*.{mp3,json}',
           'fonts/*.woff2',
           'icons/*.png',
@@ -55,6 +56,14 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: `${BASE}index.html`,
         runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith(`${BASE}audio/`),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'kana-word-audio',
+              expiration: { maxEntries: 1000 },
+            },
+          },
           {
             // Photos are large, so only the ones you have seen are kept for offline use.
             urlPattern: ({ url }) => url.pathname.startsWith(`${BASE}photos/`),

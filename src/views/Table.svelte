@@ -22,7 +22,7 @@
 
   function select(k: Kana) {
     selected = k
-    if (k.audio) void audio.playVoice(k.id)
+    void audio.playVoice(k.id)
   }
 
   function toggleGroup(g: KanaGroup) {

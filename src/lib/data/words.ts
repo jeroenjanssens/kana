@@ -12,6 +12,8 @@ export interface Word {
   meaning: string
   script: 'hiragana' | 'katakana'
   tags: WordTag[]
+  /** Position in the word list; also names the word's audio file. */
+  index: number
 }
 
 /** [kana, Hepburn romaji, meaning], roughly from easiest to hardest. */
@@ -432,10 +434,10 @@ function tagsFor(kana: string, romaji: string, script: Word['script']): WordTag[
   return tags
 }
 
-function build([kana, romaji, meaning]: Entry): Word {
+function build([kana, romaji, meaning]: Entry, index: number): Word {
   const script = /[\u30a0-\u30ff]/.test(kana) ? 'katakana' : 'hiragana'
   const accept = [...new Set([...romajiVariants(kana), ...macronVariants(romaji)])]
-  return { kana, romaji, accept, meaning, script, tags: tagsFor(kana, romaji, script) }
+  return { kana, romaji, accept, meaning, script, tags: tagsFor(kana, romaji, script), index }
 }
 
 export const words: readonly Word[] = ENTRIES.map(build)

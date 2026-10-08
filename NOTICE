@@ -4,11 +4,11 @@ kana — third-party material
 The source code of kana is licensed under the MIT License (see LICENSE).
 The following bundled assets are third-party works under their own licences.
 
-Pronunciation recordings — public/audio/
-  Recordings of the basic and dakuten kana by Hakatanoshio117117 on
-  Wikimedia Commons (https://commons.wikimedia.org/wiki/User:Hakatanoshio117117).
-  Public domain. Trimmed and re-encoded by scripts/fetch-audio.ts.
-  Per-file sources: public/audio/SOURCES.json
+Pronunciation audio — public/audio/
+  Generated with VOICEVOX (https://voicevox.hiroshiba.jp) by scripts/generate-audio.ts.
+  Female voice: VOICEVOX:春日部つむぎ (terms: https://tsumugi-official.studio.site/rule)
+  Male voice:   VOICEVOX:青山龍星 (terms: https://www.virvoxproject.com/voicevoxの利用規約)
+  Voice details: public/audio/SOURCES.json
 
 Stroke-order data — src/lib/data/kanjivg/
   Derived from KanjiVG (https://kanjivg.tagaini.net), copyright (C) Ulrich Apel

@@ -32,8 +32,21 @@ test('keyboard: space reveals, number keys grade', async ({ page, isMobile }) =>
   await expect(page.getByText('9 left')).toBeVisible()
   await page.keyboard.press('Space')
   await page.keyboard.press('1')
-  // "Again" keeps the card in the session.
-  await expect(page.getByText('9 left')).toBeVisible()
+  // "Again" keeps the card in the session: it counts as seen, and comes back.
+  await expect(page.locator('.count')).toHaveText(/8 left\s*·\s*1 again/)
+})
+
+test('the progress bar moves on every grade, not only on Easy', async ({ page }) => {
+  await page.goto('./#/study/hiragana?mode=srs')
+  const bar = page.locator('.progress span')
+  const width = () => bar.evaluate((el) => parseFloat((el as HTMLElement).style.width))
+  expect(await width()).toBe(0)
+  for (const [i, label] of ['Good', 'Hard', 'Again'].entries()) {
+    await page.getByRole('button', { name: /Show answer/ }).click()
+    await page.getByRole('button', { name: new RegExp(label) }).click()
+    await expect.poll(width).toBeCloseTo((i + 1) * 10)
+  }
+  await expect(page.locator('.count')).toHaveText(/7 left\s*·\s*3 again/)
 })
 
 test('typed answers are checked and suggest a grade', async ({ page }) => {

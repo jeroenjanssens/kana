@@ -1,0 +1,16 @@
+[
+  {
+    "id": "female",
+    "character": "春日部つむぎ",
+    "speaker": 8,
+    "credit": "VOICEVOX:春日部つむぎ",
+    "terms": "https://tsumugi-official.studio.site/rule"
+  },
+  {
+    "id": "male",
+    "character": "青山龍星",
+    "speaker": 13,
+    "credit": "VOICEVOX:青山龍星",
+    "terms": "https://www.virvoxproject.com/voicevoxの利用規約"
+  }
+]

@@ -4,7 +4,7 @@
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import PaperCard from '../components/PaperCard.svelte'
-  import { streakSemitones } from '../lib/audio/engine'
+  import type { VoiceId } from '../lib/audio/voices'
   import { randomFontId } from '../lib/data/fonts'
   import { segment } from '../lib/data/kana'
   import { words, type Word } from '../lib/data/words'
@@ -40,10 +40,11 @@
   let verdict = $state<boolean | undefined>()
   let notes = $state<ReadingNote[]>([])
   let font = $state(settings().font)
+  /** One voice per word card (matters for the "random" setting). */
+  let voice: VoiceId = audio.pickVoice()
   let tilt = $state(0)
   let score = $state(0)
   let startedAt = 0
-  let streak = 0
   let inputEl = $state<HTMLInputElement>()
 
   onDestroy(() => (ui.focus = false))
@@ -63,6 +64,7 @@
     const f = s.fontMode === 'random' ? randomFontId(s.randomFonts, font) : s.font
     await loadFontWithin(f)
     font = f
+    voice = audio.pickVoice()
     index = i
     flipped = false
     verdict = undefined
@@ -78,6 +80,8 @@
     if (!current || flipped) return
     flipped = true
     void audio.playSfx('flip')
+    const word = current
+    if (s.autoplay) setTimeout(() => current === word && audio.playWord(word.index, voice), 280)
     notes = notesFor(current).filter((n) => markNoteSeen(store.data, n.id))
   }
 
@@ -98,11 +102,9 @@
     })
     if (correct) {
       score++
-      void audio.playSfx('correct', { semitones: streakSemitones(streak++) })
-    } else {
-      streak = 0
-      void audio.playSfx('wrong')
     }
+    // Right or wrong only: right sounds like Good, wrong like Again.
+    void audio.playGrade(correct ? 3 : 1)
     if ((index + 1) % s.photoEvery === 0) nextPhoto()
     if (index + 1 >= queue.length) {
       phase = 'done'
@@ -128,6 +130,8 @@
     } else if (flipped && e.key === 'Enter') {
       e.preventDefault()
       answer(verdict ?? true)
+    } else if (flipped && (e.key === 'p' || e.key === 'P')) {
+      void audio.playWord(current.index, voice)
     } else if (flipped && !typed && e.key === '1') answer(false)
     else if (flipped && !typed && e.key === '2') answer(true)
   }
@@ -231,14 +235,21 @@
             {/if}
             <p class="romaji">{current.romaji}</p>
             <p class="meaning">{current.meaning}</p>
+            <button
+              class="btn small listen"
+              onclick={(e) => {
+                e.stopPropagation()
+                audio.playWord(current.index, voice)
+              }}
+              aria-label="Play the word (P)"><Icon name="play" size={14} filled /> Listen</button
+            >
             <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
             <div class="parts" onclick={(e) => e.stopPropagation()}>
               {#each parts as p, i (i)}
                 {#if p.kana}
                   <button
                     class="part"
-                    disabled={!p.kana.audio}
-                    onclick={() => p.kana?.audio && audio.playVoice(p.kana.id)}
+                    onclick={() => p.kana && audio.playVoice(p.kana.id, voice)}
                     title={p.kana.romaji}
                   >
                     <span lang="ja">{p.text}</span>
@@ -451,6 +462,10 @@
 
   .verdict.wrong {
     color: var(--shu);
+  }
+
+  .listen {
+    margin-bottom: 0.9rem;
   }
 
   .parts {

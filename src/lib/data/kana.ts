@@ -22,8 +22,6 @@ export interface Kana {
   col: number
   /** Global learning order. */
   order: number
-  /** True when a pronunciation recording is available. */
-  audio: boolean
 }
 
 const VOWELS = ['a', 'i', 'u', 'e', 'o']
@@ -231,7 +229,6 @@ function build(): Kana[] {
         group: 'basic',
         row,
         col,
-        audio: true,
       })
     })
   }
@@ -254,7 +251,6 @@ function build(): Kana[] {
         group: 'dakuten',
         row,
         col,
-        audio: true,
       })
     })
   }
@@ -277,7 +273,6 @@ function build(): Kana[] {
         group: 'yoon',
         row,
         col,
-        audio: false,
       })
     })
   }
@@ -293,7 +288,6 @@ function build(): Kana[] {
       group: 'extended',
       row,
       col,
-      audio: false,
     })
   }
 

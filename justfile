@@ -50,9 +50,17 @@ e2e:
 # Run everything CI runs
 ci: lint check test build e2e
 
-# Re-download and process the pronunciation audio from Wikimedia Commons
+# Start the VOICEVOX engine used to generate pronunciation audio (Docker)
+voicevox:
+    docker run -d --rm --name voicevox -p 50021:50021 voicevox/voicevox_engine:cpu-latest
+
+# Generate pronunciation audio for all voices in scripts/voices.json (needs `just voicevox`)
 audio:
-    npx tsx scripts/fetch-audio.ts
+    npx tsx scripts/generate-audio.ts
+
+# Build voice-preview/index.html to compare VOICEVOX voices (needs `just voicevox`)
+voice-preview:
+    npx tsx scripts/generate-audio.ts --preview
 
 # Re-process sound effects from scripts/sfx-sources
 sfx:

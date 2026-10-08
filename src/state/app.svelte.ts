@@ -42,6 +42,7 @@ export function startPersistence(): () => void {
         sfxVolume: s.sfxVolume,
         voiceVolume: s.voiceVolume,
         uiTicks: s.uiTicks,
+        voice: s.voice,
       })
     })
   })
