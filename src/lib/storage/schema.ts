@@ -50,6 +50,8 @@ export interface ReviewEntry {
   ms: number
   /** What was typed or picked, used for the confusion matrix (a kana id or text). */
   answer?: string
+  /** True when this was the first time the card was studied. */
+  new?: boolean
 }
 
 export interface Settings {
