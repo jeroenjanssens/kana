@@ -53,7 +53,7 @@ async function post<T>(path: string, body?: unknown, raw = false): Promise<T> {
 }
 
 interface AccentPhrase {
-  moras: { vowel_length: number }[]
+  moras: { vowel_length: number; vowel: string; consonant: string | null }[]
 }
 
 interface AudioQuery {
@@ -64,19 +64,46 @@ interface AudioQuery {
   [key: string]: unknown
 }
 
+/** How single kana are spoken. */
+export interface KanaStyle {
+  /** Speech speed (1 = normal). */
+  speed: number
+  /** Vowel length multiplier for single kana. */
+  stretch: number
+  /**
+   * Minimum length (seconds) of the weak u/i after s, sh, k, ts, ch, h, f, p, t (す, く, つ, ふ, し,
+   * き…). Japanese whispers these, so on their own they can sound like a bare consonant.
+   */
+  minWeakVowel: number
+}
+
+export const KANA_STYLE: KanaStyle = { speed: 0.9, stretch: 1.7, minWeakVowel: 0 }
+
+const VOICELESS = new Set(['s', 'sh', 'k', 'ts', 'ch', 'h', 'f', 'p', 't'])
+
 /** Synthesize `text` with a voice. `kana` text uses the phonetic notation instead of reading. */
-export async function synthesize(text: string, speaker: number, kana: boolean): Promise<Buffer> {
+export async function synthesize(
+  text: string,
+  speaker: number,
+  kana: boolean,
+  style: KanaStyle = KANA_STYLE,
+): Promise<Buffer> {
   const q = new URLSearchParams({ text: kana ? 'あ' : text, speaker: String(speaker) })
   const query = await post<AudioQuery>(`/audio_query?${q}`)
   if (kana) {
     const p = new URLSearchParams({ text, speaker: String(speaker), is_kana: 'true' })
     const phrases = await post<AccentPhrase[]>(`/accent_phrases?${p}`)
-    // Hold the vowel a little longer than in running speech, as when saying a kana on its own.
-    for (const mora of phrases.flatMap((ph) => ph.moras)) mora.vowel_length *= 1.7
+    // Hold the vowel a little longer than in running speech, as when saying a kana on its own; the
+    // weak u/i after a voiceless consonant gets extra length so it doesn't vanish into the hiss.
+    for (const mora of phrases.flatMap((ph) => ph.moras)) {
+      const weak = VOICELESS.has(mora.consonant ?? '') && (mora.vowel === 'u' || mora.vowel === 'i')
+      mora.vowel_length *= style.stretch
+      if (weak) mora.vowel_length = Math.max(mora.vowel_length, style.minWeakVowel)
+    }
     query.accent_phrases = phrases
   }
-  // Slightly slower, with a little room around the sound for clean trimming.
-  query.speedScale = kana ? 0.9 : 0.95
+  // With a little room around the sound for clean trimming.
+  query.speedScale = kana ? style.speed : 0.95
   query.prePhonemeLength = 0.1
   query.postPhonemeLength = 0.15
   return post<Buffer>(`/synthesis?speaker=${speaker}`, query, true)
@@ -147,6 +174,34 @@ async function generate(only?: string) {
   writeFileSync(join(OUT_DIR, 'SOURCES.json'), JSON.stringify(sources, null, 2) + '\n')
 }
 
+/** A small HTML page with rows of play buttons. */
+function previewPage(title: string, intro: string, rows: string[]): string {
+  return `<!doctype html><meta charset="utf-8"><title>${title}</title>
+<style>
+  body { font: 15px/1.5 system-ui, sans-serif; margin: 2rem; background: #f4efe6; color: #1c1b19 }
+  table { border-collapse: collapse } th { text-align: left; padding: .6rem 1rem .6rem 0; white-space: nowrap; vertical-align: top }
+  th small { display: block; font-weight: 400; color: #857e72 } td { padding: .4rem 0 }
+  tr { border-bottom: 1px solid #ddd2bf }
+  button { font: 20px/1 "Hiragino Sans", sans-serif; margin: 2px; padding: .4rem .55rem; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer }
+  button.word { font-size: 15px; background: #fbf8f2 } button.playing { background: #c73e1d; color: #fff }
+</style>
+<h1>${title}</h1>
+<p>${intro}</p>
+<table>${rows.join('\n')}</table>
+<script>
+  const audio = new Audio()
+  const play = (b) => new Promise((done) => {
+    document.querySelectorAll('.playing').forEach((x) => x.classList.remove('playing'))
+    b.classList.add('playing'); audio.src = b.dataset.src; audio.onended = done; audio.play()
+  })
+  document.addEventListener('click', async (e) => {
+    const b = e.target.closest('button'); if (b) return play(b)
+    const th = e.target.closest('th'); if (!th) return
+    for (const btn of th.parentElement.querySelectorAll('button')) { await play(btn); await new Promise((r) => setTimeout(r, 250)) }
+  })
+</script>`
+}
+
 /** Candidate voices for the preview page: neutral-sounding adult voices of both genders. */
 const CANDIDATES: {
   gender: 'female' | 'male'
@@ -197,37 +252,91 @@ async function preview() {
   }
   writeFileSync(
     join(PREVIEW_DIR, 'index.html'),
-    `<!doctype html><meta charset="utf-8"><title>kana — voice preview</title>
-<style>
-  body { font: 15px/1.5 system-ui, sans-serif; margin: 2rem; background: #f4efe6; color: #1c1b19 }
-  table { border-collapse: collapse } th { text-align: left; padding: .6rem 1rem .6rem 0; white-space: nowrap; vertical-align: top }
-  th small { display: block; font-weight: 400; color: #857e72 } td { padding: .4rem 0 }
-  tr { border-bottom: 1px solid #ddd2bf }
-  button { font: 20px/1 "Hiragino Sans", sans-serif; margin: 2px; padding: .4rem .55rem; border: 1px solid #ccc; border-radius: 8px; background: #fff; cursor: pointer }
-  button.word { font-size: 15px; background: #fbf8f2 } button.playing { background: #c73e1d; color: #fff }
-</style>
-<h1>kana — voice preview</h1>
-<p>Click a kana or word to hear it. <b>Play row</b>: click the voice name. Pick one ♀ and one ♂ voice.</p>
-<table>${rows.join('\n')}</table>
-<script>
-  const audio = new Audio()
-  const play = (b) => new Promise((done) => {
-    document.querySelectorAll('.playing').forEach((x) => x.classList.remove('playing'))
-    b.classList.add('playing'); audio.src = b.dataset.src; audio.onended = done; audio.play()
-  })
-  document.addEventListener('click', async (e) => {
-    const b = e.target.closest('button'); if (b) return play(b)
-    const th = e.target.closest('th'); if (!th) return
-    for (const btn of th.parentElement.querySelectorAll('button')) { await play(btn); await new Promise((r) => setTimeout(r, 250)) }
-  })
-</script>`,
+    previewPage(
+      'kana — voice preview',
+      'Click a kana or word to hear it. Click the voice name to play the row.',
+      rows,
+    ),
   )
   console.log(`Open ${PREVIEW_DIR}/index.html`)
 }
 
+/** Candidate styles for single kana, to compare by ear. */
+const STYLES: { name: string; style: KanaStyle }[] = [
+  { name: 'A · current (slow, every vowel ×1.7)', style: KANA_STYLE },
+  {
+    name: 'B · natural (normal speed, no stretch)',
+    style: { speed: 1, stretch: 1, minWeakVowel: 0 },
+  },
+  { name: 'C · natural, clear weak u/i', style: { speed: 1, stretch: 1, minWeakVowel: 0.28 } },
+  {
+    name: 'D · slightly held (×1.2), clear weak u/i',
+    style: { speed: 1, stretch: 1.2, minWeakVowel: 0.3 },
+  },
+  {
+    name: 'E · held (×1.4), clear weak u/i',
+    style: { speed: 1, stretch: 1.4, minWeakVowel: 0.32 },
+  },
+]
+const STYLE_KANA = [
+  'a',
+  'ka',
+  'su',
+  'shi',
+  'tsu',
+  'ku',
+  'fu',
+  'hi',
+  'ki',
+  'n',
+  'wo',
+  'kya',
+  'ra',
+  'ma',
+]
+
+/** Build voice-preview/styles.html: the same kana in each style, for both voices. */
+async function previewStyles() {
+  mkdirSync(PREVIEW_DIR, { recursive: true })
+  const voices = loadVoices()
+  const kana = STYLE_KANA.map((id) => KANA.find((k) => k.id === id)!)
+  const rows: string[] = []
+  for (const [si, { name, style }] of STYLES.entries()) {
+    for (const v of voices) {
+      const cells: string[] = []
+      for (const k of kana) {
+        const file = `style${si}-${v.id}-${k.id}.mp3`
+        encodeMp3(
+          await synthesize(kanaNotation(k), v.speaker, true, style),
+          join(PREVIEW_DIR, file),
+        )
+        cells.push(`<button data-src="${file}">${k.hiragana}</button>`)
+      }
+      rows.push(
+        `<tr><th>${name}<small>${v.character} (${v.id})</small></th><td>${cells.join('')}</td></tr>`,
+      )
+    }
+    console.log(`styles: ${name}`)
+  }
+  writeFileSync(
+    join(PREVIEW_DIR, 'styles.html'),
+    previewPage(
+      'kana — pronunciation styles',
+      'Compare how single kana are spoken. Click a row title to play the whole row.',
+      rows,
+    ),
+  )
+  console.log(`Open ${PREVIEW_DIR}/styles.html`)
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const only = process.argv.find((a) => a.startsWith('--voice='))?.slice('--voice='.length)
-  ;(process.argv.includes('--preview') ? preview() : generate(only)).catch((err) => {
+  const run = process.argv.includes('--preview-styles')
+    ? previewStyles()
+    : process.argv.includes('--preview')
+      ? preview()
+      : generate(only)
+  run.catch((err) => {
     console.error(err)
     process.exit(1)
   })
