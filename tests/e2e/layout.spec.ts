@@ -19,6 +19,9 @@ test('the page width is the same on short and long pages', async ({ page }) => {
 test('detail buttons stay inside the panel, even for wide kana', async ({ page }) => {
   await page.goto('./#/table')
   for (const name of [/^きゃ, kya/, /^か, ka/]) {
+    // On phones the details are a bottom sheet; close it before tapping the next kana.
+    const close = page.getByRole('button', { name: 'Close details' })
+    if (await close.isVisible()) await close.click()
     await page.getByRole('button', { name }).click()
     const panel = await page.locator('.details').boundingBox()
     for (const label of ['Listen', 'Strokes', 'Fonts']) {

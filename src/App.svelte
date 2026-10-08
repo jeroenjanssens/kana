@@ -20,6 +20,7 @@
     practice: () => import('./views/Practice.svelte'),
     drills: () => import('./views/Drills.svelte'),
     listen: () => import('./views/Listen.svelte'),
+    write: () => import('./views/Write.svelte'),
     reading: () => import('./views/Reading.svelte'),
     stats: () => import('./views/Stats.svelte'),
     settings: () => import('./views/Settings.svelte'),
@@ -117,7 +118,7 @@
       {/key}
     {:else}
       {@const key = (view in LAZY ? view : 'notfound') as keyof typeof LAZY}
-      {#key key === 'listen' ? route.segments.join('/') : key}
+      {#key key === 'listen' || key === 'write' ? route.segments.join('/') : key}
         {#await LAZY[key]() then mod}
           <mod.default />
         {/await}

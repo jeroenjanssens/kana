@@ -10,7 +10,7 @@
       href: '#/practice',
       label: 'Practice',
       icon: 'pairs',
-      match: ['practice', 'drills', 'listen', 'reading'],
+      match: ['practice', 'drills', 'listen', 'reading', 'write', 'sprint'],
     },
     { href: '#/stats', label: 'Stats', icon: 'chart', match: ['stats'] },
   ]

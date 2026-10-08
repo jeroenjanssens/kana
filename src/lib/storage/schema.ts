@@ -5,13 +5,22 @@ import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1
 
-export type DeckId = 'hiragana' | 'katakana' | 'combined' | 'listen-hiragana' | 'listen-katakana'
+export type DeckId =
+  | 'hiragana'
+  | 'katakana'
+  | 'combined'
+  | 'listen-hiragana'
+  | 'listen-katakana'
+  | 'write-hiragana'
+  | 'write-katakana'
 export const DECK_IDS: readonly DeckId[] = [
   'hiragana',
   'katakana',
   'combined',
   'listen-hiragana',
   'listen-katakana',
+  'write-hiragana',
+  'write-katakana',
 ]
 export type StudyDeckId = 'hiragana' | 'katakana' | 'combined'
 export const STUDY_DECKS: readonly StudyDeckId[] = ['hiragana', 'katakana', 'combined']
@@ -69,6 +78,8 @@ export interface Settings {
   font: string
   randomFonts: string[]
   answerStyle: AnswerStyle
+  /** How to answer in writing practice: draw the kana, or choose it from look-alikes. */
+  writeStyle: 'draw' | 'choose'
   autoplay: boolean
   showOtherScript: boolean
   romaji: RomajiSystem
@@ -111,6 +122,7 @@ export const DEFAULT_SETTINGS: Settings = {
   font: DEFAULT_FONT_ID,
   randomFonts: FONTS.map((f) => f.id),
   answerStyle: 'self',
+  writeStyle: 'draw',
   autoplay: true,
   showOtherScript: true,
   romaji: 'hepburn',

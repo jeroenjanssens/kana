@@ -141,6 +141,11 @@ export function deckKana(deck: DeckId, groups: readonly KanaGroup[]): Kana[] {
       case 'katakana':
       case 'listen-katakana':
         return true
+      // Writing practice leaves out the extended katakana (ファ, ティ…).
+      case 'write-hiragana':
+        return k.hiragana !== ''
+      case 'write-katakana':
+        return k.group !== 'extended'
     }
   })
 }

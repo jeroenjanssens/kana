@@ -26,9 +26,15 @@
   const days = $derived(heatmap(log, now))
   const due = $derived(forecast(store.data.cards, now, 14))
   const summaries = $derived(
-    ([...STUDY_DECKS, 'listen-hiragana', 'listen-katakana'] as DeckId[]).map((d) =>
-      deckSummary(store.data, d, now),
-    ),
+    (
+      [
+        ...STUDY_DECKS,
+        'listen-hiragana',
+        'listen-katakana',
+        'write-hiragana',
+        'write-katakana',
+      ] as DeckId[]
+    ).map((d) => deckSummary(store.data, d, now)),
   )
   const perf = $derived(performance(log, store.data.cards, now))
   const weak = $derived(weakest(perf, 10))
@@ -51,7 +57,7 @@
   )
 
   function scriptFor(deck: DeckId) {
-    return deck === 'katakana' || deck === 'listen-katakana' ? 'katakana' : 'hiragana'
+    return deck.endsWith('katakana') ? 'katakana' : 'hiragana'
   }
 
   function label(deck: DeckId, id: string) {

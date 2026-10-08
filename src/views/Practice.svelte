@@ -36,6 +36,11 @@
         : 'All done for today.'}
     </p>
   </a>
+  <a class="card panel" href="#/write">
+    <span class="art"><Icon name="brush" size={40} /></span>
+    <h2>Writing</h2>
+    <p>See the romaji, write the kana — stroke order and direction are checked.</p>
+  </a>
   <a class="card panel" href="#/reading">
     <span class="art" lang="ja">ねこ</span>
     <h2>Reading practice</h2>

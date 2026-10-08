@@ -37,9 +37,12 @@
         ['combined', 'Combined'],
         ['listen-hiragana', 'Listening (hiragana)'],
         ['listen-katakana', 'Listening (katakana)'],
+        ['write-hiragana', 'Writing (hiragana)'],
+        ['write-katakana', 'Writing (katakana)'],
       ] as [DeckId, string][]
     )
-      .filter(([d]) => kana.hiragana || d === 'katakana')
+      .filter(([d]) => kana.hiragana || d.endsWith('katakana'))
+      .filter(([d]) => !(kana.group === 'extended' && d.startsWith('write')))
       .map(([deck, label]) => {
         const card = store.data.cards[deck]?.[kana.id]
         const level = masteryLevel(card)
@@ -203,6 +206,11 @@
 
     .meta {
       display: none;
+    }
+
+    .hints {
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
     }
   }
 

@@ -156,6 +156,12 @@ describe('deckKana', () => {
     expect(deckKana('combined', groups)).toHaveLength(46)
     expect(deckKana('katakana', groups)).toHaveLength(65)
   })
+  test('writing decks leave out extended katakana', () => {
+    const all = ['basic', 'dakuten', 'yoon', 'extended'] as const
+    expect(deckKana('write-hiragana', all)).toHaveLength(104)
+    expect(deckKana('write-katakana', all)).toHaveLength(104)
+  })
+
   test('listening decks include every kana, yōon too', () => {
     const all = ['basic', 'dakuten', 'yoon', 'extended'] as const
     expect(deckKana('listen-hiragana', all)).toHaveLength(104)

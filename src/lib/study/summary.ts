@@ -9,6 +9,8 @@ export const DECK_INFO: Record<DeckId, { title: string; jp: string; sample: stri
   combined: { title: 'Combined', jp: 'ひらがな・カタカナ', sample: 'あア' },
   'listen-hiragana': { title: 'Listening · Hiragana', jp: 'ききとり', sample: 'あ' },
   'listen-katakana': { title: 'Listening · Katakana', jp: 'ききとり', sample: 'ア' },
+  'write-hiragana': { title: 'Writing · Hiragana', jp: 'かきかた', sample: 'あ' },
+  'write-katakana': { title: 'Writing · Katakana', jp: 'かきかた', sample: 'ア' },
 }
 
 export function queueFor(save: SaveFile, deck: DeckId, now: number = Date.now()): Queue {

@@ -1,4 +1,4 @@
-import data from './kanjivg/strokes.json'
+import data from './kanjivg/strokes.json' with { type: 'json' }
 
 export interface StrokeGlyph {
   char: string
