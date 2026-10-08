@@ -8,7 +8,7 @@
   import { HEADING_FONT_ID } from './lib/data/fonts'
   import { loadFont } from './lib/ui/fontLoader'
   import { generateWashi } from './lib/ui/washi'
-  import { settings, startPersistence } from './state/app.svelte'
+  import { audio, settings, startPersistence } from './state/app.svelte'
   import { route, startRouter } from './state/router.svelte'
   import { ui } from './state/ui.svelte'
   import Credits from './views/Credits.svelte'
@@ -79,6 +79,14 @@
   }
 
   const view = $derived(route.segments[0] ?? '')
+
+  // A soft wooden tick when moving between pages (only if enabled in settings).
+  let firstRoute = true
+  $effect(() => {
+    void view
+    if (firstRoute) firstRoute = false
+    else void audio.playSfx('tick')
+  })
 </script>
 
 <svelte:window onkeydown={onKeydown} />

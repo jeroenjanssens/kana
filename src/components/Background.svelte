@@ -25,6 +25,20 @@
       : 0,
   )
   const photo = $derived(photos[index])
+  const nextPhoto = $derived(photos.length ? photos[(index + 1) % photos.length] : undefined)
+  const width =
+    typeof window === 'undefined' ? 1280 : window.innerWidth * (window.devicePixelRatio || 1)
+  const size = width <= 700 ? 640 : width <= 1400 ? 1280 : 1920
+
+  // Warm the cache with the next photo so the cross-fade never waits for the network.
+  $effect(() => {
+    if (!show || !nextPhoto) return
+    const timer = setTimeout(() => {
+      const img = new Image()
+      img.src = `${base}photos/${nextPhoto.slug}-${size}.avif`
+    }, 4000)
+    return () => clearTimeout(timer)
+  })
 </script>
 
 <div class="backdrop washi" aria-hidden="true">

@@ -18,12 +18,14 @@
   } from '../lib/srs/scheduler'
   import { STUDY_DECKS, type Grade, type StudyDeckId } from '../lib/storage/schema'
   import { logPractice, recordReview } from '../lib/study/actions'
+  import { isStreakMilestone, rowMastered } from '../lib/study/milestones'
+  import { streak as dayStreak } from '../lib/study/stats'
   import { GRADE_LABELS, checkKana, kanaForAnswer, suggestGrade } from '../lib/study/answer'
   import { DECK_INFO, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
-  import { nextPhoto, ui } from '../state/ui.svelte'
+  import { nextPhoto, toast, ui } from '../state/ui.svelte'
 
   const deckParam = route.segments[1] as StudyDeckId | undefined
   const deck: StudyDeckId = deckParam && STUDY_DECKS.includes(deckParam) ? deckParam : 'hiragana'
@@ -169,7 +171,14 @@
   function finish() {
     phase = 'done'
     current = undefined
-    if (answered > 0) void audio.playSfx('complete')
+    if (answered === 0) return
+    void audio.playSfx('complete')
+    const before = dayStreak(store.data.log.filter((e) => e.t < sessionStart)).current
+    const after = dayStreak(store.data.log).current
+    if (after > before && isStreakMilestone(after)) {
+      setTimeout(() => void audio.playSfx('milestone'), 900)
+      toast(`${after}-day streak — keep it up!`)
+    }
   }
 
   function reveal() {
@@ -233,6 +242,13 @@
       celebrate = true
       setTimeout(() => void audio.playSfx('stamp'), 120)
       setTimeout(() => void audio.playSfx('bell'), 520)
+      const row = rowMastered(store.data, deck, current.id)
+      if (row) {
+        const first = kanaById(row[0])
+        const name = deck === 'katakana' ? first.katakana : first.hiragana
+        setTimeout(() => void audio.playSfx('milestone'), 1100)
+        toast(`You've mastered the ${name} row! 🎉`)
+      }
       await new Promise((r) => setTimeout(r, 1300))
     } else {
       await new Promise((r) => setTimeout(r, 160))

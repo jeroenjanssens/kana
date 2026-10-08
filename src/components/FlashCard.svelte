@@ -100,7 +100,7 @@
         {/if}
       </p>
     {/if}
-    <p class="romaji">{displayRomaji(kana, s.romaji)}</p>
+    <p class="romaji" class:inked={flipped}>{displayRomaji(kana, s.romaji)}</p>
     <div class="tools">
       {#if kana.audio}
         <button
@@ -195,6 +195,24 @@
     line-height: 1;
     margin: 0.4rem 0 0.8rem;
     letter-spacing: 0.02em;
+  }
+
+  /* The answer appears like ink soaking into the paper. */
+  .romaji.inked {
+    animation: ink-spread 0.9s var(--ease) 0.25s both;
+  }
+
+  @keyframes ink-spread {
+    from {
+      opacity: 0;
+      filter: blur(6px);
+      letter-spacing: 0.12em;
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+      letter-spacing: 0.02em;
+    }
   }
 
   .verdict {
