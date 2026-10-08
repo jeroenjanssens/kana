@@ -1,3 +1,6 @@
+import type { Lang } from '../i18n/format'
+import { hintsNl } from './nl/confusables'
+
 export interface ConfusableSet {
   id: string // e.g. 'shi-tsu'
   script: 'hiragana' | 'katakana' | 'mixed'
@@ -374,3 +377,8 @@ export const confusableSets: ConfusableSet[] = [
     },
   },
 ]
+
+/** The hint for a kana in a confusable set, in a language (falls back to English). */
+export function confusableHint(set: ConfusableSet, char: string, lang: Lang = 'en'): string {
+  return (lang === 'nl' && hintsNl[set.id]?.[char]) || set.hints[char]
+}

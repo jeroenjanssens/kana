@@ -220,18 +220,30 @@ export function writingGrade(result: WritingResult, ms: number): 1 | 2 | 3 | 4 {
   return ms <= 8000 ? 4 : 3
 }
 
-/** A short explanation of what went wrong, for the learner. */
-export function describeResult(result: WritingResult): string {
-  if (result.correct) return 'Correct!'
-  if (result.countIssue === 'missing') {
-    return `This kana has ${result.expected} strokes; you drew ${result.drawn}.`
-  }
-  if (result.countIssue === 'extra') {
-    return `This kana has ${result.expected} stroke${result.expected === 1 ? '' : 's'}; you drew ${result.drawn}.`
+/** A short explanation of what went wrong, as a message key and its parameters. */
+export function describeResult(result: WritingResult): {
+  key:
+    | 'write.correct'
+    | 'write.missing'
+    | 'write.extra'
+    | 'write.direction'
+    | 'write.order'
+    | 'write.shape'
+  params: Record<string, number>
+} {
+  if (result.correct) return { key: 'write.correct', params: {} }
+  if (result.countIssue) {
+    return {
+      key: result.countIssue === 'missing' ? 'write.missing' : 'write.extra',
+      params: { expected: result.expected, drawn: result.drawn },
+    }
   }
   const first = result.strokes.find((s) => !s.ok)!
-  const n = first.index + 1
-  if (first.issue === 'direction') return `Stroke ${n} goes the other way.`
-  if (first.issue === 'order') return `Stroke ${n} comes later — check the order.`
-  return `Stroke ${n} doesn't match the shape.`
+  const key =
+    first.issue === 'direction'
+      ? 'write.direction'
+      : first.issue === 'order'
+        ? 'write.order'
+        : 'write.shape'
+  return { key, params: { n: first.index + 1 } }
 }

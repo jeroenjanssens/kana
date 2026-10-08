@@ -109,7 +109,7 @@ describe('checkWriting', () => {
     const result = checkWriting(drawn, r)
     expect(result.correct).toBe(false)
     expect(result.strokes[1].issue).toBe('direction')
-    expect(describeResult(result)).toBe('Stroke 2 goes the other way.')
+    expect(describeResult(result)).toEqual({ key: 'write.direction', params: { n: 2 } })
   })
 
   test('swapped strokes are caught', () => {
@@ -127,9 +127,10 @@ describe('checkWriting', () => {
       correct: false,
       countIssue: 'missing',
     })
-    expect(describeResult(checkWriting(drawn.slice(0, 2), r))).toBe(
-      'This kana has 3 strokes; you drew 2.',
-    )
+    expect(describeResult(checkWriting(drawn.slice(0, 2), r))).toEqual({
+      key: 'write.missing',
+      params: { expected: 3, drawn: 2 },
+    })
     expect(checkWriting([...drawn, drawn[0]], r)).toMatchObject({
       correct: false,
       countIssue: 'extra',

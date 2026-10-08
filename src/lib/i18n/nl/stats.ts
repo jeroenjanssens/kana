@@ -1,0 +1,3 @@
+import type en from '../en/stats'
+
+export default {} satisfies Record<keyof typeof en, string>

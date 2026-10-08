@@ -67,6 +67,8 @@ export interface ReviewEntry {
 }
 
 export interface Settings {
+  /** Interface language: follow the browser, or English / Dutch. */
+  language: 'system' | 'en' | 'nl'
   newPerDay: number
   reviewsPerDay: number
   /** Lapses after which a card counts as a leech. */
@@ -128,6 +130,7 @@ export interface Settings {
 }
 
 export const DEFAULT_SETTINGS: Settings = {
+  language: 'system',
   newPerDay: 10,
   reviewsPerDay: 200,
   leechThreshold: 6,

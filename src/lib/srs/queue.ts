@@ -34,15 +34,22 @@ export function dayKey(now: Date | number = Date.now()): string {
 }
 
 /** Compact interval label: '<1m', '10m', '3h', '4d', '2mo', '1.5y'. */
-export function formatInterval(ms: number): string {
-  if (ms < MINUTE) return '<1m'
-  if (ms < HOUR) return `${Math.round(ms / MINUTE)}m`
-  if (ms < DAY) return `${Math.round(ms / HOUR)}h`
+const UNITS = {
+  en: { m: 'm', h: 'h', d: 'd', mo: 'mo', y: 'y' },
+  nl: { m: 'm', h: 'u', d: 'd', mo: 'mnd', y: 'j' },
+} as const
+
+export function formatInterval(ms: number, lang: 'en' | 'nl' = 'en'): string {
+  const u = UNITS[lang]
+  if (ms < MINUTE) return `<1${u.m}`
+  if (ms < HOUR) return `${Math.round(ms / MINUTE)}${u.m}`
+  if (ms < DAY) return `${Math.round(ms / HOUR)}${u.h}`
   const days = ms / DAY
-  if (days < 30) return `${Math.round(days)}d`
-  if (days < 365) return `${Math.round(days / 30)}mo`
+  if (days < 30) return `${Math.round(days)}${u.d}`
+  if (days < 365) return `${Math.round(days / 30)}${u.mo}`
   const years = days / 365
-  return `${years < 10 ? Math.round(years * 10) / 10 : Math.round(years)}y`
+  const n = years < 10 ? Math.round(years * 10) / 10 : Math.round(years)
+  return `${lang === 'nl' ? String(n).replace('.', ',') : n}${u.y}`
 }
 
 export type MasteryLevel = 'new' | 'learning' | 'young' | 'mature'

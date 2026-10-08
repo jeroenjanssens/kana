@@ -1,4 +1,4 @@
-import { GistClient, syncWithGist } from '../lib/storage/gist'
+import { GistClient, SyncError, syncWithGist } from '../lib/storage/gist'
 import { mergeSaves } from '../lib/storage/merge'
 import type { SaveFile } from '../lib/storage/schema'
 import { replaceData, store } from './app.svelte'
@@ -34,7 +34,8 @@ export async function syncNow(): Promise<boolean> {
     localStorage.setItem(LAST_KEY, String(sync.lastSync))
     return true
   } catch (err) {
-    sync.error = (err as Error).message
+    // A code the interface translates (see the 'sync.error.*' messages).
+    sync.error = err instanceof SyncError ? err.code : 'http'
     return false
   } finally {
     sync.syncing = false

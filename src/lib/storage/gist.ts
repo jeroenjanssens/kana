@@ -8,10 +8,13 @@ export const GIST_FILE = 'kana-progress.json'
 export const GIST_DESCRIPTION = 'kana — progress (synced by the kana app)'
 const API = 'https://api.github.com'
 
+export type SyncErrorCode = 'offline' | 'token' | 'scope' | 'notfound' | 'http'
+
 export class SyncError extends Error {
   constructor(
     message: string,
     readonly status?: number,
+    readonly code: SyncErrorCode = 'http',
   ) {
     super(message)
   }
@@ -50,11 +53,12 @@ export class GistClient {
         },
       })
     } catch {
-      throw new SyncError('Could not reach GitHub — are you offline?')
+      throw new SyncError('Could not reach GitHub — are you offline?', undefined, 'offline')
     }
-    if (res.status === 401) throw new SyncError('GitHub rejected the token', 401)
-    if (res.status === 403) throw new SyncError('The token is not allowed to use gists', 403)
-    if (res.status === 404) throw new SyncError('The synced gist was not found', 404)
+    if (res.status === 401) throw new SyncError('GitHub rejected the token', 401, 'token')
+    if (res.status === 403)
+      throw new SyncError('The token is not allowed to use gists', 403, 'scope')
+    if (res.status === 404) throw new SyncError('The synced gist was not found', 404, 'notfound')
     if (!res.ok) throw new SyncError(`GitHub returned an error (${res.status})`, res.status)
     return (await res.json()) as T
   }

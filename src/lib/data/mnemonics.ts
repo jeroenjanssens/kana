@@ -1,4 +1,7 @@
+import type { Lang } from '../i18n/format'
 import { kanaByChar, type Kana, type Script } from './kana'
+import { mnemonicsNl } from './nl/mnemonics'
+import { kanaNotesNl } from './nl/notes'
 
 /**
  * Memory hints for the basic kana, written for kana. The sound in the hint is in *asterisks*.
@@ -250,24 +253,37 @@ export const KANA_NOTES: Record<KanaNote, { title: string; body: string; example
   },
 }
 
+/** A note on how a kana is built, in a language (falls back to English). */
+export function kanaNote(note: KanaNote, lang: Lang = 'en') {
+  return (lang === 'nl' && kanaNotesNl[note]) || KANA_NOTES[note]
+}
+
 /** A memory hint for a kana in a script. */
-export function mnemonicFor(kana: Kana, script: Script): string {
+export function mnemonicFor(kana: Kana, script: Script, lang: Lang = 'en'): string {
   const text = script === 'hiragana' && kana.hiragana ? kana.hiragana : kana.katakana
-  const own = BASIC[kana.id]
-  if (own) return own[script === 'hiragana' && kana.hiragana ? 'hiragana' : 'katakana']
+  const which = script === 'hiragana' && kana.hiragana ? 'hiragana' : 'katakana'
+  const own = (lang === 'nl' && mnemonicsNl[kana.id]) || BASIC[kana.id]
+  if (own) return own[which]
 
   const chars = [...text]
   if (chars.length === 2) {
     const base = kanaByChar(chars[0])
     const small = SMALL[chars[1]]
     if (base && small) {
-      return `${chars[0]} ${base.romaji} + a small ${chars[1]} ${small} → one syllable: ${kana.romaji}.`
+      return lang === 'nl'
+        ? `${chars[0]} ${base.romaji} + een kleine ${chars[1]} ${small} → één lettergreep: ${kana.romaji}.`
+        : `${chars[0]} ${base.romaji} + a small ${chars[1]} ${small} → one syllable: ${kana.romaji}.`
     }
   }
   const baseChar = baseOf(chars[0])
   const base = baseChar ? kanaByChar(baseChar) : undefined
   if (base) {
-    const mark = text.normalize('NFD').includes('゚') ? 'a small circle (゜)' : 'two marks (゛)'
+    const circle = text.normalize('NFD').includes('゚')
+    if (lang === 'nl') {
+      const mark = circle ? 'een klein rondje (゜)' : 'twee streepjes (゛)'
+      return `${baseChar} ${base.romaji} met ${mark}: dezelfde vorm, nu uitgesproken als ${kana.romaji}.`
+    }
+    const mark = circle ? 'a small circle (゜)' : 'two marks (゛)'
     return `${baseChar} ${base.romaji} with ${mark}: the same shape, now pronounced ${kana.romaji}.`
   }
   return ''

@@ -1,4 +1,7 @@
+import type { Lang } from '../i18n/format'
 import { kanaByChar, segment, type Kana } from '../data/kana'
+import { meaningsNl } from '../data/nl/words'
+import { readingNotesNl } from '../data/nl/notes'
 import { words, type Word, type WordTag } from '../data/words'
 import { atLeast, masteryLevel, type MasteryLevel } from '../srs/queue'
 import type { SaveFile } from '../storage/schema'
@@ -76,8 +79,18 @@ export const NOTES: Partial<Record<WordTag, ReadingNote>> = {
   },
 }
 
-export function notesFor(word: Word): ReadingNote[] {
-  return word.tags.flatMap((t) => (NOTES[t] ? [NOTES[t]!] : []))
+export function notesFor(word: Word, lang: Lang = 'en'): ReadingNote[] {
+  return word.tags.flatMap((t) => {
+    const note = NOTES[t]
+    if (!note) return []
+    const nl = lang === 'nl' ? readingNotesNl[t as keyof typeof readingNotesNl] : undefined
+    return [nl ? { ...note, ...nl } : note]
+  })
+}
+
+/** A word's meaning in a language (falls back to English). */
+export function wordMeaning(word: Word, lang: Lang = 'en'): string {
+  return (lang === 'nl' && meaningsNl[word.kana]) || word.meaning
 }
 
 /** Unlocked words ordered for practice: least practised and least recently seen first. */
