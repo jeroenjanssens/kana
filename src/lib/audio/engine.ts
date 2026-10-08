@@ -7,7 +7,7 @@ import type { Grade } from '../storage/schema'
 import { kanaAudioPath, pickVoice, wordAudioPath, type VoiceId, type VoiceSetting } from './voices'
 
 export type SfxEvent =
-  'flip' | 'correct' | 'wrong' | 'stamp' | 'bell' | 'complete' | 'milestone' | 'tick'
+  'flip' | 'hard' | 'good' | 'easy' | 'wrong' | 'stamp' | 'bell' | 'complete' | 'milestone' | 'tick'
 
 export interface SfxManifest {
   events: Partial<Record<SfxEvent, string[]>>
@@ -23,12 +23,12 @@ export interface AudioSettings {
   voice: VoiceSetting
 }
 
-/** Koto pitch per grade, in semitones above the sample's root: Hard low, Good middle, Easy high. */
-export const GRADE_SEMITONES = { 2: 12, 3: 17, 4: 24 } as const
+/** The koto note per grade: three real notes (root, fifth, octave) from low to high. */
+const GRADE_EVENTS: Record<Grade, SfxEvent> = { 1: 'wrong', 2: 'hard', 3: 'good', 4: 'easy' }
 
 /** The sound for an answer: a wooden tock for Again, otherwise a koto note pitched by grade. */
-export function gradeSound(grade: Grade): { event: SfxEvent; semitones?: number } {
-  return grade === 1 ? { event: 'wrong' } : { event: 'correct', semitones: GRADE_SEMITONES[grade] }
+export function gradeSound(grade: Grade): SfxEvent {
+  return GRADE_EVENTS[grade]
 }
 
 export function semitonesToRate(semitones: number): number {
@@ -130,8 +130,8 @@ export class AudioEngine {
 
   /** Play the feedback sound for an answer with the given grade (1 = Again … 4 = Easy). */
   playGrade(grade: Grade): Promise<void> {
-    const { event, semitones } = gradeSound(grade)
-    return this.playSfx(event, semitones === undefined ? {} : { semitones })
+    // Koto notes play at their recorded pitch, so each grade always sounds the same.
+    return this.playSfx(gradeSound(grade), grade > 1 ? { semitones: 0 } : {})
   }
 
   /**

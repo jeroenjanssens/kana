@@ -10,7 +10,7 @@
   import { drillDeck, kanaOf, personalSets, quizOptions, quizRounds } from '../lib/study/drills'
   import { confusions } from '../lib/study/stats'
   import { loadFontWithin } from '../lib/ui/fontLoader'
-  import { audio, settings, store } from '../state/app.svelte'
+  import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
 
   const mine = $derived(personalSets(confusions(store.data.log, 6)))
@@ -66,7 +66,7 @@
       score++
     }
     // Right or wrong only: right sounds like Good, wrong like Again.
-    void audio.playGrade(correct ? 3 : 1)
+    feedback(correct ? 3 : 1)
     logPractice(store.data, {
       mode: 'confusable',
       deck: drillDeck(set, target),

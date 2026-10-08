@@ -1,12 +1,22 @@
 import { AudioEngine } from '../lib/audio/engine'
 import { configureScheduler } from '../lib/srs/scheduler'
 import { load, requestPersistence, save } from '../lib/storage/persistence'
-import type { SaveFile, Settings } from '../lib/storage/schema'
+import type { Grade, SaveFile, Settings } from '../lib/storage/schema'
+import { haptic } from '../lib/ui/haptics'
 
 /** All persistent state: settings and progress. Mutations are saved automatically. */
 export const store = $state<{ data: SaveFile }>({ data: load() })
 
 export const audio = new AudioEngine(import.meta.env.BASE_URL)
+
+/** Answer feedback: the koto note (or wood tock) for the grade, and a light vibration. */
+export function feedback(grade: Grade): void {
+  void audio.playGrade(grade)
+  haptic(grade === 1 ? 'double' : 'tap', {
+    enabled: store.data.settings.haptics,
+    reducedMotion: document.documentElement.dataset.motion === 'reduce',
+  })
+}
 
 export function settings(): Settings {
   return store.data.settings

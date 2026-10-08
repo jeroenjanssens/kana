@@ -7,7 +7,8 @@
     "sourceUrl": "https://unsplash.com/photos/body-of-water-near-mountain-under-blue-sky-during-daytime-cCw6KQVJnyU",
     "downloadUrl": "https://images.unsplash.com/photo-1618278942403-e973260cc425?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Yamanashi"
+    "location": "Yamanashi",
+    "season": "winter"
   },
   {
     "slug": "fuji-chureito",
@@ -17,7 +18,8 @@
     "sourceUrl": "https://unsplash.com/photos/pagoda-and-mount-fuji-in-japan-FuxYvi-hcWQ",
     "downloadUrl": "https://images.unsplash.com/photo-1578271887552-5ac3a72752bc?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Yamanashi"
+    "location": "Yamanashi",
+    "season": "any"
   },
   {
     "slug": "fuji-hakone-blossoms",
@@ -27,7 +29,8 @@
     "sourceUrl": "https://unsplash.com/photos/red-and-green-trees-near-mountain-during-daytime-_hPV2DY_uXo",
     "downloadUrl": "https://images.unsplash.com/photo-1605206809417-31eed948187f?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kanagawa"
+    "location": "Kanagawa",
+    "season": "spring"
   },
   {
     "slug": "fuji-snow-lake",
@@ -37,7 +40,8 @@
     "sourceUrl": "https://unsplash.com/photos/white-and-black-mountain-near-body-of-water-during-daytime-ej8pKvHDg_c",
     "downloadUrl": "https://images.unsplash.com/photo-1606918801925-e2c914c4b503?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Yamanashi"
+    "location": "Yamanashi",
+    "season": "winter"
   },
   {
     "slug": "fushimi-inari",
@@ -47,7 +51,8 @@
     "sourceUrl": "https://unsplash.com/photos/orange-and-black-tunnel-with-orange-lights-62IRMCiDaPY",
     "downloadUrl": "https://images.unsplash.com/photo-1613487691352-7d9b4ee5045b?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kyoto"
+    "location": "Kyoto",
+    "season": "any"
   },
   {
     "slug": "arashiyama-bamboo",
@@ -57,7 +62,8 @@
     "sourceUrl": "https://unsplash.com/photos/bamboo-trees-scenery-fSAyrw46Tx4",
     "downloadUrl": "https://images.unsplash.com/photo-1540999758994-161f2ee6e1c8?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kyoto"
+    "location": "Kyoto",
+    "season": "any"
   },
   {
     "slug": "tokyo-night",
@@ -67,7 +73,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-view-of-a-city-at-night-from-the-top-of-a-building-oDxB4vkZdqo",
     "downloadUrl": "https://images.unsplash.com/photo-1682985942242-31413035c2db?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Tokyo"
+    "location": "Tokyo",
+    "season": "any"
   },
   {
     "slug": "tokyo-tower",
@@ -77,7 +84,8 @@
     "sourceUrl": "https://unsplash.com/photos/tokyo-tower-illuminated-at-dusk-with-city-skyline-IocJwyqRv3M",
     "downloadUrl": "https://images.unsplash.com/photo-1513407030348-c983a97b98d8?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Tokyo"
+    "location": "Tokyo",
+    "season": "any"
   },
   {
     "slug": "shibuya-crossing",
@@ -87,7 +95,8 @@
     "sourceUrl": "https://unsplash.com/photos/cars-in-neon-shibuya-intersection-alY6_OpdwRQ",
     "downloadUrl": "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Tokyo"
+    "location": "Tokyo",
+    "season": "any"
   },
   {
     "slug": "gion-lanterns",
@@ -97,7 +106,8 @@
     "sourceUrl": "https://unsplash.com/photos/japanese-lantern-light-during-night-time-6fAgnT3Dhl4",
     "downloadUrl": "https://images.unsplash.com/photo-1574060275764-4e3e046ff29c?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kyoto"
+    "location": "Kyoto",
+    "season": "any"
   },
   {
     "slug": "cherry-blossoms",
@@ -107,7 +117,8 @@
     "sourceUrl": "https://unsplash.com/photos/pink-flowers-on-brown-tree-branch-Z4RqbN2SFbk",
     "downloadUrl": "https://images.unsplash.com/photo-1579833472711-fd404a240be7?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Japan"
+    "location": "Japan",
+    "season": "spring"
   },
   {
     "slug": "autumn-maple",
@@ -117,7 +128,8 @@
     "sourceUrl": "https://unsplash.com/photos/red-leaves-on-tree-branch-FgJPYhy7lvU",
     "downloadUrl": "https://images.unsplash.com/photo-1607569911436-75895e8b2a96?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Japan"
+    "location": "Japan",
+    "season": "autumn"
   },
   {
     "slug": "miyajima-torii",
@@ -127,7 +139,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-large-red-structure-on-a-beach-with-itsukushima-in-the-background-aXHYBxDnIks",
     "downloadUrl": "https://images.unsplash.com/photo-1660212918322-d8b71f3c8ffe?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Hiroshima"
+    "location": "Hiroshima",
+    "season": "summer"
   },
   {
     "slug": "shirakawa-go",
@@ -137,7 +150,8 @@
     "sourceUrl": "https://unsplash.com/photos/people-near-brown-house-and-trees-oxfKC1QvqyA",
     "downloadUrl": "https://images.unsplash.com/photo-1560865612-70efb2c7fd57?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Gifu"
+    "location": "Gifu",
+    "season": "spring"
   },
   {
     "slug": "japanese-garden",
@@ -147,7 +161,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-small-waterfall-in-the-middle-of-a-garden-UhmpFV76vIY",
     "downloadUrl": "https://images.unsplash.com/photo-1678754183715-87b12a70ef28?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Japan"
+    "location": "Japan",
+    "season": "summer"
   },
   {
     "slug": "kyoto-autumn-garden",
@@ -157,7 +172,8 @@
     "sourceUrl": "https://unsplash.com/photos/wooden-walkway-in-japanese-autumn-garden-u8fS3_bSWdI",
     "downloadUrl": "https://images.unsplash.com/photo-1610238115511-81be15284155?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kyoto"
+    "location": "Kyoto",
+    "season": "autumn"
   },
   {
     "slug": "zen-rock-garden",
@@ -167,7 +183,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-circular-design-made-of-sand-on-a-beach-rDwIXsgb2LY",
     "downloadUrl": "https://images.unsplash.com/photo-1567372704182-ec2ea042c937?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kyoto"
+    "location": "Kyoto",
+    "season": "any"
   },
   {
     "slug": "rice-terraces",
@@ -177,7 +194,8 @@
     "sourceUrl": "https://unsplash.com/photos/terraced-rice-fields-in-a-lush-green-valley-h8y4x_NE0GU",
     "downloadUrl": "https://images.unsplash.com/photo-1774285311895-26a7b05ae139?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Aichi"
+    "location": "Aichi",
+    "season": "summer"
   },
   {
     "slug": "nara-deer",
@@ -187,7 +205,8 @@
     "sourceUrl": "https://unsplash.com/photos/gray-deer-under-white-and-gray-arch-tEOhkLuqmUI",
     "downloadUrl": "https://images.unsplash.com/photo-1550303435-1703d8811aaa?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Nara"
+    "location": "Nara",
+    "season": "autumn"
   },
   {
     "slug": "japan-alps",
@@ -197,7 +216,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-river-flows-through-a-lush-mountain-valley-AZcuCaacyK0",
     "downloadUrl": "https://images.unsplash.com/photo-1754390032135-00ecfaa00cc0?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Nagano"
+    "location": "Nagano",
+    "season": "summer"
   },
   {
     "slug": "japan-coastline",
@@ -207,7 +227,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-large-body-of-water-next-to-a-rocky-cliff-Yh_zuOxTIxc",
     "downloadUrl": "https://images.unsplash.com/photo-1710656136793-8676a7bf8ece?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Japan"
+    "location": "Japan",
+    "season": "summer"
   },
   {
     "slug": "misty-forest",
@@ -217,7 +238,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-body-of-water-surrounded-by-trees-and-fog-OuTGWvk6a44",
     "downloadUrl": "https://images.unsplash.com/photo-1726480244470-62c21ad2fc17?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Japan"
+    "location": "Japan",
+    "season": "any"
   },
   {
     "slug": "cherry-blossom-bridge",
@@ -227,7 +249,8 @@
     "sourceUrl": "https://unsplash.com/photos/a-bridge-over-a-pond-in-a-park-kwPkNZscIhg",
     "downloadUrl": "https://images.unsplash.com/photo-1705695373213-115c102714fd?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Japan"
+    "location": "Japan",
+    "season": "spring"
   },
   {
     "slug": "kiyomizudera-autumn",
@@ -237,6 +260,7 @@
     "sourceUrl": "https://unsplash.com/photos/a-view-of-a-building-in-the-middle-of-a-forest-PZMARGiSSoI",
     "downloadUrl": "https://images.unsplash.com/photo-1727836674703-7d3d26af17c3?w=2400&q=85&fm=jpg",
     "license": "Unsplash License",
-    "location": "Kyoto"
+    "location": "Kyoto",
+    "season": "autumn"
   }
 ]

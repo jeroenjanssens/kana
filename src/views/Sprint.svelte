@@ -18,7 +18,7 @@
     sprintPool,
   } from '../lib/study/sprint'
   import { loadFontWithin } from '../lib/ui/fontLoader'
-  import { audio, settings, store } from '../state/app.svelte'
+  import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
 
@@ -86,7 +86,7 @@
       ms: performance.now() - shownAt,
       ...(answered && !correct ? { answer: answered.id } : {}),
     })
-    void audio.playGrade(correct ? 3 : 1)
+    feedback(correct ? 3 : 1)
     if (correct) {
       score++
       show(nextSprintKana(pool, current))

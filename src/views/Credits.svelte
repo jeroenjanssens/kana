@@ -84,8 +84,8 @@
   <section class="panel block">
     <h2>Sound effects</h2>
     <p>
-      From <a href="https://freesound.org" target="_blank" rel="noopener">Freesound</a> (CC0), and a few
-      generated for kana.
+      From <a href="https://freesound.org" target="_blank" rel="noopener">Freesound</a> (CC0), a few generated
+      for kana, and three koto notes cut from a recording by Torsodog on Wikimedia Commons (CC BY 3.0).
     </p>
     <ul class="list">
       {#each sfx as s (s.id)}

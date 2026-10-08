@@ -8,12 +8,32 @@ export interface Photo {
   sourceUrl: string
   license: string
   location: string
+  season: Season
   color: string
   width: number
   height: number
 }
 
 export const PHOTO_WIDTHS = [640, 1280, 1920] as const
+
+export type Season = 'spring' | 'summer' | 'autumn' | 'winter' | 'any'
+
+/** The season in Japan: spring Mar–May, summer Jun–Aug, autumn Sep–Nov, winter Dec–Feb. */
+export function seasonOf(date: Date = new Date()): Exclude<Season, 'any'> {
+  const m = date.getMonth()
+  if (m >= 2 && m <= 4) return 'spring'
+  if (m >= 5 && m <= 7) return 'summer'
+  if (m >= 8 && m <= 10) return 'autumn'
+  return 'winter'
+}
+
+/** Photos for a season: that season's own, plus the season-neutral ones. */
+export function photosForSeason<T extends Pick<Photo, 'season'>>(
+  photos: readonly T[],
+  season: Season,
+): T[] {
+  return photos.filter((p) => p.season === season || p.season === 'any')
+}
 
 /** Index of the "photo of the day" for a day key. */
 export function photoOfTheDay(day: string, count: number): number {
@@ -48,15 +68,17 @@ export function stepPhoto(photos: readonly Pick<Photo, 'slug'>[], slug: string, 
 }
 
 /**
- * The photo to show when the app starts. A known saved photo is kept, except in "daily" mode,
- * where a new day brings the photo of the day.
+ * The photo to show when the app starts. A saved photo is kept (even if it's out of season), except
+ * in "daily" mode, where a new day brings the photo of the day. New photos come from `photos`
+ * (the ones in rotation); `all` is every photo there is.
  */
 export function startPhoto(
   photos: readonly Pick<Photo, 'slug'>[],
   state: { mode: PhotoMode; slug: string; day: string },
   today: string,
+  all: readonly Pick<Photo, 'slug'>[] = photos,
 ): { slug: string; day: string } {
-  const known = photos.some((p) => p.slug === state.slug)
+  const known = all.some((p) => p.slug === state.slug)
   if ((state.mode === 'daily' && state.day !== today) || !known) {
     return { slug: photos[photoOfTheDay(today, photos.length)]?.slug ?? state.slug, day: today }
   }

@@ -16,7 +16,7 @@
   import { chooseOptions } from '../lib/study/distractors'
   import { deckSummary, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
-  import { audio, settings, store } from '../state/app.svelte'
+  import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { ui } from '../state/ui.svelte'
@@ -111,7 +111,7 @@
     })
     session.answer(current.id, result.after)
     answered++
-    void audio.playGrade(grade)
+    feedback(grade)
     if (correct) {
       correctCount++
     } else {

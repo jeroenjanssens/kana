@@ -111,6 +111,8 @@ export interface Settings {
   photoSlug: string
   /** Day the photo of the day was last chosen ('daily' mode). */
   photoDay: string
+  /** Only rotate through photos that match the current season. */
+  matchSeason: boolean
   calm: boolean
   dataSaver: boolean
   sfx: boolean
@@ -119,6 +121,8 @@ export interface Settings {
   /** Pronunciation voice: female, male, or a random one for each card. */
   voice: VoiceSetting
   uiTicks: boolean
+  /** A light vibration on answers (where supported). */
+  haptics: boolean
   silent: boolean
   reducedMotion: 'system' | 'on' | 'off'
 }
@@ -154,6 +158,7 @@ export const DEFAULT_SETTINGS: Settings = {
   photoMinutes: 5,
   photoSlug: '',
   photoDay: '',
+  matchSeason: true,
   calm: false,
   dataSaver: true,
   sfx: true,
@@ -161,6 +166,7 @@ export const DEFAULT_SETTINGS: Settings = {
   voiceVolume: 1,
   voice: 'female',
   uiTicks: false,
+  haptics: true,
   silent: false,
   reducedMotion: 'system',
 }

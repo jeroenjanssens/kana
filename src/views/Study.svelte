@@ -27,7 +27,7 @@
   import { GRADE_LABELS, checkKana, kanaForAnswer, suggestGrade } from '../lib/study/answer'
   import { DECK_INFO, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
-  import { audio, settings, store } from '../state/app.svelte'
+  import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { toast, ui } from '../state/ui.svelte'
@@ -253,7 +253,7 @@
     session.answer(current.id, result.after)
     answered++
     if (g > 1) correctCount++
-    void audio.playGrade(g)
+    feedback(g)
     cardDone()
     if (becameLeech(result.before, result.after, settings().leechThreshold)) {
       toast(
@@ -325,7 +325,7 @@
     })
     answered++
     if (correct) correctCount++
-    void audio.playGrade(grade)
+    feedback(grade)
   }
 
   function selfCheck(correct: boolean) {

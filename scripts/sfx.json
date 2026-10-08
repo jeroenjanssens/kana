@@ -7,7 +7,10 @@
     "sourceUrl": "https://freesound.org/people/vibe_crc/sounds/59880/",
     "downloadUrl": "https://cdn.freesound.org/previews/59/59880_333536-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 0.85 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.85
+    },
     "gainDb": 0
   },
   {
@@ -18,7 +21,10 @@
     "sourceUrl": "https://freesound.org/people/BenjaminNelan/sounds/353125/",
     "downloadUrl": "https://cdn.freesound.org/previews/353/353125_1196020-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 0.85 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.85
+    },
     "gainDb": 0
   },
   {
@@ -29,20 +35,56 @@
     "sourceUrl": "https://freesound.org/people/HarpyHarpHarp/sounds/449127/",
     "downloadUrl": "https://cdn.freesound.org/previews/449/449127_8895476-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 0.65 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.65
+    },
     "gainDb": 0
   },
   {
-    "id": "correct-1",
-    "event": "correct",
-    "title": "kayageum1_A2.wav",
-    "author": "spt3125",
-    "sourceUrl": "https://freesound.org/people/spt3125/sounds/24551/",
-    "downloadUrl": "https://cdn.freesound.org/previews/24/24551_164315-hq.mp3",
-    "license": "CC0",
-    "trim": { "start": 0.0, "duration": 2.5 },
+    "id": "koto-hard",
+    "event": "hard",
+    "title": "Koto performance.ogg",
+    "author": "Torsodog",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+    "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Koto_performance.ogg",
+    "license": "CC BY 3.0",
     "gainDb": 0,
-    "rootHz": 110
+    "trim": {
+      "start": 4.34,
+      "duration": 0.84
+    },
+    "rootHz": 310
+  },
+  {
+    "id": "koto-good",
+    "event": "good",
+    "title": "Koto performance.ogg",
+    "author": "Torsodog",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+    "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Koto_performance.ogg",
+    "license": "CC BY 3.0",
+    "gainDb": 0,
+    "trim": {
+      "start": 12.45,
+      "duration": 0.72
+    },
+    "rootHz": 459
+  },
+  {
+    "id": "koto-easy",
+    "event": "easy",
+    "title": "Koto performance.ogg",
+    "author": "Torsodog",
+    "sourceUrl": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+    "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Koto_performance.ogg",
+    "license": "CC BY 3.0",
+    "gainDb": 0,
+    "trim": {
+      "start": 18.82,
+      "duration": 0.66
+    },
+    "rootHz": 630
   },
   {
     "id": "wrong-1",
@@ -52,7 +94,10 @@
     "sourceUrl": "https://freesound.org/people/thomasjaunism/sounds/218460/",
     "downloadUrl": "https://cdn.freesound.org/previews/218/218460_3344538-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 0.3 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.3
+    },
     "gainDb": 0
   },
   {
@@ -63,7 +108,10 @@
     "sourceUrl": "https://freesound.org/people/thomasjaunism/sounds/218461/",
     "downloadUrl": "https://cdn.freesound.org/previews/218/218461_3344538-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 0.5 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.5
+    },
     "gainDb": 0
   },
   {
@@ -74,7 +122,10 @@
     "sourceUrl": "https://freesound.org/people/eddies2000/sounds/448474/",
     "downloadUrl": "https://cdn.freesound.org/previews/448/448474_9090982-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 0.5 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.5
+    },
     "gainDb": 0
   },
   {
@@ -85,7 +136,10 @@
     "sourceUrl": "https://freesound.org/people/eddies2000/sounds/448474/",
     "downloadUrl": "https://cdn.freesound.org/previews/448/448474_9090982-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 1.0, "duration": 0.5 },
+    "trim": {
+      "start": 1.0,
+      "duration": 0.5
+    },
     "gainDb": 0
   },
   {
@@ -96,7 +150,10 @@
     "sourceUrl": "https://freesound.org/people/steffcaffrey/sounds/452379/",
     "downloadUrl": "https://cdn.freesound.org/previews/452/452379_1844073-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 2.0 },
+    "trim": {
+      "start": 0.0,
+      "duration": 2.0
+    },
     "gainDb": 0
   },
   {
@@ -107,7 +164,10 @@
     "sourceUrl": "https://freesound.org/people/Throndronis/sounds/799520/",
     "downloadUrl": "https://cdn.freesound.org/previews/799/799520_14610131-hq.mp3",
     "license": "CC0",
-    "trim": { "start": 0.0, "duration": 4.0 },
+    "trim": {
+      "start": 0.0,
+      "duration": 4.0
+    },
     "gainDb": 0
   },
   {
@@ -118,7 +178,10 @@
     "sourceUrl": "",
     "downloadUrl": "",
     "license": "CC0 (generated)",
-    "trim": { "start": 0.0, "duration": 0.7 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.7
+    },
     "gainDb": 0,
     "generate": "aevalsrc='sin(2*PI*1400*t)*exp(-t*50)+0.4*(random(0)-0.5)*exp(-t*40)+(sin(2*PI*1300*(t-0.25))*exp(-max(t-0.25,0)*50)+0.4*(random(1)-0.5)*exp(-max(t-0.25,0)*40))*gt(t,0.25)':s=44100:d=0.7,highpass=f=300"
   },
@@ -130,7 +193,10 @@
     "sourceUrl": "",
     "downloadUrl": "",
     "license": "CC0 (generated)",
-    "trim": { "start": 0.0, "duration": 0.08 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.08
+    },
     "gainDb": 0,
     "generate": "aevalsrc='sin(2*PI*700*t)*exp(-t*120)+0.3*(random(0)-0.5)*exp(-t*100)':s=44100:d=0.08,highpass=f=300"
   },
@@ -142,7 +208,10 @@
     "sourceUrl": "",
     "downloadUrl": "",
     "license": "CC0 (generated)",
-    "trim": { "start": 0.0, "duration": 0.08 },
+    "trim": {
+      "start": 0.0,
+      "duration": 0.08
+    },
     "gainDb": 0,
     "generate": "aevalsrc='sin(2*PI*950*t)*exp(-t*130)+0.3*(random(0)-0.5)*exp(-t*110)':s=44100:d=0.08,highpass=f=300"
   }

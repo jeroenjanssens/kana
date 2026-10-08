@@ -70,7 +70,7 @@ See [PLAN.md](PLAN.md) for the design and decisions.
 kana builds on the generous work of others — see [NOTICE](NOTICE) and the in-app credits page:
 pronunciation generated with VOICEVOX (VOICEVOX:春日部つむぎ, VOICEVOX:青山龍星), stroke data from
 KanjiVG (CC BY-SA 3.0), fonts from Google Fonts (OFL), photos from Unsplash, and sound effects
-from Freesound (CC0).
+from Freesound (CC0) and a koto recording by Torsodog (Wikimedia Commons, CC BY 3.0).
 
 ## License
 

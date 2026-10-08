@@ -3,6 +3,8 @@ import { describe, expect, test } from 'vitest'
 import {
   PHOTO_WIDTHS,
   photoOfTheDay,
+  photosForSeason,
+  seasonOf,
   prefersDataSaving,
   srcset,
   startPhoto,
@@ -99,10 +101,41 @@ describe('photo rotation', () => {
     expect(startPhoto(list, { mode: 'daily', slug: 'b', day: today }, today).slug).toBe('b')
   })
 
+  test('a saved photo outside the rotation (e.g. out of season) is kept', () => {
+    const inSeason = [{ slug: 'a' }]
+    expect(startPhoto(inSeason, { mode: 'fixed', slug: 'c', day: 'x' }, 'x', list).slug).toBe('c')
+    expect(startPhoto(inSeason, { mode: 'cards', slug: '', day: '' }, 'x', list).slug).toBe('a')
+  })
+
   test('an unknown or empty saved photo falls back to the photo of the day', () => {
     const today = '2026-03-03'
     expect(startPhoto(list, { mode: 'cards', slug: '', day: '' }, today).slug).toBe(
       list[photoOfTheDay(today, list.length)].slug,
     )
+  })
+})
+
+describe('seasons', () => {
+  test('seasonOf follows the Japanese seasons', () => {
+    expect([0, 2, 5, 8, 11].map((m) => seasonOf(new Date(2026, m, 15)))).toEqual([
+      'winter',
+      'spring',
+      'summer',
+      'autumn',
+      'winter',
+    ])
+  })
+
+  test('every season has at least four photos to rotate through', () => {
+    for (const season of ['spring', 'summer', 'autumn', 'winter'] as const) {
+      const list = photosForSeason(credits, season)
+      expect(list.length, season).toBeGreaterThanOrEqual(4)
+      expect(list.every((p) => p.season === season || p.season === 'any')).toBe(true)
+    }
+  })
+
+  test('every photo has a season', () => {
+    for (const p of credits)
+      expect(['spring', 'summer', 'autumn', 'winter', 'any']).toContain(p.season)
   })
 })

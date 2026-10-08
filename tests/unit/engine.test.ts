@@ -1,7 +1,6 @@
 import { describe, expect, test, vi } from 'vitest'
 import {
   AudioEngine,
-  GRADE_SEMITONES,
   gradeSound,
   pickVariant,
   semitonesToRate,
@@ -9,15 +8,13 @@ import {
 } from '../../src/lib/audio/engine'
 
 describe('grade sounds', () => {
-  test('Again is the wooden tock, without a note', () => {
-    expect(gradeSound(1)).toEqual({ event: 'wrong' })
-  })
-  test('Hard, Good and Easy are koto notes from low to high', () => {
-    const [hard, good, easy] = ([2, 3, 4] as const).map((g) => gradeSound(g))
-    for (const s of [hard, good, easy]) expect(s.event).toBe('correct')
-    expect(hard.semitones!).toBeLessThan(good.semitones!)
-    expect(good.semitones!).toBeLessThan(easy.semitones!)
-    expect(easy.semitones! - hard.semitones!).toBe(12)
+  test('Again is the wooden tock; Hard, Good and Easy are three koto notes', () => {
+    expect(([1, 2, 3, 4] as const).map((g) => gradeSound(g))).toEqual([
+      'wrong',
+      'hard',
+      'good',
+      'easy',
+    ])
   })
   test('semitonesToRate', () => {
     expect(semitonesToRate(0)).toBe(1)
@@ -78,7 +75,9 @@ function fakeAudio() {
 const manifest = {
   events: {
     flip: ['flip-1.mp3', 'flip-2.mp3'],
-    correct: ['correct-1.mp3'],
+    hard: ['koto-hard.mp3'],
+    good: ['koto-good.mp3'],
+    easy: ['koto-easy.mp3'],
     wrong: ['wrong-1.mp3'],
     tick: ['t.mp3'],
   },
@@ -152,17 +151,20 @@ describe('AudioEngine', () => {
   test('plays sound effects with the requested pitch', async () => {
     const { engine, audio } = makeEngine()
     engine.configure(settings)
-    await engine.playSfx('correct', { semitones: 12 })
+    await engine.playSfx('good', { semitones: 12 })
     expect(audio.played.at(-1)?.rate).toBe(2)
   })
 
-  test('each grade always plays at the same pitch', async () => {
-    const { engine, audio } = makeEngine()
+  test('each grade plays its own note, always at the recorded pitch', async () => {
+    const { engine, audio, requests } = makeEngine()
     engine.configure(settings)
-    for (const g of [2, 3, 4, 3, 2] as const) await engine.playGrade(g)
-    expect(audio.played.map((p) => p.rate)).toEqual(
-      [2, 3, 4, 3, 2].map((g) => semitonesToRate(GRADE_SEMITONES[g as 2 | 3 | 4])),
-    )
+    for (const g of [2, 3, 4, 3] as const) await engine.playGrade(g)
+    expect(audio.played.map((p) => p.rate)).toEqual([1, 1, 1, 1])
+    expect(requests.filter((r) => r.includes('koto')).map((r) => r.split('/').pop())).toEqual([
+      'koto-hard.mp3',
+      'koto-good.mp3',
+      'koto-easy.mp3',
+    ])
   })
 
   test('Again plays the wooden tock', async () => {

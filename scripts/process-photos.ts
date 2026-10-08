@@ -14,6 +14,7 @@ interface PhotoMeta {
   downloadUrl: string
   license: string
   location: string
+  season: 'spring' | 'summer' | 'autumn' | 'winter' | 'any'
 }
 
 interface CreditEntry {
@@ -24,6 +25,7 @@ interface CreditEntry {
   sourceUrl: string
   license: string
   location: string
+  season: 'spring' | 'summer' | 'autumn' | 'winter' | 'any'
   color: string
   width: number
   height: number
@@ -130,6 +132,7 @@ async function processPhoto(meta: PhotoMeta): Promise<CreditEntry> {
     sourceUrl: meta.sourceUrl,
     license: meta.license,
     location: meta.location,
+    season: meta.season,
     color,
     width: finalWidth,
     height: finalHeight,

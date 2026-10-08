@@ -28,4 +28,7 @@ Photos — public/photos/
 
 Sound effects — public/sfx/
   From Freesound (https://freesound.org), CC0 1.0, plus a few effects generated
-  for kana (also CC0). Per-file sources: public/sfx/manifest.json and scripts/sfx.json.
+  for kana (also CC0). The koto notes are cut from "Koto performance.ogg" by
+  Torsodog on Wikimedia Commons, CC BY 3.0
+  (https://commons.wikimedia.org/wiki/File:Koto_performance.ogg).
+  Per-file sources: public/sfx/manifest.json and scripts/sfx.json.

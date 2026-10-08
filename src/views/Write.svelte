@@ -28,7 +28,7 @@
   import { deckSummary, queueFor } from '../lib/study/summary'
   import { UndoStack } from '../lib/study/undo'
   import { loadFontWithin } from '../lib/ui/fontLoader'
-  import { audio, settings, store } from '../state/app.svelte'
+  import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
@@ -143,7 +143,7 @@
     session.answer(current.id, r.after)
     answered++
     if (correct) correctCount++
-    void audio.playGrade(grade)
+    feedback(grade)
     cardDone()
   }
 

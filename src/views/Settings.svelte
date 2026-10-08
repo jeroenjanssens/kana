@@ -44,8 +44,10 @@
 
   const EFFECTS: { id: SfxEvent; label: string }[] = [
     { id: 'flip', label: 'Card flip' },
-    { id: 'correct', label: 'Correct' },
-    { id: 'wrong', label: 'Wrong' },
+    { id: 'easy', label: 'Easy' },
+    { id: 'good', label: 'Good' },
+    { id: 'hard', label: 'Hard' },
+    { id: 'wrong', label: 'Again' },
     { id: 'stamp', label: 'Seal' },
     { id: 'bell', label: 'Bell' },
     { id: 'complete', label: 'Session complete' },
@@ -152,7 +154,7 @@
   }
 
   function playPreview(id: SfxEvent) {
-    void audio.playSfx(id, { preview: true, ...(id === 'correct' ? { semitones: 12 } : {}) })
+    void audio.playSfx(id, { preview: true })
   }
 </script>
 
@@ -357,6 +359,12 @@
         <input type="range" min="1" max="60" step="1" bind:value={s.photoMinutes} />
       </label>
     {/if}
+    <label class="switch"
+      ><span
+        >Match the season <small class="muted">cherry blossoms in spring, maples in autumn</small
+        ></span
+      ><input type="checkbox" bind:checked={s.matchSeason} /></label
+    >
     <details class="picker">
       <summary>Choose a photo</summary>
       <ul class="thumbs">
@@ -432,6 +440,12 @@
         {/each}
       </div>
     </div>
+    <label class="switch"
+      ><span>Vibrate on answers <small class="muted">phones that support it</small></span><input
+        type="checkbox"
+        bind:checked={s.haptics}
+      /></label
+    >
     <label class="switch"
       ><span>Soft clicks in menus</span><input type="checkbox" bind:checked={s.uiTicks} /></label
     >

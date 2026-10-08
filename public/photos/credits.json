@@ -9,7 +9,8 @@
     "location": "Yamanashi",
     "color": "#8e9ba7",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "winter"
   },
   {
     "slug": "fuji-chureito",
@@ -21,7 +22,8 @@
     "location": "Yamanashi",
     "color": "#5b7976",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "fuji-hakone-blossoms",
@@ -33,7 +35,8 @@
     "location": "Kanagawa",
     "color": "#746e64",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "spring"
   },
   {
     "slug": "fuji-snow-lake",
@@ -45,7 +48,8 @@
     "location": "Yamanashi",
     "color": "#8a9196",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "winter"
   },
   {
     "slug": "fushimi-inari",
@@ -57,7 +61,8 @@
     "location": "Kyoto",
     "color": "#9a2b12",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "arashiyama-bamboo",
@@ -69,7 +74,8 @@
     "location": "Kyoto",
     "color": "#3c592d",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "tokyo-night",
@@ -81,7 +87,8 @@
     "location": "Tokyo",
     "color": "#10443a",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "tokyo-tower",
@@ -93,7 +100,8 @@
     "location": "Tokyo",
     "color": "#537e8f",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "shibuya-crossing",
@@ -105,7 +113,8 @@
     "location": "Tokyo",
     "color": "#38636f",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "gion-lanterns",
@@ -117,7 +126,8 @@
     "location": "Kyoto",
     "color": "#7b511d",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "cherry-blossoms",
@@ -129,7 +139,8 @@
     "location": "Japan",
     "color": "#9c8698",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "spring"
   },
   {
     "slug": "autumn-maple",
@@ -141,7 +152,8 @@
     "location": "Japan",
     "color": "#a53c41",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "autumn"
   },
   {
     "slug": "miyajima-torii",
@@ -153,7 +165,8 @@
     "location": "Hiroshima",
     "color": "#7d96a0",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "summer"
   },
   {
     "slug": "shirakawa-go",
@@ -165,7 +178,8 @@
     "location": "Gifu",
     "color": "#5d8a86",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "spring"
   },
   {
     "slug": "japanese-garden",
@@ -177,7 +191,8 @@
     "location": "Japan",
     "color": "#445033",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "summer"
   },
   {
     "slug": "kyoto-autumn-garden",
@@ -189,7 +204,8 @@
     "location": "Kyoto",
     "color": "#393529",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "autumn"
   },
   {
     "slug": "zen-rock-garden",
@@ -201,7 +217,8 @@
     "location": "Kyoto",
     "color": "#c2c3c3",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "rice-terraces",
@@ -213,7 +230,8 @@
     "location": "Aichi",
     "color": "#6d784f",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "summer"
   },
   {
     "slug": "nara-deer",
@@ -225,7 +243,8 @@
     "location": "Nara",
     "color": "#877d70",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "autumn"
   },
   {
     "slug": "japan-alps",
@@ -237,7 +256,8 @@
     "location": "Nagano",
     "color": "#6a857f",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "summer"
   },
   {
     "slug": "japan-coastline",
@@ -249,7 +269,8 @@
     "location": "Japan",
     "color": "#5c6363",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "summer"
   },
   {
     "slug": "misty-forest",
@@ -261,7 +282,8 @@
     "location": "Japan",
     "color": "#7391a9",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "any"
   },
   {
     "slug": "cherry-blossom-bridge",
@@ -273,7 +295,8 @@
     "location": "Japan",
     "color": "#66674a",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "spring"
   },
   {
     "slug": "kiyomizudera-autumn",
@@ -285,6 +308,7 @@
     "location": "Kyoto",
     "color": "#817278",
     "width": 1920,
-    "height": 1280
+    "height": 1280,
+    "season": "autumn"
   }
 ]

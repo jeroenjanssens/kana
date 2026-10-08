@@ -18,7 +18,7 @@
     type ReadingNote,
   } from '../lib/study/reading'
   import { loadFontWithin } from '../lib/ui/fontLoader'
-  import { audio, settings, store } from '../state/app.svelte'
+  import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { ui } from '../state/ui.svelte'
 
@@ -108,7 +108,7 @@
       score++
     }
     // Right or wrong only: right sounds like Good, wrong like Again.
-    void audio.playGrade(correct ? 3 : 1)
+    feedback(correct ? 3 : 1)
     cardDone()
     if (index + 1 >= queue.length) {
       phase = 'done'

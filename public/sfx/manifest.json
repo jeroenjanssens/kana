@@ -5,8 +5,14 @@
       "flip-2.mp3",
       "flip-3.mp3"
     ],
-    "correct": [
-      "correct-1.mp3"
+    "hard": [
+      "koto-hard.mp3"
+    ],
+    "good": [
+      "koto-good.mp3"
+    ],
+    "easy": [
+      "koto-easy.mp3"
     ],
     "wrong": [
       "wrong-1.mp3",
@@ -31,7 +37,9 @@
     ]
   },
   "rootHz": {
-    "correct-1": 110
+    "koto-hard": 310,
+    "koto-good": 459,
+    "koto-easy": 630
   },
   "credits": [
     {
@@ -56,11 +64,25 @@
       "license": "CC0"
     },
     {
-      "id": "correct-1",
-      "title": "kayageum1_A2.wav",
-      "author": "spt3125",
-      "sourceUrl": "https://freesound.org/people/spt3125/sounds/24551/",
-      "license": "CC0"
+      "id": "koto-hard",
+      "title": "Koto performance.ogg",
+      "author": "Torsodog",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+      "license": "CC BY 3.0"
+    },
+    {
+      "id": "koto-good",
+      "title": "Koto performance.ogg",
+      "author": "Torsodog",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+      "license": "CC BY 3.0"
+    },
+    {
+      "id": "koto-easy",
+      "title": "Koto performance.ogg",
+      "author": "Torsodog",
+      "sourceUrl": "https://commons.wikimedia.org/wiki/File:Koto_performance.ogg",
+      "license": "CC BY 3.0"
     },
     {
       "id": "wrong-1",
