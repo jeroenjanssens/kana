@@ -27,7 +27,7 @@
       />
       <feColorMatrix
         in="grain"
-        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.4 1.25"
+        values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -0.55 1.22"
         result="speckle"
       />
       <feComposite in="soft" in2="speckle" operator="in" />

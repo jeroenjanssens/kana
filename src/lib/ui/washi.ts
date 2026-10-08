@@ -40,9 +40,9 @@ export function generateWashi(options: WashiOptions = {}): string | undefined {
     const y = rand() * size
     const r = 30 + rand() * 90
     const alpha = 0.025 + rand() * 0.035
+    const c = dark ? '0,0,0' : rand() > 0.5 ? '120,95,60' : '255,255,255'
     wrap((dx, dy) => {
       const g = ctx.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, r)
-      const c = dark ? '0,0,0' : rand() > 0.5 ? '120,95,60' : '255,255,255'
       g.addColorStop(0, `rgba(${c},${alpha})`)
       g.addColorStop(1, `rgba(${c},0)`)
       ctx.fillStyle = g

@@ -85,16 +85,16 @@
     overflow: hidden;
   }
 
-  /* Faint deckle edge. */
+  /* Faint deckle edge and a soft vignette, as on handmade paper. */
   .face::after {
     content: '';
     position: absolute;
     inset: 0;
     border-radius: inherit;
     pointer-events: none;
-    box-shadow: inset 0 0 0 6px color-mix(in srgb, var(--paper) 60%, transparent);
-    mask: radial-gradient(circle at 50% 50%, transparent 70%, black 100%);
-    opacity: 0.6;
+    box-shadow:
+      inset 0 0 0 1px rgb(120 95 60 / 0.12),
+      inset 0 0 24px rgb(120 95 60 / 0.1);
   }
 
   .back {

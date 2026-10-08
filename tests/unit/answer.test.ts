@@ -5,6 +5,7 @@ import {
   SLOW_MS,
   checkKana,
   checkWord,
+  kanaForAnswer,
   normalize,
   suggestGrade,
   wordAnswers,
@@ -65,4 +66,16 @@ describe('suggestGrade', () => {
   test('fast is Easy', () => expect(suggestGrade(true, FAST_MS)).toBe(4))
   test('normal is Good', () => expect(suggestGrade(true, FAST_MS + 1)).toBe(3))
   test('slow is Hard', () => expect(suggestGrade(true, SLOW_MS + 1)).toBe(2))
+})
+
+describe('kanaForAnswer', () => {
+  const pool = [kanaById('shi'), kanaById('tsu'), kanaById('n')]
+  test('finds the kana that was typed', () => {
+    expect(kanaForAnswer('tsu', pool)?.id).toBe('tsu')
+    expect(kanaForAnswer('si', pool)?.id).toBe('shi')
+  })
+  test('returns undefined for unknown or empty answers', () => {
+    expect(kanaForAnswer('xyz', pool)).toBeUndefined()
+    expect(kanaForAnswer('  ', pool)).toBeUndefined()
+  })
 })

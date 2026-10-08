@@ -40,3 +40,10 @@ export function suggestGrade(correct: boolean, ms: number): Grade {
 }
 
 export const GRADE_LABELS: Record<Grade, string> = { 1: 'Again', 2: 'Hard', 3: 'Good', 4: 'Easy' }
+
+/** The kana (from `pool`) whose romaji matches what was typed, for the confusion stats. */
+export function kanaForAnswer(input: string, pool: readonly Kana[]): Kana | undefined {
+  const answer = normalize(input)
+  if (!answer) return undefined
+  return pool.find((k) => acceptedAnswers(k).some((a) => normalize(a) === answer))
+}
