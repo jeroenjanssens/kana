@@ -26,7 +26,6 @@ export interface Kana {
   audio: boolean
 }
 
-type Entry = [hiragana: string, katakana: string, romaji: string, kunrei: string, col: number]
 
 const VOWELS = ['a', 'i', 'u', 'e', 'o']
 

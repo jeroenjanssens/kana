@@ -58,6 +58,10 @@ audio:
 sfx:
     npx tsx scripts/process-sfx.ts
 
+# Download and subset the Japanese fonts
+fonts:
+    npx tsx scripts/subset-fonts.ts
+
 # Re-process background photos from scripts/photo-sources
 photos:
     npx tsx scripts/process-photos.ts
