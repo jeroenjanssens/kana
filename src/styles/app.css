@@ -32,7 +32,10 @@
   --radius: 14px;
   --radius-sm: 8px;
   --ease: cubic-bezier(0.22, 0.8, 0.24, 1);
-  --washi-texture: none;
+  --washi-0: none;
+  --washi-1: none;
+  --washi-2: none;
+  --washi-3: none;
 
   color-scheme: light;
 }
@@ -156,11 +159,35 @@ select {
   box-shadow: var(--shadow-soft);
 }
 
-/** Washi paper: base colour + generated fibre texture. */
+/**
+ * Washi paper: base colour + one of the generated fibre textures. Surfaces choose their own sheet
+ * and offset with the variables from washiStyle(); `.turn` also rotates the texture.
+ */
 .washi {
   background-color: var(--paper);
-  background-image: var(--washi-texture);
+  background-image: var(--washi-tex, var(--washi-0));
   background-size: 384px 384px;
+  background-position: var(--washi-x, 0) var(--washi-y, 0);
+}
+
+/* A background image can't rotate, so rotated paper is drawn on an oversized pseudo-element. */
+.washi.turn {
+  /* The element must be positioned (relative or absolute) for the pseudo-element. */
+  isolation: isolate;
+  overflow: hidden;
+  background-image: none;
+}
+
+.washi.turn::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -50%;
+  background-image: var(--washi-tex, var(--washi-0));
+  background-size: 384px 384px;
+  background-position: var(--washi-x, 0) var(--washi-y, 0);
+  transform: rotate(var(--washi-angle, 0deg));
+  pointer-events: none;
 }
 
 /* ─── Controls ───────────────────────────────────────────────────────────── */

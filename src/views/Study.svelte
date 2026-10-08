@@ -44,6 +44,8 @@
   /** Voice for the current card, picked once per card (matters for the "random" setting). */
   let voice: VoiceId = audio.pickVoice()
   let tilt = $state(0)
+  /** Each card gets its own sheet of paper. */
+  let paper = $state(0)
   let startedAt = 0
   let input = $state('')
   let verdict = $state<{ correct: boolean; typed: string } | undefined>()
@@ -157,6 +159,7 @@
     font = nextFont
     voice = audio.pickVoice()
     tilt = (Math.random() - 0.5) * 1.4
+    paper = Math.floor(Math.random() * 2 ** 31)
     current = kana
     currentIsNew = isNew
     phase = 'card'
@@ -449,6 +452,7 @@
             {font}
             {flipped}
             {tilt}
+            {paper}
             isNew={currentIsNew}
             {celebrate}
             {verdict}

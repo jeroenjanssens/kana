@@ -15,6 +15,7 @@
     font,
     flipped,
     tilt = 0,
+    paper = 0,
     isNew = false,
     celebrate = false,
     verdict,
@@ -28,6 +29,7 @@
     font: string
     flipped: boolean
     tilt?: number
+    paper?: number
     isNew?: boolean
     celebrate?: boolean
     /** Result of a typed answer, shown on the back. */
@@ -66,6 +68,7 @@
 <PaperCard
   {flipped}
   {tilt}
+  {paper}
   label="{scriptLabel} card{flipped ? `, ${kana.romaji}` : ', tap to reveal'}"
   {onflip}
 >

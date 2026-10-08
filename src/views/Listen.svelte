@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { washiStyle } from '../lib/ui/washi'
   import { onDestroy, onMount } from 'svelte'
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
@@ -190,7 +191,8 @@
           <div class="options" role="group" aria-label="Which kana did you hear?">
             {#each options as o, i (o.id)}
               <button
-                class="option washi"
+                class="option washi turn"
+                style={washiStyle(o.id)}
                 class:right={picked && o.id === current.id}
                 class:wrong={picked?.id === o.id && o.id !== current.id}
                 disabled={!!picked}

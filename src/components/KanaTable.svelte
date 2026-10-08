@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { washiStyle } from '../lib/ui/washi'
   import {
     COLUMN_LABELS,
     YOON_COLUMN_LABELS,
@@ -59,7 +60,8 @@
         {#if k}
           {@const level = cards ? masteryLevel(cards[k.id]) : 'new'}
           <button
-            class="cell washi level-{level}"
+            class="cell washi turn level-{level}"
+            style={washiStyle(`${script}:${k.id}`)}
             class:selected={selected === k.id}
             class:pair={script === 'combined'}
             onclick={() => onselect(k)}

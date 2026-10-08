@@ -1,3 +1,5 @@
+import { hash } from './random'
+
 export interface Photo {
   slug: string
   title: string
@@ -12,16 +14,6 @@ export interface Photo {
 }
 
 export const PHOTO_WIDTHS = [640, 1280, 1920] as const
-
-/** Stable string hash (FNV-1a). */
-export function hash(text: string): number {
-  let h = 0x811c9dc5
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i)
-    h = Math.imul(h, 0x01000193)
-  }
-  return h >>> 0
-}
 
 /** Index of the "photo of the day" for a day key. */
 export function photoOfTheDay(day: string, count: number): number {

@@ -3,22 +3,39 @@
  * a few soft cloudy patches. Returned as a data URL for use as a CSS background image.
  */
 
+import { hash, prng } from './random'
+
 export interface WashiOptions {
   size?: number
   dark?: boolean
   seed?: number
+  /** Number of fibres (default 220). */
+  fibres?: number
+  /** Number of cloudy patches (default 14). */
+  patches?: number
+  /** A faint overall tint. */
+  tint?: 'warm' | 'cool'
 }
 
-/** Small deterministic PRNG (mulberry32) so the texture is stable between renders. */
-export function prng(seed: number): () => number {
-  let a = seed >>> 0
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
+/** Four sheets of paper with different character; surfaces pick one (see washiStyle). */
+export const WASHI_VARIANTS: readonly WashiOptions[] = [
+  { seed: 7 },
+  { seed: 21, fibres: 320, patches: 8 },
+  { seed: 42, fibres: 150, patches: 22, tint: 'warm' },
+  { seed: 99, fibres: 260, patches: 12, tint: 'cool' },
+]
+
+/**
+ * CSS variables that give a surface its own sheet: one of the textures, rotated by any angle and
+ * offset. Deterministic for a seed, so a surface keeps its paper when it re-renders.
+ */
+export function washiStyle(seed: number | string): string {
+  const rand = prng(typeof seed === 'string' ? hash(seed) : seed * 2654435761)
+  const texture = Math.floor(rand() * WASHI_VARIANTS.length)
+  const angle = Math.round(rand() * 360)
+  const x = Math.round(rand() * 384)
+  const y = Math.round(rand() * 384)
+  return `--washi-tex: var(--washi-${texture}); --washi-angle: ${angle}deg; --washi-x: ${x}px; --washi-y: ${y}px`
 }
 
 export function generateWashi(options: WashiOptions = {}): string | undefined {
@@ -35,7 +52,11 @@ export function generateWashi(options: WashiOptions = {}): string | undefined {
   const wrap = (draw: (dx: number, dy: number) => void) => {
     for (const dx of [-size, 0, size]) for (const dy of [-size, 0, size]) draw(dx, dy)
   }
-  for (let i = 0; i < 14; i++) {
+  if (options.tint && !dark) {
+    ctx.fillStyle = options.tint === 'warm' ? 'rgba(190,140,70,0.035)' : 'rgba(110,135,160,0.03)'
+    ctx.fillRect(0, 0, size, size)
+  }
+  for (let i = 0; i < (options.patches ?? 14); i++) {
     const x = rand() * size
     const y = rand() * size
     const r = 30 + rand() * 90
@@ -52,7 +73,7 @@ export function generateWashi(options: WashiOptions = {}): string | undefined {
 
   // Fibres: long, thin, slightly curved strands, some darker, some lighter than the paper.
   ctx.lineCap = 'round'
-  for (let i = 0; i < 220; i++) {
+  for (let i = 0; i < (options.fibres ?? 220); i++) {
     const x = rand() * size
     const y = rand() * size
     const len = 20 + rand() * 90

@@ -7,7 +7,7 @@
   import Toasts from './components/Toasts.svelte'
   import { HEADING_FONT_ID } from './lib/data/fonts'
   import { loadFont } from './lib/ui/fontLoader'
-  import { generateWashi } from './lib/ui/washi'
+  import { WASHI_VARIANTS, generateWashi } from './lib/ui/washi'
   import { audio, settings, startPersistence } from './state/app.svelte'
   import { route, startRouter } from './state/router.svelte'
   import { ui } from './state/ui.svelte'
@@ -67,10 +67,13 @@
     // The paper texture is generated when the browser is idle, so it never delays the first paint.
     const dark = theme === 'dark'
     const idle = window.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 200))
-    idle(() => {
-      const texture = generateWashi({ dark })
-      root.style.setProperty('--washi-texture', texture ? `url(${texture})` : 'none')
-    })
+    // One sheet per idle callback, so generating all of them never blocks the page.
+    WASHI_VARIANTS.forEach((variant, i) =>
+      idle(() => {
+        const texture = generateWashi({ ...variant, dark })
+        root.style.setProperty(`--washi-${i}`, texture ? `url(${texture})` : 'none')
+      }),
+    )
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'dark' ? '#2a2722' : '#f4efe6')

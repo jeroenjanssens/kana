@@ -138,3 +138,33 @@ test('Next skips the wait after a correct listening answer', async ({ page }) =>
   await page.getByRole('button', { name: /^Next/ }).click()
   await expect(page.locator('.option.right')).toHaveCount(0)
 })
+
+test('there are several paper textures and each card gets its own sheet', async ({ page }) => {
+  await page.goto('./#/study/hiragana?mode=srs')
+  // All four textures are generated (when the browser is idle) and differ.
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        [0, 1, 2, 3].map((i) =>
+          getComputedStyle(document.documentElement).getPropertyValue(`--washi-${i}`),
+        ),
+      ),
+    )
+    .not.toContain('none')
+  const textures = await page.evaluate(() =>
+    [0, 1, 2, 3].map((i) =>
+      getComputedStyle(document.documentElement).getPropertyValue(`--washi-${i}`),
+    ),
+  )
+  expect(new Set(textures).size).toBe(4)
+
+  const sheet = () =>
+    page.locator('.face.front').evaluate((el) => (el as HTMLElement).style.cssText)
+  const first = await sheet()
+  await page.getByRole('button', { name: /Show answer/ }).click()
+  // The back of the card is rendered on rotated paper too.
+  await expect(page.locator('.face.back')).toHaveClass(/turn/)
+  await page.getByRole('button', { name: /Easy/ }).click()
+  await expect(page.getByText('9 left')).toBeVisible()
+  expect(await sheet()).not.toBe(first)
+})

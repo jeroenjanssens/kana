@@ -2,12 +2,12 @@ import { existsSync, readFileSync } from 'node:fs'
 import { describe, expect, test } from 'vitest'
 import {
   PHOTO_WIDTHS,
-  hash,
   photoOfTheDay,
   prefersDataSaving,
   srcset,
   type Photo,
 } from '../../src/lib/ui/photos'
+import { hash } from '../../src/lib/ui/random'
 
 const credits = JSON.parse(readFileSync('public/photos/credits.json', 'utf8')) as Photo[]
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { washiStyle } from '../lib/ui/washi'
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
@@ -151,7 +152,7 @@
         {#each set.chars as c (c)}
           {@const k = kanaOf(c)}
           <article class="item panel">
-            <div class="big washi">
+            <div class="big washi turn" style={washiStyle(c)}>
               <KanaGlyph text={c} font={settings().font} size="6.5rem" />
             </div>
             <p class="romaji">
@@ -177,7 +178,7 @@
       {@const target = rounds[index]}
       {#key index}
         <section class="quiz" in:fly={{ y: 16, duration: 300 }}>
-          <div class="question washi">
+          <div class="question washi turn" style={washiStyle(index * 7919 + 1)}>
             <KanaGlyph text={target} {font} size="8rem" />
           </div>
           <div class="options" role="group" aria-label="Which one is it?">
@@ -332,6 +333,7 @@
   }
 
   .big {
+    position: relative;
     width: 150px;
     height: 150px;
     display: grid;
@@ -375,6 +377,7 @@
   }
 
   .question {
+    position: relative;
     width: min(70vw, 280px);
     aspect-ratio: 1;
     display: grid;

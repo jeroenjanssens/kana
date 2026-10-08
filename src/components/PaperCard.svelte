@@ -1,10 +1,12 @@
 <script lang="ts">
   import type { Snippet } from 'svelte'
+  import { washiStyle } from '../lib/ui/washi'
 
   /** A washi-paper flashcard with a 3D flip between `front` and `back`. */
   let {
     flipped = false,
     tilt = 0,
+    paper = 0,
     label,
     front,
     back,
@@ -12,6 +14,8 @@
   }: {
     flipped?: boolean
     tilt?: number
+    /** Seed for this card's sheet of paper (texture, rotation, offset). */
+    paper?: number
     label: string
     front: Snippet
     back?: Snippet
@@ -32,10 +36,10 @@
       if (e.key === 'Enter' && e.target === e.currentTarget) onflip?.()
     }}
   >
-    <div class="face front washi">
+    <div class="face front washi turn" style={washiStyle(paper)}>
       {@render front()}
     </div>
-    <div class="face back washi" aria-hidden={!flipped}>
+    <div class="face back washi turn" style={washiStyle(paper + 1)} aria-hidden={!flipped}>
       {#if back}{@render back()}{/if}
     </div>
   </div>

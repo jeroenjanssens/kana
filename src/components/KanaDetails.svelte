@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { washiStyle } from '../lib/ui/washi'
   import { displayRomaji, type Kana } from '../lib/data/kana'
   import {
     formatInterval,
@@ -53,7 +54,7 @@
     </button>
   {/if}
   <div class="top">
-    <div class="glyphs washi">
+    <div class="glyphs washi turn" style={washiStyle(kana.id)}>
       {#if kana.hiragana}<KanaGlyph
           text={kana.hiragana}
           font={settings().font}
@@ -114,6 +115,7 @@
   }
 
   .glyphs {
+    position: relative;
     display: flex;
     gap: 0.4rem;
     padding: 0.4rem 0.8rem;

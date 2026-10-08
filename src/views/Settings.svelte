@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { washiStyle } from '../lib/ui/washi'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import { FONTS, FONT_STYLES, SYSTEM_FONT_ID } from '../lib/data/fonts'
   import type { KanaGroup } from '../lib/data/kana'
@@ -192,7 +193,8 @@
       {#each [...FONTS.map( (f) => ({ id: f.id, name: f.name, style: FONT_STYLES[f.style] }) ), { id: SYSTEM_FONT_ID, name: 'System font', style: 'Your device' }] as f (f.id)}
         <li class:chosen={s.font === f.id}>
           <button
-            class="sample washi"
+            class="sample washi turn"
+            style={washiStyle(f.id)}
             onclick={() => (s.font = f.id)}
             aria-pressed={s.font === f.id}
             aria-label="Use {f.name} as default font"
@@ -465,6 +467,7 @@
   }
 
   .sample {
+    position: relative;
     width: 100%;
     height: 64px;
     border-radius: 10px;

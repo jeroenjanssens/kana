@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { washiStyle } from '../lib/ui/washi'
   import Hanko from '../components/Hanko.svelte'
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
@@ -50,7 +51,7 @@
     {@const info = DECK_INFO[d.deck]}
     <article class="deck panel">
       <div class="deck-head">
-        <div class="sample washi" aria-hidden="true">
+        <div class="sample washi turn" style={washiStyle(d.deck)} aria-hidden="true">
           <KanaGlyph
             text={info.sample}
             font="klee-one"
@@ -183,6 +184,7 @@
   }
 
   .sample {
+    position: relative;
     width: 72px;
     height: 72px;
     border-radius: 12px;

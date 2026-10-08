@@ -43,6 +43,8 @@
   /** One voice per word card (matters for the "random" setting). */
   let voice: VoiceId = audio.pickVoice()
   let tilt = $state(0)
+  /** Each card gets its own sheet of paper. */
+  let paper = $state(0)
   let score = $state(0)
   let startedAt = 0
   let inputEl = $state<HTMLInputElement>()
@@ -71,6 +73,7 @@
     input = ''
     notes = []
     tilt = (Math.random() - 0.5) * 1.2
+    paper = Math.floor(Math.random() * 2 ** 31)
     phase = 'card'
     startedAt = performance.now()
     setTimeout(() => inputEl?.focus(), 50)
@@ -213,6 +216,7 @@
         <PaperCard
           {flipped}
           {tilt}
+          {paper}
           label="Word card{flipped ? `, ${current.romaji}` : ''}"
           onflip={() => (typed ? inputEl?.focus() : reveal())}
         >
