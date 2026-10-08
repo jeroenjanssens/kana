@@ -8,6 +8,8 @@
   import { exportFileName, exportJson, importJson } from '../lib/storage/persistence'
   import { resetProgress } from '../lib/study/actions'
   import { reminderIcs } from '../lib/study/goal'
+  import { MIN_REVIEWS, scheduledReviews, trainingData } from '../lib/srs/optimizer'
+  import type { ReviewEntry } from '../lib/storage/schema'
   import { loadFont } from '../lib/ui/fontLoader'
   import type { PhotoMode } from '../lib/ui/photos'
   import { install, isStandalone, onInstallAvailable } from '../lib/ui/pwa'
@@ -81,6 +83,32 @@
     if (next.length) s.randomFonts = next
   }
 
+  const reviews = $derived(scheduledReviews(store.data.log))
+  let optimising = $state(false)
+
+  async function optimise() {
+    optimising = true
+    try {
+      const { optimizeWeights } = await import('../lib/srs/optimize')
+      const data = trainingData($state.snapshot(store.data.log) as ReviewEntry[])
+      s.fsrsWeights = await optimizeWeights(data)
+      s.optimizedAt = Date.now()
+      s.optimizedReviews = data.reviews
+      toast('Intervals personalised to how you remember')
+    } catch (err) {
+      toast(`Could not optimise: ${(err as Error).message}`)
+    } finally {
+      optimising = false
+    }
+  }
+
+  function resetWeights() {
+    s.fsrsWeights = []
+    s.optimizedAt = 0
+    s.optimizedReviews = 0
+    toast('Back to the default intervals')
+  }
+
   function downloadReminder() {
     const url = new URL(import.meta.env.BASE_URL, location.origin).href
     const ics = reminderIcs({ time: s.reminderTime || '19:00', url })
@@ -144,6 +172,36 @@
       <span>Maximum reviews per day <small class="muted">per deck</small></span>
       <input type="number" min="0" max="2000" bind:value={s.reviewsPerDay} />
     </label>
+    <label class="field">
+      <span
+        >Desired retention <small class="muted"
+          >{Math.round(s.retention * 100)}% · higher means more reviews</small
+        ></span
+      >
+      <input type="range" min="0.8" max="0.95" step="0.01" bind:value={s.retention} />
+    </label>
+    <div class="field optimise">
+      <span>
+        Personalised intervals
+        <small class="muted">
+          {#if s.optimizedAt}
+            optimised {new Date(s.optimizedAt).toLocaleDateString()} on {s.optimizedReviews} reviews
+          {:else if reviews < MIN_REVIEWS}
+            available after {MIN_REVIEWS} reviews ({reviews} so far)
+          {:else}
+            fit the schedule to how you remember ({reviews} reviews)
+          {/if}
+        </small>
+      </span>
+      <span class="reminder">
+        <button class="btn small" onclick={optimise} disabled={reviews < MIN_REVIEWS || optimising}>
+          {optimising ? 'Optimising…' : 'Optimise'}
+        </button>
+        {#if s.optimizedAt}
+          <button class="btn small ghost" onclick={resetWeights}>Reset</button>
+        {/if}
+      </span>
+    </div>
     <label class="field">
       <span>Daily goal <small class="muted">answers per day</small></span>
       <input type="number" min="5" max="500" step="5" bind:value={s.dailyGoal} />

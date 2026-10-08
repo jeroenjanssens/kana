@@ -6,6 +6,8 @@ const BASE = '/kana/'
 
 export default defineConfig({
   base: BASE,
+  // The FSRS optimizer runs in a module worker.
+  worker: { format: 'es' },
   plugins: [
     svelte(),
     VitePWA({

@@ -19,7 +19,8 @@ export function sanitizeSettings(raw: unknown): Settings {
     const fallback = settings[key]
     if (value === undefined) continue
     if (Array.isArray(fallback)) {
-      if (Array.isArray(value) && value.every((v) => typeof v === 'string')) {
+      const type = key === 'fsrsWeights' ? 'number' : 'string'
+      if (Array.isArray(value) && value.every((v) => typeof v === type)) {
         ;(settings[key] as unknown) = value
       }
     } else if (typeof value === typeof fallback) {

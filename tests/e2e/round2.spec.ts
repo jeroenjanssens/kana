@@ -129,3 +129,41 @@ test('a calendar reminder can be downloaded', async ({ page }) => {
   const text = await (await file.createReadStream()).toArray()
   expect(Buffer.concat(text).toString()).toMatch(/DTSTART:\d{8}T081500/)
 })
+
+test('intervals can be personalised with the FSRS optimiser', async ({ page }) => {
+  const DAY_MS = 86_400_000
+  const start = Date.now() - 200 * DAY_MS
+  let state = 3
+  const rand = () => (state = (state * 16807) % 2147483647) / 2147483647
+  const log = []
+  for (let c = 0; c < 100; c++) {
+    let day = 0
+    let ivl = 1
+    for (let k = 0; k < 6; k++) {
+      const grade = rand() < 0.15 ? 1 : 3
+      log.push({
+        t: start + day * DAY_MS,
+        mode: 'srs',
+        deck: 'hiragana',
+        id: `k${c}`,
+        correct: grade > 1,
+        grade,
+        ms: 1000,
+      })
+      ivl = grade === 1 ? 1 : Math.round(ivl * 2.2)
+      day += ivl
+    }
+  }
+  await seed(page, { log })
+  await page.goto('./#/settings')
+  const button = page.getByRole('button', { name: 'Optimise' })
+  await expect(button).toBeEnabled()
+  await button.click()
+  await expect(page.getByText('Intervals personalised to how you remember')).toBeVisible({
+    timeout: 60_000,
+  })
+  const data = await savedData(page)
+  expect(data.settings.fsrsWeights).toHaveLength(21)
+  await page.getByRole('button', { name: 'Reset', exact: true }).click()
+  expect((await savedData(page)).settings.fsrsWeights).toEqual([])
+})

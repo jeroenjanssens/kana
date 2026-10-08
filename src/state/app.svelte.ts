@@ -1,4 +1,5 @@
 import { AudioEngine } from '../lib/audio/engine'
+import { configureScheduler } from '../lib/srs/scheduler'
 import { load, requestPersistence, save } from '../lib/storage/persistence'
 import type { SaveFile, Settings } from '../lib/storage/schema'
 
@@ -32,6 +33,12 @@ export function startPersistence(): () => void {
       $state.snapshot(store.data)
       const handle = setTimeout(flush, 300)
       return () => clearTimeout(handle)
+    })
+
+    // Personalised FSRS weights and desired retention apply to every new grade.
+    $effect(() => {
+      const s = store.data.settings
+      configureScheduler({ weights: $state.snapshot(s.fsrsWeights), retention: s.retention })
     })
 
     $effect(() => {

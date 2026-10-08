@@ -73,6 +73,13 @@ export interface Settings {
   leechThreshold: number
   /** Show an introduction (sound, strokes, memory hint) before a new kana is first quizzed. */
   introduce: boolean
+  /** Desired retention for spaced repetition (0.80–0.95). */
+  retention: number
+  /** Personalised FSRS weights from the optimiser (empty: defaults). */
+  fsrsWeights: number[]
+  /** When the weights were optimised, and on how many reviews. */
+  optimizedAt: number
+  optimizedReviews: number
   /** Answers per day to aim for. */
   dailyGoal: number
   /** Time of the calendar reminder, "HH:MM". */
@@ -121,6 +128,10 @@ export const DEFAULT_SETTINGS: Settings = {
   reviewsPerDay: 200,
   leechThreshold: 6,
   introduce: true,
+  retention: 0.9,
+  fsrsWeights: [],
+  optimizedAt: 0,
+  optimizedReviews: 0,
   dailyGoal: 30,
   reminderTime: '19:00',
   groups: ['basic', 'dakuten', 'yoon'],

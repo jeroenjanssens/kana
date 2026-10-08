@@ -15,9 +15,18 @@ export const LEARN_AHEAD_MS = 20 * MINUTE
 /** Reviewed cards with an interval of at least this many days count as "mature". */
 export const MATURE_DAYS = 21
 
-export function createScheduler(options: { fuzz?: boolean } = {}): FSRS {
+export interface SchedulerOptions {
+  fuzz?: boolean
+  /** Personalised FSRS weights (empty: the defaults). */
+  weights?: readonly number[]
+  /** Desired probability of remembering a card when it's due. */
+  retention?: number
+}
+
+export function createScheduler(options: SchedulerOptions = {}): FSRS {
   return fsrs({
-    request_retention: 0.9,
+    request_retention: options.retention ?? 0.9,
+    ...(options.weights?.length ? { w: [...options.weights] } : {}),
     enable_fuzz: options.fuzz ?? true,
     enable_short_term: true,
     learning_steps: ['1m', '10m'],
@@ -25,7 +34,12 @@ export function createScheduler(options: { fuzz?: boolean } = {}): FSRS {
   })
 }
 
-const defaultScheduler = createScheduler()
+let defaultScheduler = createScheduler()
+
+/** Use personalised weights and/or a different desired retention from now on. */
+export function configureScheduler(options: SchedulerOptions): void {
+  defaultScheduler = createScheduler(options)
+}
 
 export function dayKey(now: Date | number = Date.now()): string {
   const d = new Date(typeof now === 'number' ? now : now.getTime())
