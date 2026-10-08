@@ -6,6 +6,16 @@ Built with Svelte 5, TypeScript and Vite, deployed to GitHub Pages at `https://j
 
 Each design decision below lists a **default** (what I'll build unless you say otherwise) and an **alternative**. Decisions you have already made are marked ✅.
 
+> **Status (2026-10-08): all milestones M0–M12 are implemented** and deployed to
+> https://jeroenjanssens.github.io/kana/. Where the build differs from this plan:
+>
+> - **Fonts (D10):** instead of `@fontsource` packages (≈124 files per font), `scripts/subset-fonts.ts` downloads the fonts from the google/fonts repository and cuts each one down to kana, Latin and the UI kanji. That's one file per font, 1.7 MB for all 15, and all of them are pre-cached for offline use.
+> - **Pronunciation (D5):** each Commons recording says the syllable three times. The fetch script keeps only the first utterance, which comes to about 0.25–0.55 s per clip.
+> - **Sound effects (D18):** 13 effects, all CC0. 10 are from Freesound and 3 were generated with ffmpeg. No clean CC0 koto note was available, so the streak melody uses a single *kayageum* (Korean zither) pluck, pitch-shifted along the miyako-bushi scale.
+> - **Reading practice (§2.8):** 392 hand-written words. Accepted typed spellings and tags are generated from the kana, and a test checks every word's Hepburn romaji against its kana.
+> - **Tooling (D12):** ESLint + Prettier + svelte-check, Vitest (≈1,050 unit tests), and Playwright (≈70 e2e tests on desktop and mobile, including offline use).
+> - **Lighthouse:** desktop scores 99 / 100 / 100 / 100 (performance, accessibility, best practices, SEO). Mobile scores 79 for performance (simulated slow 4G) and 100 for accessibility.
+
 ---
 
 ## 1. Look & feel
