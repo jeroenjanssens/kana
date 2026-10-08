@@ -1,4 +1,4 @@
-import type { Session, SessionSnapshot } from '../srs/scheduler'
+import type { Session, SessionSnapshot } from '../srs/queue'
 import type { CardRecord, DeckId, SaveFile } from '../storage/schema'
 
 /** Everything one answer changed, so it can be reverted exactly. */

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { MasteryLevel } from '../lib/srs/scheduler'
+  import type { MasteryLevel } from '../lib/srs/queue'
 
   let { counts, total }: { counts: Record<MasteryLevel, number>; total: number } = $props()
   const LEVELS: { key: MasteryLevel; label: string }[] = [

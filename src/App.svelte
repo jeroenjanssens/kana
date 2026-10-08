@@ -8,16 +8,16 @@
   import { HEADING_FONT_ID } from './lib/data/fonts'
   import { loadFont } from './lib/ui/fontLoader'
   import { WASHI_VARIANTS, generateWashi } from './lib/ui/washi'
-  import { dayKey } from './lib/srs/scheduler'
+  import { dayKey } from './lib/srs/queue'
   import { goalProgress } from './lib/study/goal'
   import { audio, settings, startPersistence, store } from './state/app.svelte'
   import { toast, ui } from './state/ui.svelte'
   import { route, startRouter } from './state/router.svelte'
   import Home from './views/Home.svelte'
-  import Study from './views/Study.svelte'
 
   // Secondary pages are loaded on demand to keep the first load small.
   const LAZY = {
+    study: () => import('./views/Study.svelte'),
     table: () => import('./views/Table.svelte'),
     practice: () => import('./views/Practice.svelte'),
     drills: () => import('./views/Drills.svelte'),
@@ -39,7 +39,9 @@
     const stopRouter = startRouter()
     const stopPersistence = startPersistence()
     void loadFont(HEADING_FONT_ID)
-    void loadFont(settings().font)
+    // The card font is large; load it once the page is up so it doesn't compete with the first paint.
+    const idle = window.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 300))
+    idle(() => void loadFont(settings().font))
 
     const dark = matchMedia('(prefers-color-scheme: dark)')
     const reduce = matchMedia('(prefers-reduced-motion: reduce)')
@@ -125,13 +127,9 @@
   <main id="main">
     {#if view === ''}
       <Home />
-    {:else if view === 'study'}
-      {#key route.segments.join('/') + JSON.stringify(route.query)}
-        <Study />
-      {/key}
     {:else}
       {@const key = (view in LAZY ? view : 'notfound') as keyof typeof LAZY}
-      {#key ['listen', 'write', 'sprint'].includes(key) ? route.segments.join('/') : key}
+      {#key key === 'study' ? route.segments.join('/') + JSON.stringify(route.query) : ['listen', 'write', 'sprint'].includes(key) ? route.segments.join('/') : key}
         {#await LAZY[key]() then mod}
           <mod.default />
         {/await}

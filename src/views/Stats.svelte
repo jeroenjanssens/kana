@@ -19,6 +19,7 @@
   import { leeches } from '../lib/study/leeches'
   import { DECK_INFO, deckSummary } from '../lib/study/summary'
   import { buildHash } from '../lib/ui/hash'
+  import { retrievability } from '../lib/srs/scheduler'
   import { settings, store } from '../state/app.svelte'
 
   const now = Date.now()
@@ -37,7 +38,7 @@
       ] as DeckId[]
     ).map((d) => deckSummary(store.data, d, now)),
   )
-  const perf = $derived(performance(log, store.data.cards, now))
+  const perf = $derived(performance(log, store.data.cards, now, retrievability))
   const weak = $derived(weakest(perf, 10))
   const mixups = $derived(confusions(log, 8))
   const totals = $derived(totalAnswers(log))

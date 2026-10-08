@@ -1,28 +1,9 @@
-import { dayKey, grade as gradeCard, masteryLevel, type MasteryLevel } from '../srs/scheduler'
+import { masteryLevel, type MasteryLevel } from '../srs/queue'
+import { grade as gradeCard } from '../srs/scheduler'
+import { ensureDay } from './daily'
+
+export { ensureDay, newShownToday, reviewedToday } from './daily'
 import type { CardRecord, DeckId, Grade, Mode, ReviewEntry, SaveFile } from '../storage/schema'
-
-/** Reset the per-day counters when a new day has started. */
-export function ensureDay(save: SaveFile, now: number = Date.now()): void {
-  const day = dayKey(now)
-  if (save.daily.day !== day) save.daily = { day, newShown: {} }
-}
-
-/** New cards introduced today in a deck. Pure: safe to call from derived state. */
-export function newShownToday(save: SaveFile, deck: DeckId, now: number = Date.now()): number {
-  return save.daily.day === dayKey(now) ? (save.daily.newShown[deck] ?? 0) : 0
-}
-
-/** SRS reviews of previously-seen cards done today in a deck. */
-export function reviewedToday(save: SaveFile, deck: DeckId, now: number = Date.now()): number {
-  const today = dayKey(now)
-  let n = 0
-  for (let i = save.log.length - 1; i >= 0; i--) {
-    const e = save.log[i]
-    if (dayKey(e.t) !== today) break
-    if (e.deck === deck && e.grade !== undefined && !e.new) n++
-  }
-  return n
-}
 
 export interface ReviewInput {
   deck: DeckId

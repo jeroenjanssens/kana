@@ -10,13 +10,8 @@
   import type { VoiceId } from '../lib/audio/voices'
   import { FONTS, randomFontId } from '../lib/data/fonts'
   import { BASIC_ROWS, kanaById, rowsOf, type Kana, type KanaGroup } from '../lib/data/kana'
-  import {
-    Session,
-    deckKana,
-    formatInterval,
-    previewIntervals,
-    startOfNextDay,
-  } from '../lib/srs/scheduler'
+  import { Session, deckKana, formatInterval, startOfNextDay } from '../lib/srs/queue'
+  import { previewIntervals } from '../lib/srs/scheduler'
   import { STUDY_DECKS, type Grade, type StudyDeckId } from '../lib/storage/schema'
   import { introduce, logPractice, markNoteSeen, recordReview } from '../lib/study/actions'
   import { notesForKana, type KanaNote } from '../lib/data/mnemonics'

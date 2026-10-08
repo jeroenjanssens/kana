@@ -3,10 +3,9 @@ import {
   DAY_ROLLOVER_HOUR,
   type MasteryLevel,
   masteryLevel,
-  retrievability,
   startOfNextDay,
   dayKey,
-} from '../srs/scheduler'
+} from '../srs/queue'
 import type { CardRecord, DeckId, ReviewEntry } from '../storage/schema'
 
 const DAY = 86_400_000
@@ -128,6 +127,8 @@ export function performance(
   log: readonly ReviewEntry[],
   decks: Partial<Record<DeckId, Record<string, CardRecord>>>,
   now: number = Date.now(),
+  /** Recall probability of a card (pass `retrievability` from the scheduler). */
+  recall?: (card: CardRecord | undefined, now: number) => number | undefined,
 ): KanaPerformance[] {
   const byKey = new Map<string, { deck: DeckId; id: string; n: number; ok: number; ms: number[] }>()
   for (const e of log) {
@@ -143,7 +144,7 @@ export function performance(
   for (const p of byKey.values()) {
     const card = decks[p.deck]?.[p.id]
     const accuracy = p.ok / p.n
-    const r = retrievability(card, now)
+    const r = recall?.(card, now)
     const lapses = card?.lapses ?? 0
     out.push({
       deck: p.deck,

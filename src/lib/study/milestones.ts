@@ -1,5 +1,5 @@
 import { KANA } from '../data/kana'
-import { masteryLevel } from '../srs/scheduler'
+import { masteryLevel } from '../srs/queue'
 import type { DeckId, SaveFile } from '../storage/schema'
 
 /** Day streaks worth celebrating. */

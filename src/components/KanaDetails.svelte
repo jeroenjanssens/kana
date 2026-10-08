@@ -1,12 +1,8 @@
 <script lang="ts">
   import { washiStyle } from '../lib/ui/washi'
   import { displayRomaji, type Kana } from '../lib/data/kana'
-  import {
-    formatInterval,
-    masteryLevel,
-    retrievability,
-    type MasteryLevel,
-  } from '../lib/srs/scheduler'
+  import { formatInterval, masteryLevel, type MasteryLevel } from '../lib/srs/queue'
+  import { retrievability } from '../lib/srs/scheduler'
   import type { DeckId } from '../lib/storage/schema'
   import { audio, settings, store } from '../state/app.svelte'
   import { mnemonicFor } from '../lib/data/mnemonics'

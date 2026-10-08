@@ -1,4 +1,4 @@
-import { dayKey } from '../lib/srs/scheduler'
+import { dayKey } from '../lib/srs/queue'
 import { photosForSeason, seasonOf, startPhoto, stepPhoto, type Photo } from '../lib/ui/photos'
 import { settings } from './app.svelte'
 

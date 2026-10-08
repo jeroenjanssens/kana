@@ -61,6 +61,7 @@
             sizes="100vw"
             alt=""
             decoding="async"
+            fetchpriority="low"
           />
         </picture>
       </div>

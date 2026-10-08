@@ -11,7 +11,7 @@
   import { confusableSets } from '../lib/data/confusables'
   import { displayRomaji, glyph, kanaByChar, kanaById, type Kana } from '../lib/data/kana'
   import { strokesFor } from '../lib/data/strokes'
-  import { Session, deckKana } from '../lib/srs/scheduler'
+  import { Session, deckKana } from '../lib/srs/queue'
   import type { DeckId, Grade } from '../lib/storage/schema'
   import { recordReview } from '../lib/study/actions'
   import { GRADE_LABELS } from '../lib/study/answer'

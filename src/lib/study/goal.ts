@@ -1,4 +1,4 @@
-import { dayKey } from '../srs/scheduler'
+import { dayKey } from '../srs/queue'
 import type { ReviewEntry, SaveFile } from '../storage/schema'
 
 /** Answers (in any mode) logged today. */

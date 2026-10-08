@@ -1,6 +1,6 @@
-import { buildQueue, deckKana, type Queue } from '../srs/scheduler'
+import { buildQueue, deckKana, type Queue } from '../srs/queue'
 import type { DeckId, SaveFile } from '../storage/schema'
-import { newShownToday, reviewedToday } from './actions'
+import { newShownToday, reviewedToday } from './daily'
 import { masteryCounts } from './stats'
 
 export const DECK_INFO: Record<DeckId, { title: string; jp: string; sample: string }> = {

@@ -8,7 +8,7 @@
     type Kana,
     type KanaGroup,
   } from '../lib/data/kana'
-  import { masteryLevel } from '../lib/srs/scheduler'
+  import { masteryLevel } from '../lib/srs/queue'
   import type { CardRecord } from '../lib/storage/schema'
   import { settings } from '../state/app.svelte'
   import Hanko from './Hanko.svelte'

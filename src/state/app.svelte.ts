@@ -1,5 +1,4 @@
 import { AudioEngine } from '../lib/audio/engine'
-import { configureScheduler } from '../lib/srs/scheduler'
 import { load, requestPersistence, save } from '../lib/storage/persistence'
 import type { Grade, SaveFile, Settings } from '../lib/storage/schema'
 import { haptic } from '../lib/ui/haptics'
@@ -48,7 +47,9 @@ export function startPersistence(): () => void {
     // Personalised FSRS weights and desired retention apply to every new grade.
     $effect(() => {
       const s = store.data.settings
-      configureScheduler({ weights: $state.snapshot(s.fsrsWeights), retention: s.retention })
+      const options = { weights: $state.snapshot(s.fsrsWeights), retention: s.retention }
+      // Loaded on demand: the Home page doesn't need the FSRS algorithm.
+      void import('../lib/srs/scheduler').then((m) => m.configureScheduler(options))
     })
 
     $effect(() => {

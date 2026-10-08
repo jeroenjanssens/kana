@@ -1,6 +1,6 @@
 import { kanaByChar, segment, type Kana } from '../data/kana'
 import { words, type Word, type WordTag } from '../data/words'
-import { atLeast, masteryLevel, type MasteryLevel } from '../srs/scheduler'
+import { atLeast, masteryLevel, type MasteryLevel } from '../srs/queue'
 import type { SaveFile } from '../storage/schema'
 
 /** The kana a word is built from (っ, ー and other marks are skipped). */

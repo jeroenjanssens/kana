@@ -7,7 +7,7 @@
   import MasteryBar from '../components/MasteryBar.svelte'
   import { confusableSets } from '../lib/data/confusables'
   import { displayRomaji, glyph, kanaById, kanaByChar, type Kana } from '../lib/data/kana'
-  import { Session, deckKana } from '../lib/srs/scheduler'
+  import { Session, deckKana } from '../lib/srs/queue'
   import type { VoiceId } from '../lib/audio/voices'
   import type { DeckId } from '../lib/storage/schema'
   import { recordReview } from '../lib/study/actions'

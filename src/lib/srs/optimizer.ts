@@ -1,5 +1,5 @@
 import type { ReviewEntry } from '../storage/schema'
-import { dayKey } from './scheduler'
+import { dayKey } from './queue'
 
 /** Modes whose answers are real SRS reviews (graded and scheduled). */
 const SCHEDULED = new Set(['srs', 'listen', 'write'])
