@@ -1,6 +1,7 @@
 <script lang="ts">
   import { FONTS } from '../lib/data/fonts'
   import type { Photo } from '../lib/ui/photos'
+  import { t } from '../state/i18n.svelte'
 
   const base = import.meta.env.BASE_URL
   let photos = $state<Photo[]>([])
@@ -27,26 +28,25 @@
 </script>
 
 <header class="page-head">
-  <p class="eyebrow light">感謝 · Thanks</p>
-  <h1>Credits</h1>
-  <p class="lead">kana is built on the generous work of these creators.</p>
+  <p class="eyebrow light">{t('misc.creditsEyebrow')}</p>
+  <h1>{t('misc.creditsHeading')}</h1>
+  <p class="lead">{t('misc.creditsLead')}</p>
 </header>
 
 <div class="sections">
   <section class="panel block">
-    <h2>Pronunciation</h2>
+    <h2>{t('misc.pronunciationHeading')}</h2>
     <p>
-      Generated with <a href="https://voicevox.hiroshiba.jp" target="_blank" rel="noopener"
-        >VOICEVOX</a
-      >.
+      {t('misc.pronunciationGeneratedWith')}
+      <a href="https://voicevox.hiroshiba.jp" target="_blank" rel="noopener">VOICEVOX</a>.
     </p>
     <ul class="list">
       {#each voices as v (v.id)}
         <li>
           {v.credit}
           <span class="muted"
-            >· {v.id === 'female' ? 'female' : 'male'} voice ·
-            <a href={v.terms} target="_blank" rel="noopener">terms</a></span
+            >· {v.id === 'female' ? t('misc.femaleVoice') : t('misc.maleVoice')} ·
+            <a href={v.terms} target="_blank" rel="noopener">{t('misc.terms')}</a></span
           >
         </li>
       {/each}
@@ -54,12 +54,11 @@
   </section>
 
   <section class="panel block">
-    <h2>Stroke order</h2>
+    <h2>{t('misc.strokeOrderHeading')}</h2>
     <p>
-      Stroke data from <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener"
-        >KanjiVG</a
-      >
-      by Ulrich Apel and contributors, licensed under
+      {t('misc.strokeDataFrom')}
+      <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a>
+      {t('misc.byContributors')}
       <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener"
         >CC BY-SA 3.0</a
       >.
@@ -67,12 +66,12 @@
   </section>
 
   <section class="panel block">
-    <h2>Fonts</h2>
+    <h2>{t('misc.fontsHeading')}</h2>
     <p>
-      Japanese fonts from <a href="https://fonts.google.com" target="_blank" rel="noopener"
-        >Google Fonts</a
-      >, used under the SIL Open Font License (Kosugi Maru: Apache 2.0). Interface text is set in
-      Inter.
+      {t('misc.japaneseFontsFrom')}
+      <a href="https://fonts.google.com" target="_blank" rel="noopener">Google Fonts</a>{t(
+        'misc.fontsLicenseNote',
+      )}
     </p>
     <ul class="list">
       {#each FONTS as f (f.id)}
@@ -82,10 +81,11 @@
   </section>
 
   <section class="panel block">
-    <h2>Sound effects</h2>
+    <h2>{t('misc.sfxHeading')}</h2>
     <p>
-      From <a href="https://freesound.org" target="_blank" rel="noopener">Freesound</a> (CC0), a few generated
-      for kana, and three koto notes cut from a recording by Torsodog on Wikimedia Commons (CC BY 3.0).
+      {t('misc.sfxFrom')}
+      <a href="https://freesound.org" target="_blank" rel="noopener">Freesound</a>
+      {t('misc.sfxDesc2')}
     </p>
     <ul class="list">
       {#each sfx as s (s.id)}
@@ -99,10 +99,12 @@
   </section>
 
   <section class="panel block wide">
-    <h2>Photos</h2>
+    <h2>{t('misc.photosHeading')}</h2>
     <p>
-      All photos from <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>,
-      used under the Unsplash License.
+      {t('misc.allPhotosFrom')}
+      <a href="https://unsplash.com" target="_blank" rel="noopener">Unsplash</a>{t(
+        'misc.photosLicense',
+      )}
     </p>
     <ul class="photos">
       {#each photos as p (p.slug)}

@@ -1,22 +1,25 @@
 <script lang="ts">
   import { fly } from 'svelte/transition'
   import { dismissToast, ui } from '../state/ui.svelte'
+  import { t } from '../state/i18n.svelte'
 </script>
 
 <div class="toasts" aria-live="polite">
-  {#each ui.toasts as t (t.id)}
+  {#each ui.toasts as toast (toast.id)}
     <div class="toast" transition:fly={{ y: 16, duration: 250 }}>
-      <span>{t.text}</span>
-      {#if t.action}
+      <span>{toast.text}</span>
+      {#if toast.action}
         <button
           class="btn small shu"
           onclick={() => {
-            t.action?.run()
-            dismissToast(t.id)
-          }}>{t.action.label}</button
+            toast.action?.run()
+            dismissToast(toast.id)
+          }}>{toast.action.label}</button
         >
       {/if}
-      <button class="close" onclick={() => dismissToast(t.id)} aria-label="Dismiss">×</button>
+      <button class="close" onclick={() => dismissToast(toast.id)} aria-label={t('misc.dismiss')}
+        >×</button
+      >
     </div>
   {/each}
 </div>

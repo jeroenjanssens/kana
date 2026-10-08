@@ -1,3 +1,31 @@
 import type en from '../en/home'
 
-export default {} satisfies Record<keyof typeof en, string>
+export default {
+  'home.greeting.morning': 'Goedemorgen',
+  'home.greeting.day': 'Hallo',
+  'home.greeting.evening': 'Goedenavond',
+  'home.lead':
+    'Leer hiragana en katakana lezen met gespreide herhaling — een paar minuten per dag, en de kaarten komen precies terug voordat je ze vergeet.',
+  'home.goal.title': 'Dagdoel: {goal} antwoorden',
+  'home.goal.label': 'Dagdoel: {done} van {goal}',
+  'home.goal.today': '{done}/{goal} vandaag',
+  'home.streak.title': 'Dagen op rij',
+  'home.streak': '{n} {n|dag|dagen} op rij',
+  'home.mastered': '{count} beheerst',
+  'home.decks.ariaLabel': 'Decks',
+  'home.deck.due': 'Te doen',
+  'home.deck.newToday': 'Nieuw vandaag',
+  'home.deck.mastered': 'Beheerst',
+  'home.deck.study': 'Leer {count}',
+  'home.deck.allDone': 'Alles klaar',
+  'home.deck.inOrder': 'Op volgorde',
+  'home.more.ariaLabel': 'Meer',
+  'home.tile.confusable': 'Verwarrende paren',
+  'home.tile.confusableSub': 'Onderscheid op elkaar lijkende kana',
+  'home.tile.listening': 'Luisteren',
+  'home.tile.listeningSub': 'Hoor het, vind de kana',
+  'home.tile.reading': 'Leesoefening',
+  'home.tile.readingSub': 'Echte woorden die je kunt lezen',
+  'home.tile.table': 'Kana-tabel',
+  'home.tile.tableSub': 'Zie en hoor ze allemaal',
+} satisfies Record<keyof typeof en, string>

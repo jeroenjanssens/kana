@@ -1,5 +1,11 @@
 # Improvements, round 2: plan
 
+> **Status (2026-10-08): implemented.** Where the build differs from this plan:
+> - **Sprint (6):** instead of waiting for Space after "n", answers are judged as you type. An answer is correct as soon as it matches an accepted spelling, and wrong as soon as it can't become one, so no Enter is needed.
+> - **FSRS optimizer (8):** `fsrs-browser` is built with threads, but runs single-threaded in a Web Worker without cross-origin isolation (tested in Chromium). If a browser can't run it, Settings says so.
+> - **Koto (10a):** the real-recording default worked. Three isolated notes were cut from the recording, and they happen to form a root, fifth and octave (310 / 459 / 630 Hz).
+> - **Mobile performance (10b):** Lighthouse mobile went from 77 to 97. The biggest win was loading the large card font after the first paint, followed by splitting `ts-fsrs` out of the first load.
+
 This round covers every suggestion from the "what else?" list: eight learning and habit features, four polish items, and the three known compromises.
 
 As before:

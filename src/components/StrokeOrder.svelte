@@ -2,6 +2,7 @@
   import { untrack } from 'svelte'
   import type { StrokeGlyph } from '../lib/data/strokes'
   import Icon from './Icon.svelte'
+  import { t } from '../state/i18n.svelte'
 
   /** Animated stroke order for a kana, drawn in ink, stroke by stroke. */
   let {
@@ -60,7 +61,7 @@
     width={(size * width) / GRID}
     height={size}
     role="img"
-    aria-label="Stroke order for {text}, {strokes.length} strokes"
+    aria-label={t('study.strokeOrder.ariaLabel', { text, n: strokes.length })}
   >
     {#each glyphs as g (g.x)}
       <g class="grid" transform="translate({g.x} 0)">
@@ -106,18 +107,20 @@
     {/key}
   </svg>
   <figcaption>
-    <button class="btn small ghost" onclick={replay} aria-label="Replay animation">
-      <Icon name="replay" size={16} /> Replay
+    <button class="btn small ghost" onclick={replay} aria-label={t('study.strokeOrder.replay')}>
+      <Icon name="replay" size={16} />
+      {t('study.strokeOrder.replayBtn')}
     </button>
-    <button class="btn small ghost" onclick={prev} aria-label="Previous stroke">
+    <button class="btn small ghost" onclick={prev} aria-label={t('study.strokeOrder.prevStroke')}>
       <Icon name="left" size={16} />
     </button>
     <span class="count">{step ?? strokes.length} / {strokes.length}</span>
-    <button class="btn small ghost" onclick={next} aria-label="Next stroke">
+    <button class="btn small ghost" onclick={next} aria-label={t('study.strokeOrder.nextStroke')}>
       <Icon name="right" size={16} />
     </button>
     <label class="numbers-toggle">
-      <input type="checkbox" bind:checked={showNumbers} /> Numbers
+      <input type="checkbox" bind:checked={showNumbers} />
+      {t('study.strokeOrder.numbers')}
     </label>
   </figcaption>
 </figure>

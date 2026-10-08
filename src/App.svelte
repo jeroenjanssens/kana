@@ -14,6 +14,7 @@
   import { startSync } from './state/sync.svelte'
   import { toast, ui } from './state/ui.svelte'
   import { route, startRouter } from './state/router.svelte'
+  import { t, lang } from './state/i18n.svelte'
   import Home from './views/Home.svelte'
 
   // Secondary pages are loaded on demand to keep the first load small.
@@ -70,6 +71,10 @@
   )
 
   $effect(() => {
+    document.documentElement.lang = lang()
+  })
+
+  $effect(() => {
     const root = document.documentElement
     root.dataset.theme = theme
     root.dataset.motion = reduceMotion ? 'reduce' : 'full'
@@ -108,7 +113,7 @@
     if (store.data.goalDay === today || !goalProgress(store.data).reached) return
     store.data.goalDay = today
     void audio.playSfx('milestone')
-    toast(`Daily goal reached: ${store.data.settings.dailyGoal} answers. おみごと!`)
+    toast(t('misc.goalToast', { goal: store.data.settings.dailyGoal }))
   })
 
   // A soft wooden tick when moving between pages (only if enabled in settings).

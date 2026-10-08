@@ -1,29 +1,32 @@
 <script lang="ts">
+  import { t, lang } from '../../state/i18n.svelte'
+
   /** Bar chart of reviews due on each of the coming days. */
   let { counts }: { counts: number[] } = $props()
 
   const max = $derived(Math.max(1, ...counts))
   const W = 28
   const H = 110
+  const locale = $derived(lang() === 'nl' ? 'nl-NL' : 'en-GB')
   const labels = $derived(
     counts.map((_, i) => {
-      if (i === 0) return 'Today'
+      if (i === 0) return t('stats.today')
       const d = new Date()
       d.setDate(d.getDate() + i)
-      return i === 1 ? 'Tmrw' : d.toLocaleDateString(undefined, { weekday: 'narrow' })
+      return i === 1 ? t('stats.tomorrow') : d.toLocaleDateString(locale, { weekday: 'narrow' })
     }),
   )
 </script>
 
 {#if counts.every((c) => c === 0)}
   <p class="empty">
-    Nothing scheduled yet — study a few cards and their reviews will show up here.
+    {t('stats.nothingScheduled')}
   </p>
 {/if}
 <svg
   viewBox="0 0 {counts.length * W} {H + 30}"
   role="img"
-  aria-label="Reviews due: {counts.join(', ')}"
+  aria-label={t('stats.reviewsDue', { counts: counts.join(', ') })}
 >
   {#each counts as c, i (i)}
     {@const h = (c / max) * H}

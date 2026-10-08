@@ -9,11 +9,13 @@
   import { streak } from '../lib/study/stats'
   import { DECK_INFO, deckSummary } from '../lib/study/summary'
   import { store } from '../state/app.svelte'
+  import { t } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   let now = $state(Date.now())
   $effect(() => {
-    const t = setInterval(() => (now = Date.now()), 30_000)
-    return () => clearInterval(t)
+    const timer = setInterval(() => (now = Date.now()), 30_000)
+    return () => clearInterval(timer)
   })
 
   const summaries = $derived(STUDY_DECKS.map((d) => deckSummary(store.data, d, now)))
@@ -25,8 +27,15 @@
   const hour = new Date().getHours()
   const greeting =
     hour < 5 ? 'こんばんは' : hour < 11 ? 'おはよう' : hour < 18 ? 'こんにちは' : 'こんばんは'
-  const greetingEn =
-    hour < 5 ? 'Good evening' : hour < 11 ? 'Good morning' : hour < 18 ? 'Hello' : 'Good evening'
+  const greetingEn = $derived(
+    hour < 5
+      ? t('home.greeting.evening')
+      : hour < 11
+        ? t('home.greeting.morning')
+        : hour < 18
+          ? t('home.greeting.day')
+          : t('home.greeting.evening'),
+  )
 </script>
 
 <section class="hero">
@@ -34,16 +43,15 @@
   <h1><span lang="ja">{greeting}</span></h1>
   {#if firstVisit}
     <p class="lead">
-      Learn to read hiragana and katakana with spaced repetition — a few minutes a day, and the
-      cards come back right before you'd forget them.
+      {t('home.lead')}
     </p>
   {:else}
     <div class="badges">
       <span
         class="badge goal"
         class:reached={goal.reached}
-        title="Daily goal: {goal.goal} answers"
-        aria-label="Daily goal: {goal.done} of {goal.goal}"
+        title={t('home.goal.title', { goal: String(goal.goal) })}
+        aria-label={t('home.goal.label', { done: String(goal.done), goal: String(goal.goal) })}
       >
         <svg class="ring" viewBox="0 0 36 36" aria-hidden="true">
           <circle cx="18" cy="18" r="15" />
@@ -55,17 +63,17 @@
             style:stroke-dasharray="{goal.fraction * 94.25} 94.25"
           />
         </svg>
-        {goal.done}/{goal.goal} today
+        {t('home.goal.today', { done: String(goal.done), goal: String(goal.goal) })}
       </span>
-      <span class="badge" title="Days in a row"
-        ><Icon name="flame" size={16} /> {s.current} day{s.current === 1 ? '' : 's'} streak</span
+      <span class="badge" title={t('home.streak.title')}
+        ><Icon name="flame" size={16} /> {t('home.streak', { n: s.current })}</span
       >
-      <span class="badge"><Hanko size={18} /> {mastered} mastered</span>
+      <span class="badge"><Hanko size={18} /> {t('home.mastered', { count: mastered })}</span>
     </div>
   {/if}
 </section>
 
-<section class="decks" aria-label="Decks">
+<section class="decks" aria-label={t('home.decks.ariaLabel')}>
   {#each summaries as d (d.deck)}
     {@const info = DECK_INFO[d.deck]}
     <article class="deck panel">
@@ -78,51 +86,68 @@
           />
         </div>
         <div>
-          <h2>{info.title}</h2>
+          <h2>{t(`deck.${d.deck}` as MessageKey)}</h2>
           <p class="jp" lang="ja">{info.jp}</p>
         </div>
       </div>
       <dl class="counts">
         <div>
-          <dt>Due</dt>
+          <dt>{t('home.deck.due')}</dt>
           <dd class:hot={d.due > 0}>{d.due}</dd>
         </div>
         <div>
-          <dt>New today</dt>
+          <dt>{t('home.deck.newToday')}</dt>
           <dd>{d.fresh}</dd>
         </div>
         <div>
-          <dt>Mastered</dt>
+          <dt>{t('home.deck.mastered')}</dt>
           <dd>{d.mastery.mature}<span class="muted">/{d.total}</span></dd>
         </div>
       </dl>
       <MasteryBar counts={d.mastery} total={d.total} />
       <div class="actions">
         <a class="btn primary" href="#/study/{d.deck}?mode=srs">
-          {d.due + d.fresh > 0 ? `Study ${d.due + d.fresh}` : 'All done'}
+          {d.due + d.fresh > 0
+            ? t('home.deck.study', { count: d.due + d.fresh })
+            : t('home.deck.allDone')}
         </a>
-        <a class="btn" href="#/study/{d.deck}?mode=order">In order</a>
+        <a class="btn" href="#/study/{d.deck}?mode=order">{t('home.deck.inOrder')}</a>
       </div>
     </article>
   {/each}
 </section>
 
-<section class="more" aria-label="More">
+<section class="more" aria-label={t('home.more.ariaLabel')}>
   <a class="tile panel" href="#/drills">
     <span class="tile-glyph" lang="ja">シ ツ</span>
-    <span><strong>Confusable pairs</strong><span class="muted">Tell look-alikes apart</span></span>
+    <span
+      ><strong>{t('home.tile.confusable')}</strong><span class="muted"
+        >{t('home.tile.confusableSub')}</span
+      ></span
+    >
   </a>
   <a class="tile panel" href="#/listen">
     <span class="tile-icon"><Icon name="ear" size={26} /></span>
-    <span><strong>Listening</strong><span class="muted">Hear it, find the kana</span></span>
+    <span
+      ><strong>{t('home.tile.listening')}</strong><span class="muted"
+        >{t('home.tile.listeningSub')}</span
+      ></span
+    >
   </a>
   <a class="tile panel" href="#/reading">
     <span class="tile-glyph" lang="ja">ねこ</span>
-    <span><strong>Reading practice</strong><span class="muted">Real words you can read</span></span>
+    <span
+      ><strong>{t('home.tile.reading')}</strong><span class="muted"
+        >{t('home.tile.readingSub')}</span
+      ></span
+    >
   </a>
   <a class="tile panel" href="#/table">
     <span class="tile-icon"><Icon name="table" size={26} /></span>
-    <span><strong>Kana table</strong><span class="muted">See and hear them all</span></span>
+    <span
+      ><strong>{t('home.tile.table')}</strong><span class="muted">{t('home.tile.tableSub')}</span
+      ></span
+    >
   </a>
 </section>
 

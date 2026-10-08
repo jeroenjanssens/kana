@@ -1,9 +1,10 @@
 <script lang="ts">
   import { displayRomaji, type Kana } from '../lib/data/kana'
-  import { KANA_NOTES, mnemonicFor, type KanaNote } from '../lib/data/mnemonics'
+  import { kanaNote, mnemonicFor, type KanaNote } from '../lib/data/mnemonics'
   import type { StudyDeckId } from '../lib/storage/schema'
   import { washiStyle } from '../lib/ui/washi'
   import { settings } from '../state/app.svelte'
+  import { t, lang } from '../state/i18n.svelte'
   import Hint from './Hint.svelte'
   import Icon from './Icon.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
@@ -39,17 +40,18 @@
 <article
   class="intro washi turn"
   style={washiStyle(`intro:${kana.id}`)}
-  aria-label="New kana: {kana.romaji}"
+  aria-label={t('study.kanaIntro.ariaLabel', { romaji: kana.romaji })}
 >
-  <p class="eyebrow">New kana · 新しい字</p>
+  <p class="eyebrow">{t('study.kanaIntro.eyebrow')}</p>
   <div class="glyphs">
     {#each scripts as script (script)}
       <KanaGlyph text={text(script)} {font} size={kana.hiragana.length > 1 ? '4.4rem' : '6rem'} />
     {/each}
   </div>
   <p class="romaji">{displayRomaji(kana, settings().romaji)}</p>
-  <button class="btn small" onclick={onplay} aria-label="Play pronunciation (P)">
-    <Icon name="play" size={14} filled /> Listen
+  <button class="btn small" onclick={onplay} aria-label={t('study.kanaIntro.playLabel')}>
+    <Icon name="play" size={14} filled />
+    {t('common.listen')}
   </button>
   <div class="strokes">
     {#each scripts as script (script)}
@@ -60,21 +62,24 @@
     {#each scripts as script (script)}
       <li>
         {#if scripts.length > 1}<span class="script"
-            >{script === 'hiragana' ? 'Hiragana' : 'Katakana'}</span
+            >{t(script === 'hiragana' ? 'common.hiragana' : 'common.katakana')}</span
           >{/if}
-        <Hint text={mnemonicFor(kana, script)} />
+        <Hint text={mnemonicFor(kana, script, lang())} />
       </li>
     {/each}
   </ul>
   {#each notes as n (n)}
+    {@const note = kanaNote(n, lang())}
     <aside class="note">
-      <strong>{KANA_NOTES[n].title}</strong>
-      <span>{KANA_NOTES[n].body}</span>
-      <span class="example" lang="ja">{KANA_NOTES[n].example}</span>
+      <strong>{note.title}</strong>
+      <span>{note.body}</span>
+      <span class="example" lang="ja">{note.example}</span>
     </aside>
   {/each}
-  <button class="btn primary got" onclick={ondone}>Got it <kbd>Space</kbd></button>
-  <p class="muted small">It comes back as a quiz in a minute.</p>
+  <button class="btn primary got" onclick={ondone}
+    >{t('study.kanaIntro.gotIt')} <kbd>Space</kbd></button
+  >
+  <p class="muted small">{t('study.kanaIntro.comesBack')}</p>
 </article>
 
 <style>

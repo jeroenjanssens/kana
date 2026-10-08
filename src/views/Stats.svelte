@@ -17,10 +17,12 @@
   } from '../lib/study/stats'
   import { goalDays } from '../lib/study/goal'
   import { leeches } from '../lib/study/leeches'
-  import { DECK_INFO, deckSummary } from '../lib/study/summary'
+  import { deckSummary } from '../lib/study/summary'
   import { buildHash } from '../lib/ui/hash'
   import { retrievability } from '../lib/srs/scheduler'
   import { settings, store } from '../state/app.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
+  import { t } from '../state/i18n.svelte'
 
   const now = Date.now()
   const log = $derived(store.data.log)
@@ -98,52 +100,56 @@
 </script>
 
 <header class="page-head">
-  <p class="eyebrow light">記録 · Progress</p>
-  <h1>Stats</h1>
+  <p class="eyebrow light">{t('stats.eyebrow')}</p>
+  <h1>{t('stats.heading')}</h1>
 </header>
 
 <section class="tiles">
   <div class="tile panel">
     <Icon name="flame" size={22} />
-    <strong>{s.current}</strong><span>day streak</span>
-    <small class="muted">Longest: {s.longest}</small>
+    <strong>{s.current}</strong><span>{t('stats.streakUnit', { n: s.current })}</span>
+    <small class="muted">{t('stats.longest', { n: s.longest })}</small>
   </div>
   <div class="tile panel">
     <Hanko size={26} />
-    <strong>{mastered}</strong><span>mastered</span>
-    <small class="muted">of {totalCards} cards</small>
+    <strong>{mastered}</strong><span>{t('stats.mastered')}</span>
+    <small class="muted">{t('stats.masteredOf', { total: totalCards })}</small>
   </div>
   <div class="tile panel">
     <Icon name="cards" size={22} />
-    <strong>{totals.total}</strong><span>answers</span>
+    <strong>{totals.total}</strong><span>{t('stats.answers')}</span>
     <small class="muted"
-      >{totals.total ? Math.round((totals.correct / totals.total) * 100) : 0}% correct</small
+      >{t('stats.correctPct', {
+        pct: totals.total ? Math.round((totals.correct / totals.total) * 100) : 0,
+      })}</small
     >
   </div>
   <div class="tile panel">
     <Icon name="chart" size={22} />
-    <strong>{due[0]}</strong><span>due today</span>
-    <small class="muted">{due.slice(1, 8).reduce((a, b) => a + b, 0)} in the next 7 days</small>
+    <strong>{due[0]}</strong><span>{t('stats.dueToday')}</span>
+    <small class="muted"
+      >{t('stats.dueNextWeek', { n: due.slice(1, 8).reduce((a, b) => a + b, 0) })}</small
+    >
   </div>
 </section>
 
 <section class="panel block">
-  <h2>Activity</h2>
+  <h2>{t('stats.activity')}</h2>
   <Heatmap {days} goalDays={goalDays(log, settings().dailyGoal)} />
 </section>
 
 <div class="two">
   <section class="panel block">
-    <h2>Due in the next two weeks</h2>
+    <h2>{t('stats.dueNextTwoWeeks')}</h2>
     <Forecast counts={due} />
   </section>
 
   <section class="panel block">
-    <h2>Mastery per deck</h2>
+    <h2>{t('stats.masteryPerDeck')}</h2>
     <ul class="decks">
       {#each summaries as d (d.deck)}
         <li>
-          <span class="name">{DECK_INFO[d.deck].title}</span>
+          <span class="name">{t(`deck.${d.deck}` as MessageKey)}</span>
           <span class="muted">{d.mastery.mature}/{d.total}</span>
           <MasteryBar counts={d.mastery} total={d.total} />
         </li>
@@ -154,15 +160,15 @@
 
 <div class="two">
   <section class="panel block">
-    <h2>Weakest kana</h2>
+    <h2>{t('stats.weakestKana')}</h2>
     {#if weak.length}
       <ol class="weak">
         {#each weak as w (w.deck + w.id)}
           <li>
             <span class="glyph" lang="ja">{label(w.deck, w.id)}</span>
             <span class="romaji">{kanaById(w.id).romaji}</span>
-            <span class="muted small">{DECK_INFO[w.deck].title}</span>
-            <span class="acc" class:low={w.accuracy < 0.7} title="Accuracy"
+            <span class="muted small">{t(`deck.${w.deck}` as MessageKey)}</span>
+            <span class="acc" class:low={w.accuracy < 0.7} title={t('stats.accuracy')}
               >{Math.round(w.accuracy * 100)}%</span
             >
           </li>
@@ -170,38 +176,42 @@
       </ol>
       <div class="row">
         {#each drillLinks as l (l.deck)}
-          <a class="btn primary small" href={l.href}>Drill these ({l.deck})</a>
+          <a class="btn primary small" href={l.href}>{t('stats.drillThese', { deck: l.deck })}</a>
         {/each}
       </div>
     {:else}
-      <p class="muted">Study a little and your trickiest kana will show up here.</p>
+      <p class="muted">{t('stats.studyFirst')}</p>
     {/if}
   </section>
 
   {#if tricky.length}
     <section class="panel block">
-      <h2>Tricky kana</h2>
+      <h2>{t('stats.trickyKana')}</h2>
       <p class="muted small">
-        Forgotten {settings().leechThreshold} times or more. Drill them in order, with their hints.
+        {t('stats.trickyDesc', { threshold: settings().leechThreshold })}
       </p>
       <ul class="mixups">
-        {#each tricky as t (t.deck + t.id)}
+        {#each tricky as trick (trick.deck + trick.id)}
           <li>
-            <span class="glyph" lang="ja">{label(t.deck, t.id)}</span>
-            <span class="muted small">{DECK_INFO[t.deck].title} · forgotten {t.lapses}×</span>
+            <span class="glyph" lang="ja">{label(trick.deck, trick.id)}</span>
+            <span class="muted small"
+              >{t(`deck.${trick.deck}` as MessageKey)} · {t('stats.trickyForgotten', {
+                lapses: trick.lapses,
+              })}</span
+            >
           </li>
         {/each}
       </ul>
       <div class="row">
         {#each trickyLinks as l (l.deck)}
-          <a class="btn primary small" href={l.href}>Drill tricky kana ({l.deck})</a>
+          <a class="btn primary small" href={l.href}>{t('stats.drillTricky', { deck: l.deck })}</a>
         {/each}
       </div>
     </section>
   {/if}
 
   <section class="panel block">
-    <h2>Most confused</h2>
+    <h2>{t('stats.mostConfused')}</h2>
     {#if mixups.length}
       <ul class="mixups">
         {#each mixups as m (m.shown + m.answered)}
@@ -218,21 +228,21 @@
           </li>
         {/each}
       </ul>
-      <a class="btn small" href="#/drills">Practise confusable pairs</a>
+      <a class="btn small" href="#/drills">{t('stats.practiceConfusable')}</a>
     {:else}
-      <p class="muted">Mix-ups from typed answers, listening and drills appear here.</p>
+      <p class="muted">{t('stats.noMixups')}</p>
     {/if}
   </section>
 </div>
 
 {#if timed.length}
   <section class="panel block">
-    <h2>Slowest to recognise</h2>
+    <h2>{t('stats.slowest')}</h2>
     <ul class="timed">
-      {#each timed as t (t.deck + t.id)}
+      {#each timed as tim (tim.deck + tim.id)}
         <li>
-          <span class="glyph" lang="ja">{label(t.deck, t.id)}</span>
-          <span class="time">{((t.avgMs ?? 0) / 1000).toFixed(1)}s</span>
+          <span class="glyph" lang="ja">{label(tim.deck, tim.id)}</span>
+          <span class="time">{((tim.avgMs ?? 0) / 1000).toFixed(1)}s</span>
         </li>
       {/each}
     </ul>

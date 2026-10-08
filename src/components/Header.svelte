@@ -1,33 +1,35 @@
 <script lang="ts">
   import { route } from '../state/router.svelte'
+  import { t } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
   import Icon, { type IconName } from './Icon.svelte'
   import SoundToggle from './SoundToggle.svelte'
 
-  const NAV: { href: string; label: string; icon: IconName; match: string[] }[] = [
-    { href: '#/', label: 'Learn', icon: 'cards', match: ['', 'study'] },
-    { href: '#/table', label: 'Table', icon: 'table', match: ['table'] },
+  const NAV: { href: string; labelKey: MessageKey; icon: IconName; match: string[] }[] = [
+    { href: '#/', labelKey: 'nav.learn', icon: 'cards', match: ['', 'study'] },
+    { href: '#/table', labelKey: 'nav.table', icon: 'table', match: ['table'] },
     {
       href: '#/practice',
-      label: 'Practice',
+      labelKey: 'nav.practice',
       icon: 'pairs',
       match: ['practice', 'drills', 'listen', 'reading', 'write', 'sprint'],
     },
-    { href: '#/stats', label: 'Stats', icon: 'chart', match: ['stats'] },
+    { href: '#/stats', labelKey: 'nav.stats', icon: 'chart', match: ['stats'] },
   ]
 
   const section = $derived(route.segments[0] ?? '')
 </script>
 
 <header class="header">
-  <a class="logo" href="#/" title="kana — home">
+  <a class="logo" href="#/" title={t('nav.home')}>
     <span class="mark" aria-hidden="true">仮名</span>
     <span class="word">kana</span>
   </a>
-  <nav class="nav" aria-label="Main">
+  <nav class="nav" aria-label={t('nav.main')}>
     {#each NAV as item (item.href)}
       <a href={item.href} aria-current={item.match.includes(section) ? 'page' : undefined}>
         <Icon name={item.icon} size={20} />
-        <span>{item.label}</span>
+        <span>{t(item.labelKey)}</span>
       </a>
     {/each}
   </nav>
@@ -36,8 +38,8 @@
     <a
       class="btn icon ghost"
       href="#/settings"
-      aria-label="Settings"
-      title="Settings"
+      aria-label={t('nav.settings')}
+      title={t('nav.settings')}
       aria-current={section === 'settings' ? 'page' : undefined}
     >
       <Icon name="gear" />

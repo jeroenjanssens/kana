@@ -6,6 +6,7 @@
   import { FONT_STYLES, fontById } from '../lib/data/fonts'
   import type { DeckId } from '../lib/storage/schema'
   import { settings } from '../state/app.svelte'
+  import { t, lang } from '../state/i18n.svelte'
   import FontGallery from './FontGallery.svelte'
   import Hanko from './Hanko.svelte'
   import Icon from './Icon.svelte'
@@ -78,19 +79,22 @@
   )
   const galleryFonts = $derived(s.fontMode === 'random' ? s.randomFonts : [s.font])
   const scriptLabel = $derived(
-    deck === 'combined' ? 'Hiragana and katakana' : deck === 'katakana' ? 'Katakana' : 'Hiragana',
+    deck === 'combined'
+      ? t('study.flashCard.hiraganaAndKatakana')
+      : deck === 'katakana'
+        ? t('common.katakana')
+        : t('common.hiragana'),
+  )
+  const cardLabel = $derived(
+    flipped
+      ? t('study.flashCard.cardLabelBack', { script: scriptLabel, romaji: kana.romaji })
+      : t('study.flashCard.cardLabelFront', { script: scriptLabel }),
   )
 </script>
 
-<PaperCard
-  {flipped}
-  {tilt}
-  {paper}
-  label="{scriptLabel} card{flipped ? `, ${kana.romaji}` : ', tap to reveal'}"
-  {onflip}
->
+<PaperCard {flipped} {tilt} {paper} label={cardLabel} {onflip}>
   {#snippet front()}
-    {#if isNew}<span class="chip new">New</span>{/if}
+    {#if isNew}<span class="chip new">{t('study.flashCard.new')}</span>{/if}
     <div class="front-glyph" class:pair={deck === 'combined'}>
       {#if deck === 'combined'}
         <KanaGlyph text={kana.hiragana} {font} size={frontSize} />
@@ -100,13 +104,13 @@
         <KanaGlyph text={frontText} {font} size={frontSize} />
       {/if}
     </div>
-    <span class="hint muted">Tap or press <kbd>Space</kbd></span>
+    <span class="hint muted">{t('study.flashCard.tapHintPre')}<kbd>Space</kbd></span>
   {/snippet}
   {#snippet back()}
     <div class="back-top">
       <KanaGlyph text={frontText} {font} size="2.6rem" />
       {#if s.showOtherScript && otherScript}
-        <span class="other" title="The same sound in the other script">
+        <span class="other" title={t('study.flashCard.otherScriptTitle')}>
           <KanaGlyph text={otherScript} {font} size="1.6rem" ink={false} />
         </span>
       {/if}
@@ -114,25 +118,26 @@
     {#if verdict}
       <p class="verdict" class:wrong={!verdict.correct}>
         {#if verdict.correct}
-          <Icon name="check" size={16} /> Correct
+          <Icon name="check" size={16} /> {t('study.flashCard.correct')}
         {:else}
-          You typed <strong>{verdict.typed || '—'}</strong>
+          {t('study.flashCard.youTypedPre')}<strong>{verdict.typed || '—'}</strong>
         {/if}
       </p>
     {/if}
     {#if tricky}
       <p class="tricky">
-        <span class="chip">Tricky</span>
+        <span class="chip">{t('study.flashCard.tricky')}</span>
         {#if drill}
           <a href="#/drills/{drill.id}" onclick={(e) => e.stopPropagation()}
-            >Compare {drill.title}</a
+            >{t('study.flashCard.drillCompare', { title: drill.title })}</a
           >
         {/if}
       </p>
     {/if}
     <p class="romaji" class:inked={flipped}>{displayRomaji(kana, s.romaji)}</p>
     <p class="mnemonic">
-      {#each hintScripts as script (script)}<span><Hint text={mnemonicFor(kana, script)} /></span
+      {#each hintScripts as script (script)}<span
+          ><Hint text={mnemonicFor(kana, script, lang())} /></span
         >{/each}
     </p>
     <div class="tools">
@@ -142,7 +147,8 @@
           e.stopPropagation()
           onplay()
         }}
-        aria-label="Play pronunciation (P)"><Icon name="play" size={14} filled /> Listen</button
+        aria-label={t('study.flashCard.playLabel')}
+        ><Icon name="play" size={14} filled /> {t('common.listen')}</button
       >
       <button
         class="btn small"
@@ -150,7 +156,8 @@
           e.stopPropagation()
           onstrokes()
         }}
-        aria-label="Stroke order (S)"><Icon name="brush" size={14} /> Strokes</button
+        aria-label={t('study.flashCard.strokesLabel')}
+        ><Icon name="brush" size={14} /> {t('common.strokes')}</button
       >
       <button
         class="btn small"
@@ -158,7 +165,8 @@
           e.stopPropagation()
           onfonts()
         }}
-        aria-label="Font gallery (F)"><Icon name="fonts" size={14} /> Fonts</button
+        aria-label={t('study.flashCard.fontsLabel')}
+        ><Icon name="fonts" size={14} /> {t('common.fonts')}</button
       >
     </div>
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
@@ -171,10 +179,12 @@
       />
     </div>
     <p class="font-name">
-      {fontInfo ? `${fontInfo.name} · ${FONT_STYLES[fontInfo.style]}` : 'System font'}
+      {fontInfo
+        ? `${fontInfo.name} · ${FONT_STYLES[fontInfo.style]}`
+        : t('study.flashCard.systemFont')}
     </p>
     {#if celebrate}
-      <div class="seal"><Hanko size={92} stamp title="Mastered!" /></div>
+      <div class="seal"><Hanko size={92} stamp title={t('study.flashCard.mastered')} /></div>
     {/if}
   {/snippet}
 </PaperCard>

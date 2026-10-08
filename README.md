@@ -12,25 +12,31 @@ stroke-order animations and flashcards that look like ink on washi paper.
 ## Features
 
 - **Spaced repetition** (FSRS, the algorithm Anki uses) for three decks: hiragana, katakana, and
-  both side by side. Self-grade like Anki, or type the romaji and get a suggested grade.
+  both side by side. Self-grade like Anki, or type the romaji and get a suggested grade. **Undo**
+  any answer, and optionally **personalise the intervals** to your own memory with the FSRS
+  optimizer.
+- **An introduction for every new kana**: its sound, an animated stroke order and an original
+  memory hint, before it's quizzed.
+- **Writing practice**: see the romaji and draw the kana; stroke count, order and direction are
+  checked stroke by stroke. Or choose the right kana from look-alikes.
 - **In-order mode** to go through rows one by one without touching your schedule.
-- **Kana table** with separate or combined layouts, a romaji toggle, click-to-hear, and a
-  mastery overlay that shows how well you know each kana.
-- **Pronunciation** for every kana and every reading word, in a female or male voice (or a random one per card), generated with VOICEVOX.
-- **Fonts**: pick one of 15 Japanese fonts, or let every card use a random one so you learn to
-  recognise kana in any style. A font gallery shows the same kana in every font.
-- **Stroke-order animations** for every kana (KanjiVG).
-- **Confusable pairs**: compare look-alikes (シ/ツ, ソ/ン, ぬ/め, …) and quiz yourself; sets are
-  also built from your own mistakes.
-- **Listening**: hear a sound, pick the kana — with its own spaced-repetition schedule.
-- **Reading practice**: ~300 real words that unlock as you learn their kana, with short notes on
-  っ, ー, long vowels and yōon.
-- **Stats**: activity heatmap, streaks, due forecast, mastery per deck, weakest and most-confused kana.
-- **Look & feel**: washi-paper cards with ink (every card on its own sheet), photos of Japan
-  that rotate by cards, by time, daily or stay fixed, hanko seals for mastered cards, subtle
-  traditional sound effects whose pitch follows your answer, light and dark themes.
-- **Works offline** and can be installed as an app. Progress stays in your browser; export and
-  import it as JSON.
+- **Kana table** with separate or combined layouts, a romaji toggle, click-to-hear, memory hints
+  and a mastery overlay that shows how well you know each kana.
+- **Pronunciation** for every kana and every reading word, in a female or male voice (or a random
+  one per card), generated with VOICEVOX.
+- **Fonts**: pick one of 15 Japanese fonts, or let every card use a random one, plus a font gallery.
+- **Practice modes**: confusable pairs (シ/ツ, ぬ/め, …, also built from your own mistakes),
+  listening with its own schedule, reading practice with ~400 real words, and a **one-minute
+  sprint**.
+- **Help with tricky kana**: cards you keep forgetting are flagged, with a hint and a drill.
+- **Stats**: activity heatmap, streaks, a **daily goal**, due forecast, mastery per deck, weakest,
+  tricky and most-confused kana. A daily reminder can be added to your calendar.
+- **Look & feel**: washi-paper cards with ink (every card on its own sheet), photos of Japan that
+  match the season, hanko seals for mastered cards, real koto notes whose pitch follows your
+  answer, light and dark themes, and a light vibration on phones.
+- **In English and Dutch** (Nederlands).
+- **Works offline** and can be installed as an app. Progress stays in your browser; export it,
+  or sync it between devices through a secret GitHub gist.
 
 ## Development
 

@@ -23,7 +23,7 @@ test('clicking a kana shows its details', async ({ page }) => {
   const details = page.locator('.details')
   await expect(details.locator('.romaji')).toHaveText('ka')
   await expect(details.getByText('Young')).toBeVisible()
-  await expect(page.getByRole('button', { name: /^か, ka, young/ })).toHaveClass(/level-young/)
+  await expect(page.getByRole('button', { name: /^か, ka, young/i })).toHaveClass(/level-young/)
 })
 
 test('clicking a yōon plays its pronunciation', async ({ page }) => {

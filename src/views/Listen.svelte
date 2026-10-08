@@ -20,6 +20,8 @@
   import { navigate, route } from '../state/router.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { ui } from '../state/ui.svelte'
+  import { t } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   const scriptParam = route.segments[1]
   const script =
@@ -167,12 +169,9 @@
 
 {#if !deck}
   <header class="page-head">
-    <p class="eyebrow light">聞き取り · Listening</p>
-    <h1>Listening</h1>
-    <p class="lead">
-      Hear a sound and pick the kana. Trains the link from sound to shape — with its own
-      spaced-repetition schedule.
-    </p>
+    <p class="eyebrow light">{t('listen.eyebrow')}</p>
+    <h1>{t('listen.heading')}</h1>
+    <p class="lead">{t('listen.lead')}</p>
   </header>
   <div class="decks">
     {#each summaries as d (d.deck)}
@@ -181,14 +180,20 @@
         <div class="head">
           <span class="icon"><Icon name="ear" size={28} /></span>
           <div>
-            <h2>{isKata ? 'Katakana' : 'Hiragana'}</h2>
-            <p class="muted">{d.total} sounds</p>
+            <h2>{isKata ? t('common.katakana') : t('common.hiragana')}</h2>
+            <p class="muted">{t('listen.sounds', { count: d.total })}</p>
           </div>
         </div>
-        <p class="counts"><strong>{d.due}</strong> due · <strong>{d.fresh}</strong> new today</p>
+        <p class="counts">
+          <strong>{d.due}</strong>
+          {t('listen.due')} · <strong>{d.fresh}</strong>
+          {t('listen.newToday')}
+        </p>
         <MasteryBar counts={d.mastery} total={d.total} />
         <a class="btn primary" href="#/listen/{isKata ? 'katakana' : 'hiragana'}">
-          {d.due + d.fresh ? `Start · ${d.due + d.fresh}` : 'All done for today'}
+          {d.due + d.fresh
+            ? t('practice.deckStart', { count: d.due + d.fresh })
+            : t('practice.allDoneBtn')}
         </a>
       </article>
     {/each}
@@ -196,22 +201,28 @@
 {:else}
   <div class="listen">
     <div class="topbar panel">
-      <button class="btn icon ghost" onclick={() => navigate('/listen')} aria-label="Leave (Esc)">
+      <button
+        class="btn icon ghost"
+        onclick={() => navigate('/listen')}
+        aria-label={t('common.leave')}
+      >
         <Icon name="close" />
       </button>
-      <strong>Listening · {script === 'katakana' ? 'Katakana' : 'Hiragana'}</strong>
+      <strong>{t(`deck.${deck}` as MessageKey)}</strong>
       <span class="bar" style:--p={counts.progress}></span>
       <button
         class="btn icon ghost"
         onclick={undoLast}
         disabled={!canUndo}
-        aria-label="Undo last answer (U)"
-        title="Undo (U)"
+        aria-label={t('common.undo')}
+        title={t('practice.undoTitle')}
       >
         <Icon name="undo" />
       </button>
       <span class="muted"
-        >{counts.unseen} left{counts.repeating ? ` · ${counts.repeating} again` : ''}</span
+        >{t('common.left', { count: counts.unseen })}{counts.repeating
+          ? ` · ${t('common.repeating', { count: counts.repeating })}`
+          : ''}</span
       >
     </div>
 
@@ -221,12 +232,12 @@
           <button
             class="speaker washi"
             onclick={() => current && audio.playVoice(current.id, voice)}
-            aria-label="Play the sound again (P)"
+            aria-label={t('listen.playAgainLabel')}
           >
             <Icon name="speaker" size={56} />
-            <span class="muted">Play again <kbd>P</kbd></span>
+            <span class="muted">{t('listen.playAgain')} <kbd>P</kbd></span>
           </button>
-          <div class="options" role="group" aria-label="Which kana did you hear?">
+          <div class="options" role="group" aria-label={t('listen.whichKana')}>
             {#each options as o, i (o.id)}
               <button
                 class="option washi turn"
@@ -250,28 +261,30 @@
           {#if picked && picked.id !== current.id}
             <div class="after">
               <button class="btn small" onclick={() => picked && audio.playVoice(picked.id, voice)}>
-                <Icon name="play" size={14} filled /> Hear what you picked ({picked.romaji})
+                <Icon name="play" size={14} filled />
+                {t('listen.hearPicked', { romaji: picked.romaji })}
               </button>
-              <button class="btn primary" onclick={next}>Next <kbd>Enter</kbd></button>
+              <button class="btn primary" onclick={next}>{t('common.next')} <kbd>Enter</kbd></button
+              >
             </div>
           {:else if picked}
             <div class="after">
-              <button class="btn" onclick={next}>Next <kbd>Enter</kbd></button>
+              <button class="btn" onclick={next}>{t('common.next')} <kbd>Enter</kbd></button>
             </div>
           {/if}
         </section>
       {/key}
     {:else if done}
       <section class="done panel">
-        <h2>{answered ? 'Session complete' : 'Nothing to listen to right now'}</h2>
+        <h2>{answered ? t('listen.sessionComplete') : t('listen.sessionNothing')}</h2>
         {#if answered}
-          <p>{correctCount} of {answered} correct.</p>
+          <p>{t('listen.sessionCorrect', { correct: correctCount, answered })}</p>
         {:else}
-          <p class="muted">You've done all listening reviews for today.</p>
+          <p class="muted">{t('listen.sessionAllDone')}</p>
         {/if}
         <div class="row">
-          <a class="btn primary" href="#/practice">Back to practice</a>
-          <a class="btn" href="#/">Home</a>
+          <a class="btn primary" href="#/practice">{t('practice.backToPractice')}</a>
+          <a class="btn" href="#/">{t('common.home')}</a>
         </div>
       </section>
     {/if}

@@ -1,26 +1,34 @@
 <script lang="ts">
   import type { MasteryLevel } from '../lib/srs/queue'
+  import { t } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   let { counts, total }: { counts: Record<MasteryLevel, number>; total: number } = $props()
-  const LEVELS: { key: MasteryLevel; label: string }[] = [
-    { key: 'mature', label: 'Mastered' },
-    { key: 'young', label: 'Young' },
-    { key: 'learning', label: 'Learning' },
-    { key: 'new', label: 'New' },
+  const LEVELS: { key: MasteryLevel }[] = [
+    { key: 'mature' },
+    { key: 'young' },
+    { key: 'learning' },
+    { key: 'new' },
   ]
 </script>
 
 <div
   class="bar"
   role="img"
-  aria-label={LEVELS.map((l) => `${counts[l.key]} ${l.label.toLowerCase()}`).join(', ')}
+  aria-label={LEVELS.map(
+    (l) => `${counts[l.key]} ${t(`study.mastery.${l.key}` as MessageKey).toLowerCase()}`,
+  ).join(', ')}
 >
   {#each LEVELS as l (l.key)}
     {#if counts[l.key] > 0}
       <span
         class="seg {l.key}"
         style:flex-grow={counts[l.key]}
-        title="{l.label}: {counts[l.key]} of {total}"
+        title={t('study.mastery.titleSegment', {
+          label: t(`study.mastery.${l.key}` as MessageKey),
+          count: String(counts[l.key]),
+          total: String(total),
+        })}
       ></span>
     {/if}
   {/each}

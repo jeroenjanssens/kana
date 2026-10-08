@@ -21,6 +21,8 @@
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
+  import { t } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   const param = route.segments[1]
   const script: Script | undefined =
@@ -138,20 +140,17 @@
 
 {#if !script}
   <header class="page-head">
-    <p class="eyebrow light">早読み · Sprint</p>
-    <h1>One-minute sprint</h1>
-    <p class="lead">
-      Read as many kana as you can in 60 seconds. Type the romaji — no Enter needed. A mistake costs
-      two seconds.
-    </p>
+    <p class="eyebrow light">{t('sprint.eyebrow')}</p>
+    <h1>{t('sprint.heading')}</h1>
+    <p class="lead">{t('sprint.lead')}</p>
   </header>
   <div class="decks">
     {#each ['hiragana', 'katakana'] as const as sc (sc)}
       <a class="deck panel" href="#/sprint/{sc}">
         <span class="art" lang="ja">{sc === 'hiragana' ? 'あ' : 'ア'}</span>
         <span>
-          <strong>{sc === 'hiragana' ? 'Hiragana' : 'Katakana'}</strong>
-          <span class="muted">Best: {best[sc]}</span>
+          <strong>{sc === 'hiragana' ? t('common.hiragana') : t('common.katakana')}</strong>
+          <span class="muted">{t('sprint.bestScore', { score: best[sc] })}</span>
         </span>
       </a>
     {/each}
@@ -159,20 +158,24 @@
 {:else}
   <div class="sprint">
     <div class="topbar panel">
-      <button class="btn icon ghost" onclick={() => navigate('/sprint')} aria-label="Leave (Esc)">
+      <button
+        class="btn icon ghost"
+        onclick={() => navigate('/sprint')}
+        aria-label={t('common.leave')}
+      >
         <Icon name="close" />
       </button>
-      <strong>Sprint · {script === 'katakana' ? 'Katakana' : 'Hiragana'}</strong>
+      <strong>{t('sprint.title', { script: t(`common.${script}` as MessageKey) })}</strong>
       <span class="bar" style:--p={left / SPRINT_MS}></span>
-      <span class="time" aria-label="Seconds left">{Math.ceil(left / 1000)}s</span>
-      <span class="score" aria-label="Score">{score}</span>
+      <span class="time" aria-label={t('sprint.secondsLeft')}>{Math.ceil(left / 1000)}s</span>
+      <span class="score" aria-label={t('sprint.scoreLabel')}>{score}</span>
     </div>
 
     {#if phase === 'ready'}
       <section class="panel card" in:fly={{ y: 12 }}>
-        <h2>Ready?</h2>
-        <p class="muted">Best so far: {bestSprint(store.data, script)}</p>
-        <button class="btn primary" onclick={start}>Start <kbd>Enter</kbd></button>
+        <h2>{t('sprint.ready')}</h2>
+        <p class="muted">{t('sprint.bestSoFar', { score: bestSprint(store.data, script) })}</p>
+        <button class="btn primary" onclick={start}>{t('common.start')} <kbd>Enter</kbd></button>
       </section>
     {:else if phase === 'running' && current}
       {#key current.id + score + mistakes}
@@ -182,7 +185,7 @@
         </div>
       {/key}
       {#if touch}
-        <div class="options" role="group" aria-label="Which romaji?">
+        <div class="options" role="group" aria-label={t('sprint.whichRomaji')}>
           {#each options as o (o.id)}
             <button
               class="btn option"
@@ -208,16 +211,20 @@
       {/if}
     {:else if phase === 'done'}
       <section class="panel card" in:fly={{ y: 12 }}>
-        {#if record}<div class="seal"><Hanko size={72} stamp title="New record" /></div>{/if}
-        <p class="eyebrow">結果 · Result</p>
-        <h2>{score} kana in one minute</h2>
+        {#if record}<div class="seal">
+            <Hanko size={72} stamp title={t('sprint.newRecordTitle')} />
+          </div>{/if}
+        <p class="eyebrow">{t('sprint.doneEyebrow')}</p>
+        <h2>{t('sprint.doneKana', { score })}</h2>
         <p class="muted">
-          {mistakes} mistake{mistakes === 1 ? '' : 's'} ·
-          {record ? `New record! (was ${previousBest})` : `Best: ${bestSprint(store.data, script)}`}
+          {t('sprint.mistakes', { mistakes })} ·
+          {record
+            ? t('sprint.newRecord', { previous: previousBest })
+            : t('sprint.bestScore', { score: bestSprint(store.data, script) })}
         </p>
         <div class="row">
-          <button class="btn primary" onclick={start}>Again <kbd>Enter</kbd></button>
-          <a class="btn" href="#/practice">Practice</a>
+          <button class="btn primary" onclick={start}>{t('common.again')} <kbd>Enter</kbd></button>
+          <a class="btn" href="#/practice">{t('nav.practice')}</a>
         </div>
       </section>
     {/if}

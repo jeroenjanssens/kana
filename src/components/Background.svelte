@@ -5,6 +5,7 @@
   import { gallery, loadPhotos, showPhoto } from '../state/photos.svelte'
   import { route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
+  import { t } from '../state/i18n.svelte'
   import Icon from './Icon.svelte'
 
   const base = import.meta.env.BASE_URL
@@ -75,22 +76,26 @@
     <p class="credit">
       <span class="title">{photo.title}</span>
       <span>
-        Photo by <a href={photo.photographerUrl} target="_blank" rel="noopener"
-          >{photo.photographer}</a
-        >
-        on <a href={photo.sourceUrl} target="_blank" rel="noopener">Unsplash</a>
+        {t('misc.photoBy')}
+        <a href={photo.photographerUrl} target="_blank" rel="noopener">{photo.photographer}</a>
+        {t('misc.photoOn')} <a href={photo.sourceUrl} target="_blank" rel="noopener">Unsplash</a>
       </span>
     </p>
     <div class="arrows">
       <button
         class="arrow"
         onclick={() => showPhoto(-1)}
-        aria-label="Previous photo"
-        title="Previous photo"
+        aria-label={t('misc.previousPhoto')}
+        title={t('misc.previousPhoto')}
       >
         <Icon name="left" size={16} />
       </button>
-      <button class="arrow" onclick={() => showPhoto(1)} aria-label="Next photo" title="Next photo">
+      <button
+        class="arrow"
+        onclick={() => showPhoto(1)}
+        aria-label={t('misc.nextPhoto')}
+        title={t('misc.nextPhoto')}
+      >
         <Icon name="right" size={16} />
       </button>
     </div>

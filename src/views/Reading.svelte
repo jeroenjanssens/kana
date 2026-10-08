@@ -15,12 +15,14 @@
     notesFor,
     practiceOrder,
     unlockedWords,
+    wordMeaning,
     type ReadingNote,
   } from '../lib/study/reading'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { ui } from '../state/ui.svelte'
+  import { t, lang } from '../state/i18n.svelte'
 
   const ROUND = 15
 
@@ -86,7 +88,7 @@
     void audio.playSfx('flip')
     const word = current
     if (s.autoplay) setTimeout(() => current === word && audio.playWord(word.index, voice), 280)
-    notes = notesFor(current).filter((n) => markNoteSeen(store.data, n.id))
+    notes = notesFor(current, lang()).filter((n) => markNoteSeen(store.data, n.id))
   }
 
   function submit() {
@@ -147,33 +149,32 @@
 
 {#if phase === 'overview'}
   <header class="page-head">
-    <p class="eyebrow light">読む練習 · Reading</p>
-    <h1>Reading practice</h1>
-    <p class="lead">
-      Real Japanese words, built only from kana you already know. A word unlocks when every kana in
-      it is at least "young" in your decks.
-    </p>
+    <p class="eyebrow light">{t('reading.eyebrow')}</p>
+    <h1>{t('reading.heading')}</h1>
+    <p class="lead">{t('reading.lead')}</p>
   </header>
 
   <section class="panel block start">
     <div>
-      <h2>{unlocked.length} of {words.length} words unlocked</h2>
+      <h2>{t('reading.unlocked', { count: unlocked.length, total: words.length })}</h2>
       <p class="muted">
         {unlocked.length
-          ? `Practise a round of ${Math.min(ROUND, unlocked.length)} words.`
-          : 'Learn the first rows (あ い う え お, か き く け こ…) to unlock your first words.'}
+          ? t('reading.practise', { count: Math.min(ROUND, unlocked.length) })
+          : t('reading.noWords')}
       </p>
     </div>
-    <button class="btn primary" disabled={!unlocked.length} onclick={start}>Start reading</button>
+    <button class="btn primary" disabled={!unlocked.length} onclick={start}
+      >{t('reading.startBtn')}</button
+    >
   </section>
 
   {#if unlocked.length}
     <section class="panel block">
-      <h2>Unlocked</h2>
+      <h2>{t('reading.unlockedSection')}</h2>
       <ul class="chips">
         {#each unlocked as w (w.kana)}
           {@const p = store.data.words[w.kana]}
-          <li title="{w.romaji} — {w.meaning}" class:practised={p && p.correct > 0}>
+          <li title="{w.romaji} — {wordMeaning(w, lang())}" class:practised={p && p.correct > 0}>
             <span lang="ja">{w.kana}</span>
           </li>
         {/each}
@@ -183,12 +184,12 @@
 
   {#if locked.length}
     <section class="panel block">
-      <h2>Next to unlock</h2>
+      <h2>{t('reading.nextToUnlock')}</h2>
       <ul class="next">
         {#each locked.slice(0, 8) as { w, missing } (w.kana)}
           <li>
             <span class="word" lang="ja">{w.kana}</span>
-            <span class="muted">needs</span>
+            <span class="muted">{t('reading.needs')}</span>
             <span lang="ja" class="missing">
               {missing.map((k) => (w.script === 'katakana' ? k.katakana : k.hiragana)).join(' ')}
             </span>
@@ -203,11 +204,11 @@
       <button
         class="btn icon ghost"
         onclick={() => ((phase = 'overview'), (ui.focus = false))}
-        aria-label="Leave (Esc)"
+        aria-label={t('common.leave')}
       >
         <Icon name="close" />
       </button>
-      <strong>Reading</strong>
+      <strong>{t('reading.sessionTitle')}</strong>
       <span class="bar" style:--p={(index + (flipped ? 1 : 0)) / queue.length}></span>
       <span class="muted">{index + 1} / {queue.length}</span>
     </div>
@@ -218,7 +219,7 @@
           {flipped}
           {tilt}
           {paper}
-          label="Word card{flipped ? `, ${current.romaji}` : ''}"
+          label={flipped ? `${t('reading.cardLabel')}, ${current.romaji}` : t('reading.cardLabel')}
           onflip={() => (typed ? inputEl?.focus() : reveal())}
         >
           {#snippet front()}
@@ -228,25 +229,26 @@
               size={current.kana.length > 4 ? '3.6rem' : '5rem'}
             />
             <span class="muted hint"
-              >{current.script === 'katakana' ? 'Katakana' : 'Hiragana'} word</span
+              >{current.script === 'katakana' ? t('reading.kataWord') : t('reading.hiraWord')}</span
             >
           {/snippet}
           {#snippet back()}
             <KanaGlyph text={current.kana} {font} size="2.4rem" />
             {#if verdict !== undefined}
               <p class="verdict" class:wrong={!verdict}>
-                {verdict ? 'Correct' : `You typed “${input}”`}
+                {verdict ? t('reading.correct') : t('reading.youTyped', { input })}
               </p>
             {/if}
             <p class="romaji">{current.romaji}</p>
-            <p class="meaning">{current.meaning}</p>
+            <p class="meaning">{wordMeaning(current, lang())}</p>
             <button
               class="btn small listen"
               onclick={(e) => {
                 e.stopPropagation()
                 audio.playWord(current.index, voice)
               }}
-              aria-label="Play the word (P)"><Icon name="play" size={14} filled /> Listen</button
+              aria-label={t('reading.listenLabel')}
+              ><Icon name="play" size={14} filled /> {t('common.listen')}</button
             >
             <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
             <div class="parts" onclick={(e) => e.stopPropagation()}>
@@ -280,7 +282,7 @@
 
     {#each notes as n (n.id)}
       <aside class="note panel" in:fly={{ y: 8 }}>
-        <p class="eyebrow">New rule</p>
+        <p class="eyebrow">{t('reading.newRule')}</p>
         <h3>{n.title}</h3>
         <p>{n.body}</p>
         <p class="example" lang="ja">{n.example}</p>
@@ -303,34 +305,38 @@
             autocomplete="off"
             autocapitalize="off"
             spellcheck="false"
-            placeholder="Type how it reads…"
-            aria-label="Reading in romaji"
+            placeholder={t('reading.inputPlaceholder')}
+            aria-label={t('reading.inputLabel')}
           />
-          <button class="btn primary" type="submit">Check</button>
+          <button class="btn primary" type="submit">{t('reading.check')}</button>
         </form>
       {:else if !flipped}
-        <button class="btn primary" onclick={reveal}>Show reading <kbd>Space</kbd></button>
+        <button class="btn primary" onclick={reveal}
+          >{t('reading.showReading')} <kbd>Space</kbd></button
+        >
       {:else if typed}
         <button class="btn primary" onclick={() => answer(verdict ?? false)}
-          >Next <kbd>Enter</kbd></button
+          >{t('common.next')} <kbd>Enter</kbd></button
         >
       {:else}
         <div class="row">
           <button class="btn missed" onclick={() => answer(false)}
-            >Couldn't read it <kbd>1</kbd></button
+            >{t('reading.couldntRead')} <kbd>1</kbd></button
           >
-          <button class="btn got" onclick={() => answer(true)}>Read it <kbd>2</kbd></button>
+          <button class="btn got" onclick={() => answer(true)}
+            >{t('reading.readIt')} <kbd>2</kbd></button
+          >
         </div>
       {/if}
     </div>
   </div>
 {:else if phase === 'done'}
   <section class="panel block done">
-    <p class="eyebrow">よくできました · Well read</p>
-    <h2>{score} / {queue.length} words read correctly</h2>
+    <p class="eyebrow">{t('reading.doneEyebrow')}</p>
+    <h2>{t('reading.doneScore', { score, total: queue.length })}</h2>
     <div class="row">
-      <button class="btn primary" onclick={start}>Another round</button>
-      <button class="btn" onclick={() => (phase = 'overview')}>Overview</button>
+      <button class="btn primary" onclick={start}>{t('reading.anotherRound')}</button>
+      <button class="btn" onclick={() => (phase = 'overview')}>{t('reading.overview')}</button>
     </div>
   </section>
 {/if}

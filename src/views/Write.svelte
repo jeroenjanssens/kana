@@ -14,7 +14,6 @@
   import { Session, deckKana } from '../lib/srs/queue'
   import type { DeckId, Grade } from '../lib/storage/schema'
   import { recordReview } from '../lib/study/actions'
-  import { GRADE_LABELS } from '../lib/study/answer'
   import { chooseOptions } from '../lib/study/distractors'
   import {
     checkWriting,
@@ -32,6 +31,8 @@
   import { cardDone } from '../state/photos.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
+  import { t } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   const scriptParam = route.segments[1]
   const script =
@@ -204,21 +205,18 @@
 
 {#if !deck}
   <header class="page-head">
-    <p class="eyebrow light">書き方 · Writing</p>
-    <h1>Writing</h1>
-    <p class="lead">
-      See the romaji, write the kana. Stroke count, order and direction are checked — with its own
-      spaced-repetition schedule.
-    </p>
+    <p class="eyebrow light">{t('write.eyebrow')}</p>
+    <h1>{t('write.heading')}</h1>
+    <p class="lead">{t('write.lead')}</p>
   </header>
   <div class="style panel">
-    <span>Answer by</span>
-    <div class="segmented" role="group" aria-label="Answer by">
+    <span>{t('write.answerBy')}</span>
+    <div class="segmented" role="group" aria-label={t('write.answerBy')}>
       <button aria-pressed={s.writeStyle === 'draw'} onclick={() => (s.writeStyle = 'draw')}
-        >Drawing</button
+        >{t('write.drawing')}</button
       >
       <button aria-pressed={s.writeStyle === 'choose'} onclick={() => (s.writeStyle = 'choose')}
-        >Choosing</button
+        >{t('write.choosing')}</button
       >
     </div>
   </div>
@@ -229,14 +227,20 @@
         <div class="head">
           <span class="icon"><Icon name="brush" size={28} /></span>
           <div>
-            <h2>{kata ? 'Katakana' : 'Hiragana'}</h2>
-            <p class="muted">{d.total} kana</p>
+            <h2>{kata ? t('common.katakana') : t('common.hiragana')}</h2>
+            <p class="muted">{t('write.kanaCount', { count: d.total })}</p>
           </div>
         </div>
-        <p class="counts"><strong>{d.due}</strong> due · <strong>{d.fresh}</strong> new today</p>
+        <p class="counts">
+          <strong>{d.due}</strong>
+          {t('listen.due')} · <strong>{d.fresh}</strong>
+          {t('listen.newToday')}
+        </p>
         <MasteryBar counts={d.mastery} total={d.total} />
         <a class="btn primary" href="#/write/{kata ? 'katakana' : 'hiragana'}">
-          {d.due + d.fresh ? `Start · ${d.due + d.fresh}` : 'All done for today'}
+          {d.due + d.fresh
+            ? t('practice.deckStart', { count: d.due + d.fresh })
+            : t('practice.allDoneBtn')}
         </a>
       </article>
     {/each}
@@ -244,22 +248,28 @@
 {:else}
   <div class="writing">
     <div class="topbar panel">
-      <button class="btn icon ghost" onclick={() => navigate('/write')} aria-label="Leave (Esc)">
+      <button
+        class="btn icon ghost"
+        onclick={() => navigate('/write')}
+        aria-label={t('common.leave')}
+      >
         <Icon name="close" />
       </button>
-      <strong>Writing · {script === 'katakana' ? 'Katakana' : 'Hiragana'}</strong>
+      <strong>{t(`deck.${deck}` as MessageKey)}</strong>
       <span class="bar" style:--p={counts.progress}></span>
       <button
         class="btn icon ghost"
         onclick={undoLast}
         disabled={!canUndo}
-        aria-label="Undo last answer (U)"
-        title="Undo (U)"
+        aria-label={t('common.undo')}
+        title={t('practice.undoTitle')}
       >
         <Icon name="undo" />
       </button>
       <span class="muted"
-        >{counts.unseen} left{counts.repeating ? ` · ${counts.repeating} again` : ''}</span
+        >{t('common.left', { count: counts.unseen })}{counts.repeating
+          ? ` · ${t('common.repeating', { count: counts.repeating })}`
+          : ''}</span
       >
     </div>
 
@@ -267,14 +277,15 @@
       {#key current.id + answered}
         <section class="stage" in:fly={{ y: 14, duration: 300 }}>
           <div class="prompt">
-            <span class="eyebrow">Write in {script}</span>
+            <span class="eyebrow">{t('write.writeIn', { script: script ?? '' })}</span>
             <span class="romaji">{displayRomaji(current, s.romaji)}</span>
             <div class="row">
               <button
                 class="btn small"
                 onclick={() => current && audio.playVoice(current.id, voice)}
               >
-                <Icon name="play" size={14} filled /> Listen
+                <Icon name="play" size={14} filled />
+                {t('common.listen')}
               </button>
               {#if !choose && !result}
                 <button
@@ -282,14 +293,14 @@
                   onclick={() => {
                     peeked = true
                     strokesOpen = true
-                  }}><Icon name="brush" size={14} /> Show me</button
+                  }}><Icon name="brush" size={14} /> {t('write.showMe')}</button
                 >
               {/if}
             </div>
           </div>
 
           {#if choose}
-            <div class="options" role="group" aria-label="Which kana is it?">
+            <div class="options" role="group" aria-label={t('write.whichKana')}>
               {#each options as o, i (o.id)}
                 <button
                   class="option washi"
@@ -309,7 +320,8 @@
               {/each}
             </div>
             {#if picked}
-              <button class="btn primary" onclick={next}>Next <kbd>Enter</kbd></button>
+              <button class="btn primary" onclick={next}>{t('common.next')} <kbd>Enter</kbd></button
+              >
             {/if}
           {:else}
             <WritingPad
@@ -321,20 +333,21 @@
             />
             {#if !result}
               <button class="btn primary" onclick={check} disabled={!strokes.length}
-                >Check <kbd>Enter</kbd></button
+                >{t('write.checkBtn')} <kbd>Enter</kbd></button
               >
             {:else}
+              {@const r = describeResult(result)}
               <p class="verdict" class:wrong={!result.correct} aria-live="polite">
-                {describeResult(result)}
+                {t(r.key, r.params)}
               </p>
-              <div class="grades" role="group" aria-label="How well did you know it?">
+              <div class="grades" role="group" aria-label={t('write.howWell')}>
                 {#each [1, 2, 3, 4] as const as g (g)}
                   <button
                     class="btn grade g{g}"
                     class:suggested={suggested === g}
                     onclick={() => grade(g)}
                   >
-                    {GRADE_LABELS[g]} <kbd>{g}</kbd>
+                    {t(`grade.${g}` as MessageKey)} <kbd>{g}</kbd>
                   </button>
                 {/each}
               </div>
@@ -344,15 +357,15 @@
       {/key}
     {:else if done}
       <section class="done panel">
-        <h2>{answered ? 'Session complete' : 'Nothing to write right now'}</h2>
+        <h2>{answered ? t('write.sessionComplete') : t('write.sessionNothing')}</h2>
         {#if answered}
-          <p>{correctCount} of {answered} correct.</p>
+          <p>{t('write.sessionCorrect', { correct: correctCount, answered })}</p>
         {:else}
-          <p class="muted">You've done all writing reviews for today.</p>
+          <p class="muted">{t('write.sessionAllDone')}</p>
         {/if}
         <div class="row">
-          <a class="btn primary" href="#/practice">Back to practice</a>
-          <a class="btn" href="#/">Home</a>
+          <a class="btn primary" href="#/practice">{t('practice.backToPractice')}</a>
+          <a class="btn" href="#/">{t('common.home')}</a>
         </div>
       </section>
     {/if}
@@ -360,7 +373,7 @@
 {/if}
 
 {#if current && text}
-  <Modal bind:open={strokesOpen} title="Stroke order">
+  <Modal bind:open={strokesOpen} title={t('write.strokeOrder')}>
     <StrokeOrder {text} />
   </Modal>
 {/if}

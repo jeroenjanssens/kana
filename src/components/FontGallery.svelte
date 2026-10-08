@@ -3,6 +3,7 @@
   import { FONTS, FONT_STYLES, SYSTEM_FONT_ID } from '../lib/data/fonts'
   import { loadFont } from '../lib/ui/fontLoader'
   import KanaGlyph from './KanaGlyph.svelte'
+  import { t } from '../state/i18n.svelte'
 
   /** The same kana in many fonts, so you learn to recognise it in any style. */
   let {
@@ -17,8 +18,8 @@
       const font = FONTS.find((f) => f.id === id)
       return {
         id,
-        name: font?.name ?? 'System font',
-        style: font ? FONT_STYLES[font.style] : 'Your device',
+        name: font?.name ?? t('study.fontGallery.systemFont'),
+        style: font ? FONT_STYLES[font.style] : t('study.fontGallery.yourDevice'),
       }
     }),
   )
@@ -32,7 +33,7 @@
   })
 </script>
 
-<ul class="gallery" class:compact aria-label="{text} in different fonts">
+<ul class="gallery" class:compact aria-label={t('study.fontGallery.ariaLabel', { text })}>
   {#each entries as e (e.id)}
     <li class:current={e.id === current} class:loading={!ready[e.id]}>
       <KanaGlyph {text} font={e.id} size={compact ? '2.1rem' : '3.4rem'} ink={!compact} />

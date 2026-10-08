@@ -2,6 +2,7 @@
   import type { StrokeGlyph } from '../lib/data/strokes'
   import type { Point, WritingResult } from '../lib/study/handwriting'
   import Icon from './Icon.svelte'
+  import { t } from '../state/i18n.svelte'
 
   /**
    * A paper square to draw kana on, in the same 109-unit grid as the KanjiVG strokes. After a
@@ -74,7 +75,7 @@
     width={size * cells * scale}
     height={size * scale}
     role="img"
-    aria-label="Drawing area: {strokes.length} stroke{strokes.length === 1 ? '' : 's'} drawn"
+    aria-label={t('writingpad.areaLabel', { count: strokes.length })}
     onpointerdown={down}
     onpointermove={move}
     onpointerup={up}
@@ -114,13 +115,15 @@
       class="btn small ghost"
       onclick={() => (strokes = strokes.slice(0, -1))}
       disabled={disabled || !strokes.length}
-      aria-label="Undo stroke"><Icon name="undo" size={16} /> Stroke</button
+      aria-label={t('writingpad.undoStroke')}
+      ><Icon name="undo" size={16} /> {t('writingpad.stroke')}</button
     >
     <button
       class="btn small ghost"
       onclick={() => (strokes = [])}
       disabled={disabled || !strokes.length}
-      aria-label="Clear drawing"><Icon name="close" size={16} /> Clear</button
+      aria-label={t('writingpad.clearLabel')}
+      ><Icon name="close" size={16} /> {t('writingpad.clear')}</button
     >
   </div>
 </div>

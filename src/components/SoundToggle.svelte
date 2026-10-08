@@ -1,5 +1,6 @@
 <script lang="ts">
   import { audio, settings } from '../state/app.svelte'
+  import { t } from '../state/i18n.svelte'
   import Icon from './Icon.svelte'
 
   let open = $state(false)
@@ -21,8 +22,8 @@
   <button
     class="btn icon ghost"
     onclick={toggle}
-    aria-label={muted ? 'Unmute sound effects (M)' : 'Mute sound effects (M)'}
-    title={muted ? 'Unmute sound effects (M)' : 'Mute sound effects (M)'}
+    aria-label={muted ? t('misc.unmuteSfx') : t('misc.muteSfx')}
+    title={muted ? t('misc.unmuteSfx') : t('misc.muteSfx')}
   >
     <Icon name={muted ? 'mute' : 'speaker'} />
   </button>
@@ -30,8 +31,8 @@
     class="btn icon ghost more"
     onclick={() => (open = !open)}
     aria-expanded={open}
-    aria-label="Volume settings"
-    title="Volume"
+    aria-label={t('misc.volumeSettings')}
+    title={t('misc.volume')}
   >
     <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"
       ><path d="M1 3l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" /></svg
@@ -40,13 +41,16 @@
   {#if open}
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div class="backdrop" onclick={() => (open = false)} onkeydown={() => {}}></div>
-    <div class="popover panel" role="dialog" aria-label="Sound settings">
+    <div class="popover panel" role="dialog" aria-label={t('misc.soundSettings')}>
       <label class="switch">
-        <span>Sound effects</span>
+        <span>{t('misc.soundEffects')}</span>
         <input type="checkbox" bind:checked={s.sfx} />
       </label>
       <label class="slider">
-        <span>Effects volume <span class="muted">{Math.round(s.sfxVolume * 100)}%</span></span>
+        <span
+          >{t('misc.effectsVolumeLabel')}
+          <span class="muted">{Math.round(s.sfxVolume * 100)}%</span></span
+        >
         <input
           type="range"
           min="0"
@@ -58,12 +62,15 @@
       </label>
       <label class="slider">
         <span
-          >Pronunciation volume <span class="muted">{Math.round(s.voiceVolume * 100)}%</span></span
+          >{t('misc.pronunciationVolumeLabel')}
+          <span class="muted">{Math.round(s.voiceVolume * 100)}%</span></span
         >
         <input type="range" min="0" max="1" step="0.05" bind:value={s.voiceVolume} />
       </label>
       <label class="switch">
-        <span>Silent mode <span class="muted small">mutes everything</span></span>
+        <span
+          >{t('misc.silentMode')} <span class="muted small">{t('misc.mutesEverything')}</span></span
+        >
         <input type="checkbox" bind:checked={s.silent} />
       </label>
     </div>

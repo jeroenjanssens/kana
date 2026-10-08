@@ -1,14 +1,25 @@
 <script lang="ts">
+  import { t } from '../state/i18n.svelte'
+
   /** A red inkan-style seal. `stamp` plays the stamping animation when it appears. */
   let {
     text = '熟',
     size = 56,
     stamp = false,
-    title = 'Mastered',
+    title,
   }: { text?: string; size?: number; stamp?: boolean; title?: string } = $props()
+
+  const displayTitle = $derived(title ?? t('study.hanko.mastered'))
 </script>
 
-<span class="hanko" class:stamp style:--size="{size}px" {title} role="img" aria-label={title}>
+<span
+  class="hanko"
+  class:stamp
+  style:--size="{size}px"
+  title={displayTitle}
+  role="img"
+  aria-label={displayTitle}
+>
   <svg viewBox="0 0 100 100" aria-hidden="true">
     <defs>
       <filter id="hanko-rough" x="-10%" y="-10%" width="120%" height="120%">

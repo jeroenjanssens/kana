@@ -8,11 +8,20 @@
     type Kana,
     type KanaGroup,
   } from '../lib/data/kana'
-  import { masteryLevel } from '../lib/srs/queue'
+  import { masteryLevel, type MasteryLevel } from '../lib/srs/queue'
   import type { CardRecord } from '../lib/storage/schema'
+  import type { MessageKey } from '../lib/i18n/messages'
   import { settings } from '../state/app.svelte'
+  import { t } from '../state/i18n.svelte'
   import Hanko from './Hanko.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
+
+  const LEVEL_KEY: Record<MasteryLevel, MessageKey> = {
+    new: 'table.levelNew',
+    learning: 'table.levelLearning',
+    young: 'table.levelYoung',
+    mature: 'table.levelMature',
+  }
 
   let {
     group,
@@ -67,7 +76,7 @@
             onclick={() => onselect(k)}
             aria-label="{script === 'combined'
               ? `${k.hiragana} ${k.katakana}`
-              : text(k)}, {k.romaji}{cards ? `, ${level}` : ''}"
+              : text(k)}, {k.romaji}{cards ? `, ${t(LEVEL_KEY[level])}` : ''}"
           >
             <span class="glyphs">
               {#if script === 'combined'}

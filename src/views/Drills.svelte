@@ -4,7 +4,7 @@
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
-  import { confusableSets, type ConfusableSet } from '../lib/data/confusables'
+  import { confusableSets, confusableHint, type ConfusableSet } from '../lib/data/confusables'
   import { randomFontId } from '../lib/data/fonts'
   import { logPractice } from '../lib/study/actions'
   import { drillDeck, kanaOf, personalSets, quizOptions, quizRounds } from '../lib/study/drills'
@@ -12,16 +12,24 @@
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
+  import { t, lang } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   const mine = $derived(personalSets(confusions(store.data.log, 6)))
   const all = $derived([...mine, ...confusableSets])
   const setId = $derived(route.segments[1])
   const set = $derived(all.find((s) => s.id === setId))
 
-  const SECTIONS: { title: string; filter: (s: ConfusableSet) => boolean }[] = [
-    { title: 'Katakana', filter: (s) => s.script === 'katakana' && !s.id.startsWith('mine') },
-    { title: 'Hiragana', filter: (s) => s.script === 'hiragana' && !s.id.startsWith('mine') },
-    { title: 'Hiragana or katakana?', filter: (s) => s.script === 'mixed' },
+  const SECTIONS: { key: MessageKey; filter: (s: ConfusableSet) => boolean }[] = [
+    {
+      key: 'drills.sectionKatakana',
+      filter: (s) => s.script === 'katakana' && !s.id.startsWith('mine'),
+    },
+    {
+      key: 'drills.sectionHiragana',
+      filter: (s) => s.script === 'hiragana' && !s.id.startsWith('mine'),
+    },
+    { key: 'drills.sectionMixed', filter: (s) => s.script === 'mixed' },
   ]
 
   // ── Quiz state ────────────────────────────────────────────────────────────
@@ -98,28 +106,28 @@
 
 {#if !set}
   <header class="page-head">
-    <p class="eyebrow light">似ている字 · Look-alikes</p>
-    <h1>Confusable pairs</h1>
-    <p class="lead">Kana that look alike, side by side. Compare them, then test yourself.</p>
+    <p class="eyebrow light">{t('drills.eyebrow')}</p>
+    <h1>{t('drills.heading')}</h1>
+    <p class="lead">{t('drills.lead')}</p>
   </header>
 
   {#if mine.length}
     <section class="section">
-      <h2 class="section-title">From your mistakes</h2>
+      <h2 class="section-title">{t('drills.myMistakes')}</h2>
       <div class="sets">
         {#each mine as s (s.id)}
           <a class="set panel mine" href="#/drills/{s.id}">
             <span class="chars" lang="ja">{s.chars.join(' ')}</span>
-            <span class="muted">{s.hints[s.chars[0]]}</span>
+            <span class="muted">{confusableHint(s, s.chars[0], lang())}</span>
           </a>
         {/each}
       </div>
     </section>
   {/if}
 
-  {#each SECTIONS as section (section.title)}
+  {#each SECTIONS as section (section.key)}
     <section class="section">
-      <h2 class="section-title">{section.title}</h2>
+      <h2 class="section-title">{t(section.key)}</h2>
       <div class="sets">
         {#each confusableSets.filter(section.filter) as s (s.id)}
           <a class="set panel" href="#/drills/{s.id}">
@@ -136,7 +144,7 @@
       <button
         class="btn icon ghost"
         onclick={() => navigate('/drills')}
-        aria-label="Back to all sets"
+        aria-label={t('drills.backLabel')}
       >
         <Icon name="left" />
       </button>
@@ -158,13 +166,14 @@
             <p class="romaji">
               {k.romaji}
               {#if set.script === 'mixed'}<span class="chip"
-                  >{c.codePointAt(0)! >= 0x30a0 ? 'katakana' : 'hiragana'}</span
+                  >{c.codePointAt(0)! >= 0x30a0 ? t('common.katakana') : t('common.hiragana')}</span
                 >{/if}
             </p>
-            <p class="hint">{set.hints[c]}</p>
+            <p class="hint">{confusableHint(set, c, lang())}</p>
             <div class="row">
               <button class="btn small" onclick={() => audio.playVoice(k.id)}>
-                <Icon name="play" size={14} filled /> Listen
+                <Icon name="play" size={14} filled />
+                {t('common.listen')}
               </button>
             </div>
             <StrokeOrder text={c} size={120} />
@@ -172,7 +181,7 @@
         {/each}
       </section>
       <div class="cta">
-        <button class="btn primary" onclick={startQuiz}>Test yourself</button>
+        <button class="btn primary" onclick={startQuiz}>{t('drills.testYourself')}</button>
       </div>
     {:else if step === 'quiz'}
       {@const target = rounds[index]}
@@ -181,7 +190,7 @@
           <div class="question washi turn" style={washiStyle(index * 7919 + 1)}>
             <KanaGlyph text={target} {font} size="8rem" />
           </div>
-          <div class="options" role="group" aria-label="Which one is it?">
+          <div class="options" role="group" aria-label={t('drills.whichLabel')}>
             {#each quizOptions(set) as o, i (o.char)}
               <button
                 class="btn option"
@@ -196,25 +205,25 @@
             {/each}
           </div>
           {#if picked && picked !== target}
-            <p class="hint feedback" in:fly={{ y: 6 }}>{set.hints[target]}</p>
+            <p class="hint feedback" in:fly={{ y: 6 }}>{confusableHint(set, target, lang())}</p>
           {/if}
         </section>
       {/key}
     {:else}
       <section class="result panel" in:fly={{ y: 12 }}>
-        <p class="eyebrow">結果 · Result</p>
-        <h2>{score} / {rounds.length} correct</h2>
+        <p class="eyebrow">{t('drills.resultEyebrow')}</p>
+        <h2>{t('drills.resultScore', { score, total: rounds.length })}</h2>
         <p class="muted">
           {score === rounds.length
-            ? 'Perfect — you can tell these apart.'
+            ? t('drills.perfect')
             : score / rounds.length >= 0.8
-              ? 'Nearly there. One more round?'
-              : 'These are tricky. Look at the hints again, then try once more.'}
+              ? t('drills.nearly')
+              : t('drills.tricky')}
         </p>
         <div class="row">
-          <button class="btn primary" onclick={startQuiz}>Again</button>
-          <button class="btn" onclick={() => (step = 'compare')}>Compare again</button>
-          <a class="btn" href="#/drills">All sets</a>
+          <button class="btn primary" onclick={startQuiz}>{t('common.again')}</button>
+          <button class="btn" onclick={() => (step = 'compare')}>{t('drills.compareAgain')}</button>
+          <a class="btn" href="#/drills">{t('drills.allSets')}</a>
         </div>
       </section>
     {/if}

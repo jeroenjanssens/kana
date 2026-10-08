@@ -1,7 +1,7 @@
 <script lang="ts">
   import { washiStyle } from '../lib/ui/washi'
   import KanaGlyph from '../components/KanaGlyph.svelte'
-  import { FONTS, FONT_STYLES, SYSTEM_FONT_ID } from '../lib/data/fonts'
+  import { FONTS, SYSTEM_FONT_ID } from '../lib/data/fonts'
   import type { KanaGroup } from '../lib/data/kana'
   import type { SfxEvent } from '../lib/audio/engine'
   import { pickVoice, type VoiceSetting } from '../lib/audio/voices'
@@ -17,6 +17,8 @@
   import { connect, disconnect, sync, syncNow } from '../state/sync.svelte'
   import { audio, replaceData, settings, store } from '../state/app.svelte'
   import { toast } from '../state/ui.svelte'
+  import { t, lang } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   const s = $derived(settings())
   let fileInput = $state<HTMLInputElement>()
@@ -37,39 +39,50 @@
     void loadPhotos()
   })
 
-  const GROUPS: { id: KanaGroup; label: string; example: string }[] = [
-    { id: 'basic', label: 'Basic', example: 'あ か さ' },
-    { id: 'dakuten', label: 'Dakuten & handakuten', example: 'が ざ ぱ' },
-    { id: 'yoon', label: 'Yōon', example: 'きゃ しゅ' },
-    { id: 'extended', label: 'Extended katakana', example: 'ファ ティ' },
+  const GROUPS: { id: KanaGroup; example: string }[] = [
+    { id: 'basic', example: 'あ か さ' },
+    { id: 'dakuten', example: 'が ざ ぱ' },
+    { id: 'yoon', example: 'きゃ しゅ' },
+    { id: 'extended', example: 'ファ ティ' },
   ]
 
-  const EFFECTS: { id: SfxEvent; label: string }[] = [
-    { id: 'flip', label: 'Card flip' },
-    { id: 'easy', label: 'Easy' },
-    { id: 'good', label: 'Good' },
-    { id: 'hard', label: 'Hard' },
-    { id: 'wrong', label: 'Again' },
-    { id: 'stamp', label: 'Seal' },
-    { id: 'bell', label: 'Bell' },
-    { id: 'complete', label: 'Session complete' },
-    { id: 'milestone', label: 'Milestone' },
-    { id: 'tick', label: 'UI tick' },
+  const EFFECTS: { id: SfxEvent }[] = [
+    { id: 'flip' },
+    { id: 'easy' },
+    { id: 'good' },
+    { id: 'hard' },
+    { id: 'wrong' },
+    { id: 'stamp' },
+    { id: 'bell' },
+    { id: 'complete' },
+    { id: 'milestone' },
+    { id: 'tick' },
   ]
 
   const base = import.meta.env.BASE_URL
-  const PHOTO_MODES: { id: PhotoMode; label: string }[] = [
-    { id: 'cards', label: 'Cards' },
-    { id: 'minutes', label: 'Timer' },
-    { id: 'daily', label: 'Daily' },
-    { id: 'fixed', label: 'Fixed' },
+  const PHOTO_MODES: { id: PhotoMode }[] = [
+    { id: 'cards' },
+    { id: 'minutes' },
+    { id: 'daily' },
+    { id: 'fixed' },
   ]
 
-  const VOICE_OPTIONS: { id: VoiceSetting; label: string }[] = [
-    { id: 'female', label: 'Female' },
-    { id: 'male', label: 'Male' },
-    { id: 'random', label: 'Random' },
-  ]
+  const VOICE_OPTIONS: { id: VoiceSetting }[] = [{ id: 'female' }, { id: 'male' }, { id: 'random' }]
+
+  const fontList = $derived([
+    ...FONTS.map((f) => ({
+      id: f.id,
+      name: f.name,
+      styleLabel: t(`settings.fontStyle.${f.style}` as MessageKey),
+      isSystem: false,
+    })),
+    {
+      id: SYSTEM_FONT_ID,
+      name: t('settings.systemFont'),
+      styleLabel: t('settings.systemFontStyle'),
+      isSystem: true,
+    },
+  ])
 
   /** Switch voice and play a sample right away. */
   function chooseVoice(voice: VoiceSetting) {
@@ -98,9 +111,9 @@
       s.fsrsWeights = await optimizeWeights(data)
       s.optimizedAt = Date.now()
       s.optimizedReviews = data.reviews
-      toast('Intervals personalised to how you remember')
+      toast(t('settings.toast.optimised'))
     } catch (err) {
-      toast(`Could not optimise: ${(err as Error).message}`)
+      toast(t('settings.toast.optimiseFailed', { error: (err as Error).message }))
     } finally {
       optimising = false
     }
@@ -110,7 +123,7 @@
     s.fsrsWeights = []
     s.optimizedAt = 0
     s.optimizedReviews = 0
-    toast('Back to the default intervals')
+    toast(t('settings.toast.resetWeights'))
   }
 
   function downloadReminder() {
@@ -121,7 +134,7 @@
     a.download = 'kana-reminder.ics'
     a.click()
     URL.revokeObjectURL(a.href)
-    toast('Open the downloaded file to add the reminder to your calendar')
+    toast(t('settings.toast.reminder'))
   }
 
   function download() {
@@ -132,7 +145,7 @@
     a.download = exportFileName()
     a.click()
     URL.revokeObjectURL(url)
-    toast('Progress exported')
+    toast(t('settings.toast.exported'))
   }
 
   async function upload(e: Event) {
@@ -141,9 +154,9 @@
     try {
       const data = importJson(await file.text())
       replaceData(data)
-      toast('Progress imported')
+      toast(t('settings.toast.imported'))
     } catch (err) {
-      toast(`Import failed: ${(err as Error).message}`)
+      toast(t('settings.toast.importFailed', { error: (err as Error).message }))
     } finally {
       if (fileInput) fileInput.value = ''
     }
@@ -152,80 +165,115 @@
   function reset() {
     resetProgress(store.data)
     confirmReset = false
-    toast('Progress reset')
+    toast(t('settings.toast.reset'))
   }
 
   function playPreview(id: SfxEvent) {
     void audio.playSfx(id, { preview: true })
   }
+
+  function dateLocale(): string {
+    return lang() === 'nl' ? 'nl-NL' : 'en-GB'
+  }
 </script>
 
 <header class="page-head">
-  <p class="eyebrow light">設定 · Settings</p>
-  <h1>Settings</h1>
+  <p class="eyebrow light">{t('settings.eyebrow')}</p>
+  <h1>{t('settings.title')}</h1>
 </header>
 
 <div class="sections">
   <section class="panel block">
-    <h2>Study</h2>
+    <h2>{t('settings.section.study')}</h2>
+    <div class="field">
+      <span>{t('settings.language')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.language')}>
+        <button aria-pressed={s.language === 'system'} onclick={() => (s.language = 'system')}
+          >{t('settings.lang.system')}</button
+        >
+        <button aria-pressed={s.language === 'en'} onclick={() => (s.language = 'en')}
+          >English</button
+        >
+        <button aria-pressed={s.language === 'nl'} onclick={() => (s.language = 'nl')}
+          >Nederlands</button
+        >
+      </div>
+    </div>
     <label class="field">
-      <span>New cards per day <small class="muted">per deck</small></span>
+      <span>{t('settings.newPerDay')} <small class="muted">{t('settings.perDeck')}</small></span>
       <input type="number" min="0" max="200" bind:value={s.newPerDay} />
     </label>
     <label class="field">
-      <span>Maximum reviews per day <small class="muted">per deck</small></span>
+      <span>{t('settings.reviewsPerDay')} <small class="muted">{t('settings.perDeck')}</small></span
+      >
       <input type="number" min="0" max="2000" bind:value={s.reviewsPerDay} />
     </label>
     <label class="field">
       <span
-        >Desired retention <small class="muted"
-          >{Math.round(s.retention * 100)}% · higher means more reviews</small
+        >{t('settings.retention')}
+        <small class="muted"
+          >{t('settings.retentionNote', { count: Math.round(s.retention * 100) })}</small
         ></span
       >
       <input type="range" min="0.8" max="0.95" step="0.01" bind:value={s.retention} />
     </label>
     <div class="field optimise">
       <span>
-        Personalised intervals
+        {t('settings.personalisedIntervals')}
         <small class="muted">
           {#if s.optimizedAt}
-            optimised {new Date(s.optimizedAt).toLocaleDateString()} on {s.optimizedReviews} reviews
+            {t('settings.optimisedOn', {
+              date: new Date(s.optimizedAt).toLocaleDateString(dateLocale()),
+              count: s.optimizedReviews,
+            })}
           {:else if reviews < MIN_REVIEWS}
-            available after {MIN_REVIEWS} reviews ({reviews} so far)
+            {t('settings.optimiseAvailable', { count: MIN_REVIEWS, done: reviews })}
           {:else}
-            fit the schedule to how you remember ({reviews} reviews)
+            {t('settings.optimiseFit', { count: reviews })}
           {/if}
         </small>
       </span>
       <span class="reminder">
         <button class="btn small" onclick={optimise} disabled={reviews < MIN_REVIEWS || optimising}>
-          {optimising ? 'Optimising…' : 'Optimise'}
+          {optimising ? t('settings.optimising') : t('settings.optimise')}
         </button>
         {#if s.optimizedAt}
-          <button class="btn small ghost" onclick={resetWeights}>Reset</button>
+          <button class="btn small ghost" onclick={resetWeights}
+            >{t('settings.resetIntervals')}</button
+          >
         {/if}
       </span>
     </div>
     <label class="field">
-      <span>Daily goal <small class="muted">answers per day</small></span>
+      <span
+        >{t('settings.dailyGoal')} <small class="muted">{t('settings.answersPerDay')}</small></span
+      >
       <input type="number" min="5" max="500" step="5" bind:value={s.dailyGoal} />
     </label>
     <div class="field">
-      <span>Daily reminder <small class="muted">adds an event to your calendar</small></span>
+      <span
+        >{t('settings.dailyReminder')}
+        <small class="muted">{t('settings.dailyReminderNote')}</small></span
+      >
       <span class="reminder">
-        <input type="time" bind:value={s.reminderTime} aria-label="Reminder time" />
-        <button class="btn small" onclick={downloadReminder}>Add to calendar</button>
+        <input type="time" bind:value={s.reminderTime} aria-label={t('settings.reminderTime')} />
+        <button class="btn small" onclick={downloadReminder}>{t('settings.addToCalendar')}</button>
       </span>
     </div>
     <label class="field">
-      <span>Mark as tricky after <small class="muted">times forgotten</small></span>
+      <span
+        >{t('settings.leechThreshold')} <small class="muted">{t('settings.leechNote')}</small></span
+      >
       <input type="number" min="2" max="20" bind:value={s.leechThreshold} />
     </label>
     <fieldset>
-      <legend>Kana to learn</legend>
+      <legend>{t('settings.kanaToLearn')}</legend>
       {#each GROUPS as g (g.id)}
         <label class="switch">
-          <span>{g.label} <span class="muted" lang="ja">{g.example}</span></span>
+          <span
+            >{t(`settings.group.${g.id}` as MessageKey)}
+            <span class="muted" lang="ja">{g.example}</span></span
+          >
           <input
             type="checkbox"
             checked={s.groups.includes(g.id)}
@@ -236,19 +284,19 @@
       {/each}
     </fieldset>
     <div class="field">
-      <span>Answer style</span>
-      <div class="segmented" role="group" aria-label="Answer style">
+      <span>{t('settings.answerStyleLabel')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.answerStyleLabel')}>
         <button aria-pressed={s.answerStyle === 'self'} onclick={() => (s.answerStyle = 'self')}
-          >Self-grade</button
+          >{t('settings.answerStyleSelf')}</button
         >
         <button aria-pressed={s.answerStyle === 'typed'} onclick={() => (s.answerStyle = 'typed')}
-          >Type the romaji</button
+          >{t('settings.answerStyleTyped')}</button
         >
       </div>
     </div>
     <div class="field">
-      <span>Romanisation</span>
-      <div class="segmented" role="group" aria-label="Romanisation">
+      <span>{t('settings.romanisationLabel')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.romanisationLabel')}>
         <button aria-pressed={s.romaji === 'hepburn'} onclick={() => (s.romaji = 'hepburn')}
           >Hepburn (shi)</button
         >
@@ -259,18 +307,17 @@
     </div>
     <label class="switch"
       ><span
-        >Introduce new kana <small class="muted">sound, strokes and a memory hint first</small
-        ></span
+        >{t('settings.introduce')} <small class="muted">{t('settings.introduceNote')}</small></span
       ><input type="checkbox" bind:checked={s.introduce} /></label
     >
     <label class="switch"
-      ><span>Play pronunciation when revealing a card</span><input
+      ><span>{t('settings.autoplay')}</span><input
         type="checkbox"
         bind:checked={s.autoplay}
       /></label
     >
     <label class="switch"
-      ><span>Show the other script on the back</span><input
+      ><span>{t('settings.showOtherScript')}</span><input
         type="checkbox"
         bind:checked={s.showOtherScript}
       /></label
@@ -278,45 +325,46 @@
   </section>
 
   <section class="panel block">
-    <h2>Fonts</h2>
+    <h2>{t('settings.section.fonts')}</h2>
     <div class="field">
-      <span>Card font</span>
-      <div class="segmented" role="group" aria-label="Font mode">
+      <span>{t('settings.cardFont')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.fontModeLabel')}>
         <button aria-pressed={s.fontMode === 'fixed'} onclick={() => (s.fontMode = 'fixed')}
-          >One font</button
+          >{t('settings.fontModeFixed')}</button
         >
         <button aria-pressed={s.fontMode === 'random'} onclick={() => (s.fontMode = 'random')}
-          >Random fonts</button
+          >{t('settings.fontModeRandom')}</button
         >
       </div>
     </div>
     <p class="muted small">
-      {s.fontMode === 'fixed'
-        ? 'Choose the font for cards and tables.'
-        : 'Each card uses a random font from the ones you select, so you get used to many styles. The table uses the font marked as default.'}
+      {s.fontMode === 'fixed' ? t('settings.fontDescFixed') : t('settings.fontDescRandom')}
     </p>
     <ul class="fonts">
-      {#each [...FONTS.map( (f) => ({ id: f.id, name: f.name, style: FONT_STYLES[f.style] }) ), { id: SYSTEM_FONT_ID, name: 'System font', style: 'Your device' }] as f (f.id)}
+      {#each fontList as f (f.id)}
         <li class:chosen={s.font === f.id}>
           <button
             class="sample washi turn"
             style={washiStyle(f.id)}
             onclick={() => (s.font = f.id)}
             aria-pressed={s.font === f.id}
-            aria-label="Use {f.name} as default font"
+            aria-label={t('settings.useAsDefault', { name: f.name })}
           >
             <KanaGlyph text="あア" font={f.id} size="1.9rem" ink={false} />
           </button>
           <span class="name">{f.name}</span>
-          <span class="muted tiny">{f.style}{s.font === f.id ? ' · default' : ''}</span>
-          {#if s.fontMode === 'random' && f.id !== SYSTEM_FONT_ID}
+          <span class="muted tiny"
+            >{f.styleLabel}{s.font === f.id ? ` ${t('settings.fontDefault')}` : ''}</span
+          >
+          {#if s.fontMode === 'random' && !f.isSystem}
             <label class="tiny check">
               <input
                 type="checkbox"
                 checked={s.randomFonts.includes(f.id)}
                 onchange={(e) =>
                   toggleRandomFont(f.id, (e.currentTarget as HTMLInputElement).checked)}
-              /> in rotation
+              />
+              {t('settings.inRotation')}
             </label>
           {/if}
         </li>
@@ -325,50 +373,63 @@
   </section>
 
   <section class="panel block">
-    <h2>Appearance</h2>
+    <h2>{t('settings.section.appearance')}</h2>
     <div class="field">
-      <span>Theme</span>
-      <div class="segmented" role="group" aria-label="Theme">
+      <span>{t('settings.themeLabel')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.themeLabel')}>
         <button aria-pressed={s.theme === 'system'} onclick={() => (s.theme = 'system')}
-          >System</button
+          >{t('settings.themeSystem')}</button
         >
-        <button aria-pressed={s.theme === 'light'} onclick={() => (s.theme = 'light')}>Light</button
+        <button aria-pressed={s.theme === 'light'} onclick={() => (s.theme = 'light')}
+          >{t('settings.themeLight')}</button
         >
-        <button aria-pressed={s.theme === 'dark'} onclick={() => (s.theme = 'dark')}>Dark</button>
+        <button aria-pressed={s.theme === 'dark'} onclick={() => (s.theme = 'dark')}
+          >{t('settings.themeDark')}</button
+        >
       </div>
     </div>
     <label class="switch"
-      ><span>Photo backgrounds</span><input type="checkbox" bind:checked={s.photos} /></label
+      ><span>{t('settings.photoBackgrounds')}</span><input
+        type="checkbox"
+        bind:checked={s.photos}
+      /></label
     >
     <div class="field">
-      <span>Change the photo</span>
-      <div class="segmented" role="group" aria-label="Change the photo">
+      <span>{t('settings.changePhoto')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.changePhoto')}>
         {#each PHOTO_MODES as m (m.id)}
           <button aria-pressed={s.photoMode === m.id} onclick={() => (s.photoMode = m.id)}
-            >{m.label}</button
+            >{t(`settings.photoMode.${m.id}` as MessageKey)}</button
           >
         {/each}
       </div>
     </div>
     {#if s.photoMode === 'cards'}
       <label class="field">
-        <span>Every <small class="muted">{s.photoEvery} cards</small></span>
+        <span
+          >{t('settings.everyLabel')}
+          <small class="muted">{t('settings.everyCardsNote', { count: s.photoEvery })}</small></span
+        >
         <input type="range" min="3" max="50" step="1" bind:value={s.photoEvery} />
       </label>
     {:else if s.photoMode === 'minutes'}
       <label class="field">
-        <span>Every <small class="muted">{s.photoMinutes} minutes</small></span>
+        <span
+          >{t('settings.everyLabel')}
+          <small class="muted">{t('settings.everyMinutesNote', { count: s.photoMinutes })}</small
+          ></span
+        >
         <input type="range" min="1" max="60" step="1" bind:value={s.photoMinutes} />
       </label>
     {/if}
     <label class="switch"
       ><span
-        >Match the season <small class="muted">cherry blossoms in spring, maples in autumn</small
-        ></span
+        >{t('settings.matchSeason')}
+        <small class="muted">{t('settings.matchSeasonNote')}</small></span
       ><input type="checkbox" bind:checked={s.matchSeason} /></label
     >
     <details class="picker">
-      <summary>Choose a photo</summary>
+      <summary>{t('settings.choosePhoto')}</summary>
       <ul class="thumbs">
         {#each gallery.photos as p (p.slug)}
           <li>
@@ -391,90 +452,104 @@
       </ul>
     </details>
     <label class="switch"
-      ><span>Calm mode <small class="muted">plain paper, no photos</small></span><input
-        type="checkbox"
-        bind:checked={s.calm}
-      /></label
+      ><span
+        >{t('settings.calmMode')} <small class="muted">{t('settings.calmModeNote')}</small></span
+      ><input type="checkbox" bind:checked={s.calm} /></label
     >
     <label class="switch"
-      ><span>Data saver <small class="muted">no photos on slow or metered connections</small></span
+      ><span
+        >{t('settings.dataSaver')} <small class="muted">{t('settings.dataSaverNote')}</small></span
       ><input type="checkbox" bind:checked={s.dataSaver} /></label
     >
     <div class="field">
-      <span>Reduce motion</span>
-      <div class="segmented" role="group" aria-label="Reduce motion">
+      <span>{t('settings.reduceMotionLabel')}</span>
+      <div class="segmented" role="group" aria-label={t('settings.reduceMotionLabel')}>
         <button
           aria-pressed={s.reducedMotion === 'system'}
-          onclick={() => (s.reducedMotion = 'system')}>System</button
+          onclick={() => (s.reducedMotion = 'system')}>{t('settings.reduceMotionSystem')}</button
         >
         <button aria-pressed={s.reducedMotion === 'on'} onclick={() => (s.reducedMotion = 'on')}
-          >On</button
+          >{t('settings.reduceMotionOn')}</button
         >
         <button aria-pressed={s.reducedMotion === 'off'} onclick={() => (s.reducedMotion = 'off')}
-          >Off</button
+          >{t('settings.reduceMotionOff')}</button
         >
       </div>
     </div>
   </section>
 
   <section class="panel block">
-    <h2>Sound</h2>
+    <h2>{t('settings.section.sound')}</h2>
     <label class="switch"
-      ><span>Sound effects <kbd>M</kbd></span><input type="checkbox" bind:checked={s.sfx} /></label
+      ><span>{t('settings.soundEffects')} <kbd>M</kbd></span><input
+        type="checkbox"
+        bind:checked={s.sfx}
+      /></label
     >
     <label class="field">
-      <span>Effects volume <small class="muted">{Math.round(s.sfxVolume * 100)}%</small></span>
+      <span
+        >{t('settings.effectsVolume')}
+        <small class="muted"
+          >{t('settings.volumePct', { count: Math.round(s.sfxVolume * 100) })}</small
+        ></span
+      >
       <input type="range" min="0" max="1" step="0.05" bind:value={s.sfxVolume} disabled={!s.sfx} />
     </label>
     <label class="field">
       <span
-        >Pronunciation volume <small class="muted">{Math.round(s.voiceVolume * 100)}%</small></span
+        >{t('settings.pronunciationVolume')}
+        <small class="muted"
+          >{t('settings.volumePct', { count: Math.round(s.voiceVolume * 100) })}</small
+        ></span
       >
       <input type="range" min="0" max="1" step="0.05" bind:value={s.voiceVolume} />
     </label>
     <div class="field">
-      <span>Voice <small class="muted">random: a different speaker per card</small></span>
-      <div class="segmented" role="group" aria-label="Voice">
+      <span>{t('settings.voiceLabel')} <small class="muted">{t('settings.voiceNote')}</small></span>
+      <div class="segmented" role="group" aria-label={t('settings.voiceLabel')}>
         {#each VOICE_OPTIONS as v (v.id)}
           <button aria-pressed={s.voice === v.id} onclick={() => chooseVoice(v.id)}
-            >{v.label}</button
+            >{t(`settings.voice.${v.id}` as MessageKey)}</button
           >
         {/each}
       </div>
     </div>
     <label class="switch"
-      ><span>Vibrate on answers <small class="muted">phones that support it</small></span><input
+      ><span>{t('settings.vibrate')} <small class="muted">{t('settings.vibrateNote')}</small></span
+      ><input type="checkbox" bind:checked={s.haptics} /></label
+    >
+    <label class="switch"
+      ><span>{t('settings.softClicks')}</span><input
         type="checkbox"
-        bind:checked={s.haptics}
+        bind:checked={s.uiTicks}
       /></label
     >
     <label class="switch"
-      ><span>Soft clicks in menus</span><input type="checkbox" bind:checked={s.uiTicks} /></label
+      ><span
+        >{t('settings.silentMode')}
+        <small class="muted">{t('settings.silentModeNote')}</small></span
+      ><input type="checkbox" bind:checked={s.silent} /></label
     >
-    <label class="switch"
-      ><span>Silent mode <small class="muted">mutes everything</small></span><input
-        type="checkbox"
-        bind:checked={s.silent}
-      /></label
-    >
-    <p class="muted small">Preview the effects:</p>
+    <p class="muted small">{t('settings.previewEffects')}</p>
     <div class="row">
       {#each EFFECTS as e (e.id)}
-        <button class="btn small" onclick={() => playPreview(e.id)}>{e.label}</button>
+        <button class="btn small" onclick={() => playPreview(e.id)}
+          >{t(`settings.sfx.${e.id}` as MessageKey)}</button
+        >
       {/each}
     </div>
   </section>
 
   <section class="panel block">
-    <h2>Your data</h2>
+    <h2>{t('settings.section.yourData')}</h2>
     <p class="muted small">
-      Your progress is stored only in this browser{persisted === true
-        ? ', and the browser has agreed to keep it'
-        : ''}. Export it now and then as a backup, or to move it to another device.
+      {t('settings.dataStored')}{persisted === true ? t('settings.dataPersisted') : ''}{t(
+        'settings.dataExportHint',
+      )}
     </p>
     <div class="row">
-      <button class="btn" onclick={download}>Export progress</button>
-      <button class="btn" onclick={() => fileInput?.click()}>Import progress</button>
+      <button class="btn" onclick={download}>{t('settings.exportProgress')}</button>
+      <button class="btn" onclick={() => fileInput?.click()}>{t('settings.importProgress')}</button>
       <input
         bind:this={fileInput}
         type="file"
@@ -483,37 +558,41 @@
         onchange={upload}
       />
       {#if confirmReset}
-        <button class="btn shu" onclick={reset}>Yes, erase all progress</button>
-        <button class="btn ghost" onclick={() => (confirmReset = false)}>Cancel</button>
+        <button class="btn shu" onclick={reset}>{t('settings.confirmErase')}</button>
+        <button class="btn ghost" onclick={() => (confirmReset = false)}
+          >{t('settings.cancelReset')}</button
+        >
       {:else}
         <button class="btn ghost danger" onclick={() => (confirmReset = true)}
-          >Reset progress…</button
+          >{t('settings.resetProgress')}</button
         >
       {/if}
     </div>
   </section>
 
   <section class="panel block">
-    <h2>Sync between devices</h2>
+    <h2>{t('settings.section.sync')}</h2>
     {#if sync.connected}
       <p class="small">
-        Your progress syncs through a secret gist on your GitHub account.
-        {#if sync.lastSync}Last synced {new Date(sync.lastSync).toLocaleString()}.{/if}
+        {t('settings.syncConnectedDesc')}
+        {#if sync.lastSync}{t('settings.lastSynced', {
+            date: new Date(sync.lastSync).toLocaleString(dateLocale()),
+          })}{/if}
       </p>
       <div class="row">
         <button class="btn" onclick={() => syncNow()} disabled={sync.syncing}>
-          {sync.syncing ? 'Syncing…' : 'Sync now'}
+          {sync.syncing ? t('settings.syncing') : t('settings.syncNow')}
         </button>
-        <button class="btn ghost" onclick={() => disconnect()}>Disconnect</button>
+        <button class="btn ghost" onclick={() => disconnect()}>{t('settings.disconnect')}</button>
       </div>
     {:else}
       <p class="small">
-        Keep your progress in sync across devices with a secret GitHub gist. Create a
+        {t('settings.syncSetupDesc')}
         <a
           href="https://github.com/settings/tokens/new?scopes=gist&description=kana%20sync"
           target="_blank"
-          rel="noopener">token with only the “gist” permission</a
-        >, and paste it here. It's stored only in this browser.
+          rel="noopener">{t('settings.syncTokenLink')}</a
+        >{t('settings.syncSetupEnd')}
       </p>
       <form
         class="row"
@@ -521,53 +600,51 @@
           e.preventDefault()
           if (await connect(token)) {
             token = ''
-            toast('Connected — your progress is synced')
+            toast(t('settings.toast.connected'))
           }
         }}
       >
         <input
           type="password"
           bind:value={token}
-          placeholder="GitHub token"
-          aria-label="GitHub token"
+          placeholder={t('settings.githubToken')}
+          aria-label={t('settings.githubToken')}
           autocomplete="off"
         />
         <button class="btn primary" type="submit" disabled={!token.trim() || sync.syncing}>
-          {sync.syncing ? 'Connecting…' : 'Connect'}
+          {sync.syncing ? t('settings.connecting') : t('settings.connect')}
         </button>
       </form>
     {/if}
-    {#if sync.error}<p class="small error" role="alert">{sync.error}</p>{/if}
+    {#if sync.error}<p class="small error" role="alert">
+        {t(`settings.syncError.${sync.error}` as MessageKey)}
+      </p>{/if}
   </section>
 
   <section class="panel block">
-    <h2>Install</h2>
+    <h2>{t('settings.section.install')}</h2>
     {#if standalone}
-      <p class="small">kana is installed and works offline.</p>
+      <p class="small">{t('settings.installedDesc')}</p>
     {:else if canInstall}
-      <p class="small">
-        Install kana as an app: it starts from your home screen and works offline.
-      </p>
-      <div class="row"><button class="btn primary" onclick={install}>Install kana</button></div>
+      <p class="small">{t('settings.installAppDesc')}</p>
+      <div class="row">
+        <button class="btn primary" onclick={install}>{t('settings.installButton')}</button>
+      </div>
     {:else}
-      <p class="small">
-        kana works offline once loaded. To install it, use your browser's “Install app” or, on
-        iPhone and iPad, Share → “Add to Home Screen”. Installing on iOS also keeps Safari from
-        clearing your progress.
-      </p>
+      <p class="small">{t('settings.installManualDesc')}</p>
     {/if}
   </section>
 
   <section class="panel block">
-    <h2>About</h2>
+    <h2>{t('settings.section.about')}</h2>
     <p class="small">
-      kana is free and open source. Pronunciation, photos, fonts, stroke data and sound effects come
-      from generous creators — see the <a href="#/credits">credits</a>. Press <kbd>?</kbd> for keyboard
-      shortcuts.
+      {t('settings.aboutBody')}<a href="#/credits">{t('settings.credits')}</a>{t(
+        'settings.aboutBodyEnd',
+      )}<kbd>?</kbd>{t('settings.aboutShortcutsEnd')}
     </p>
     <p class="small">
       <a href="https://github.com/jeroenjanssens/kana" target="_blank" rel="noopener"
-        >Source code on GitHub</a
+        >{t('settings.githubLink')}</a
       >
     </p>
   </section>

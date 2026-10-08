@@ -6,6 +6,8 @@
   import type { DeckId } from '../lib/storage/schema'
   import { audio, settings, store } from '../state/app.svelte'
   import { mnemonicFor } from '../lib/data/mnemonics'
+  import type { MessageKey } from '../lib/i18n/messages'
+  import { t, lang } from '../state/i18n.svelte'
   import Hanko from './Hanko.svelte'
   import Hint from './Hint.svelte'
   import Icon from './Icon.svelte'
@@ -18,39 +20,49 @@
     onclose,
   }: { kana: Kana; onstrokes: () => void; onfonts: () => void; onclose?: () => void } = $props()
 
-  const LEVEL_LABEL: Record<MasteryLevel, string> = {
-    new: 'Not studied',
-    learning: 'Learning',
-    young: 'Young',
-    mature: 'Mastered',
+  const LEVEL_KEY: Record<MasteryLevel, MessageKey> = {
+    new: 'table.levelNew',
+    learning: 'table.levelLearning',
+    young: 'table.levelYoung',
+    mature: 'table.levelMature',
+  }
+
+  const DECK_LABEL_KEY: Record<DeckId, MessageKey> = {
+    hiragana: 'table.detailDeckHiragana',
+    katakana: 'table.detailDeckKatakana',
+    combined: 'table.detailDeckCombined',
+    'listen-hiragana': 'table.detailDeckListenHiragana',
+    'listen-katakana': 'table.detailDeckListenKatakana',
+    'write-hiragana': 'table.detailDeckWriteHiragana',
+    'write-katakana': 'table.detailDeckWriteKatakana',
   }
 
   const decks = $derived(
     (
       [
-        ['hiragana', 'Hiragana'],
-        ['katakana', 'Katakana'],
-        ['combined', 'Combined'],
-        ['listen-hiragana', 'Listening (hiragana)'],
-        ['listen-katakana', 'Listening (katakana)'],
-        ['write-hiragana', 'Writing (hiragana)'],
-        ['write-katakana', 'Writing (katakana)'],
-      ] as [DeckId, string][]
+        'hiragana',
+        'katakana',
+        'combined',
+        'listen-hiragana',
+        'listen-katakana',
+        'write-hiragana',
+        'write-katakana',
+      ] as DeckId[]
     )
-      .filter(([d]) => kana.hiragana || d.endsWith('katakana'))
-      .filter(([d]) => !(kana.group === 'extended' && d.startsWith('write')))
-      .map(([deck, label]) => {
+      .filter((d) => kana.hiragana || d.endsWith('katakana'))
+      .filter((d) => !(kana.group === 'extended' && d.startsWith('write')))
+      .map((deck) => {
         const card = store.data.cards[deck]?.[kana.id]
         const level = masteryLevel(card)
         const r = retrievability(card)
-        return { deck, label, card, level, r }
+        return { deck, card, level, r }
       }),
   )
 </script>
 
 <article class="details panel" aria-live="polite">
   {#if onclose}
-    <button class="btn icon ghost close" onclick={onclose} aria-label="Close details">
+    <button class="btn icon ghost close" onclick={onclose} aria-label={t('table.closeDetails')}>
       <Icon name="close" size={18} />
     </button>
   {/if}
@@ -67,31 +79,38 @@
   </div>
   <div class="actions">
     <button class="btn small" onclick={() => audio.playVoice(kana.id)}>
-      <Icon name="play" size={14} filled /> Listen
+      <Icon name="play" size={14} filled />
+      {t('common.listen')}
     </button>
-    <button class="btn small" onclick={onstrokes}><Icon name="brush" size={14} /> Strokes</button>
-    <button class="btn small" onclick={onfonts}><Icon name="fonts" size={14} /> Fonts</button>
+    <button class="btn small" onclick={onstrokes}
+      ><Icon name="brush" size={14} /> {t('common.strokes')}</button
+    >
+    <button class="btn small" onclick={onfonts}
+      ><Icon name="fonts" size={14} /> {t('common.fonts')}</button
+    >
   </div>
   <ul class="hints">
-    {#if kana.hiragana}<li><Hint text={mnemonicFor(kana, 'hiragana')} /></li>{/if}
-    <li><Hint text={mnemonicFor(kana, 'katakana')} /></li>
+    {#if kana.hiragana}<li><Hint text={mnemonicFor(kana, 'hiragana', lang())} /></li>{/if}
+    <li><Hint text={mnemonicFor(kana, 'katakana', lang())} /></li>
   </ul>
   <ul class="decks">
     {#each decks as d (d.deck)}
       <li>
         <span class="dot level-{d.level}" aria-hidden="true"></span>
-        <span class="label">{d.label}</span>
+        <span class="label">{t(DECK_LABEL_KEY[d.deck])}</span>
         <span class="level">
           {#if d.level === 'mature'}<Hanko size={16} />{/if}
-          {LEVEL_LABEL[d.level]}
+          {t(LEVEL_KEY[d.level])}
         </span>
         {#if d.card && d.card.state !== 0}
           <span class="meta muted">
-            {d.card.reps} reviews · {d.card.lapses} lapses ·
+            {t('table.metaReviews', { reps: d.card.reps })} · {t('table.metaLapses', {
+              lapses: d.card.lapses,
+            })} ·
             {d.card.due > Date.now()
-              ? `due in ${formatInterval(d.card.due - Date.now())}`
-              : 'due now'}
-            {#if d.r !== undefined}· {Math.round(d.r * 100)}% recall{/if}
+              ? t('table.dueIn', { interval: formatInterval(d.card.due - Date.now(), lang()) })
+              : t('table.dueNow')}
+            {#if d.r !== undefined}· {t('table.metaRecall', { pct: Math.round(d.r * 100) })}{/if}
           </span>
         {/if}
       </li>

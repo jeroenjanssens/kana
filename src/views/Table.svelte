@@ -6,14 +6,16 @@
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import { FONTS } from '../lib/data/fonts'
   import type { Kana, KanaGroup } from '../lib/data/kana'
+  import type { MessageKey } from '../lib/i18n/messages'
   import { audio, settings, store } from '../state/app.svelte'
+  import { t } from '../state/i18n.svelte'
 
   const s = $derived(settings())
-  const GROUPS: { group: KanaGroup; title: string; jp: string }[] = [
-    { group: 'basic', title: 'Basic', jp: '清音' },
-    { group: 'dakuten', title: 'Dakuten & handakuten', jp: '濁音・半濁音' },
-    { group: 'yoon', title: 'Yōon', jp: '拗音' },
-    { group: 'extended', title: 'Extended katakana', jp: '外来音' },
+  const GROUPS: { group: KanaGroup; jp: string; key: MessageKey }[] = [
+    { group: 'basic', jp: '清音', key: 'table.groupBasic' },
+    { group: 'dakuten', jp: '濁音・半濁音', key: 'table.groupDakuten' },
+    { group: 'yoon', jp: '拗音', key: 'table.groupYoon' },
+    { group: 'extended', jp: '外来音', key: 'table.groupExtended' },
   ]
   let openGroups = $state<KanaGroup[]>(['basic', 'dakuten', 'yoon'])
   let selected = $state<Kana | undefined>()
@@ -29,13 +31,21 @@
     openGroups = openGroups.includes(g) ? openGroups.filter((x) => x !== g) : [...openGroups, g]
   }
 
+  const SCRIPT_TITLE_KEY: Record<string, MessageKey> = {
+    combined: 'table.hiraganaKatakana',
+    hiragana: 'common.hiragana',
+    katakana: 'common.katakana',
+  }
+  const SCRIPT_JP: Record<string, string> = {
+    combined: 'ひらがな・カタカナ',
+    hiragana: 'ひらがな',
+    katakana: 'カタカナ',
+  }
+
   const tables = $derived(
     s.tableLayout === 'combined'
-      ? [{ script: 'combined' as const, title: 'Hiragana · Katakana', jp: 'ひらがな・カタカナ' }]
-      : [
-          { script: 'hiragana' as const, title: 'Hiragana', jp: 'ひらがな' },
-          { script: 'katakana' as const, title: 'Katakana', jp: 'カタカナ' },
-        ],
+      ? [{ script: 'combined' as const }]
+      : [{ script: 'hiragana' as const }, { script: 'katakana' as const }],
   )
 
   function cardsFor(script: 'hiragana' | 'katakana' | 'combined') {
@@ -47,33 +57,39 @@
 
 <header class="page-head">
   <div>
-    <p class="eyebrow light">五十音図 · Gojūon</p>
-    <h1>Kana table</h1>
+    <p class="eyebrow light">{t('table.eyebrow')}</p>
+    <h1>{t('table.heading')}</h1>
   </div>
   <div class="controls panel">
-    <div class="segmented" role="group" aria-label="Layout">
+    <div class="segmented" role="group" aria-label={t('table.layout')}>
       <button
         aria-pressed={s.tableLayout === 'separate'}
-        onclick={() => (s.tableLayout = 'separate')}>Separate</button
+        onclick={() => (s.tableLayout = 'separate')}>{t('table.separate')}</button
       >
       <button
         aria-pressed={s.tableLayout === 'combined'}
-        onclick={() => (s.tableLayout = 'combined')}>Combined</button
+        onclick={() => (s.tableLayout = 'combined')}>{t('table.combined')}</button
       >
     </div>
     <label class="switch"
-      ><span>Romaji</span><input type="checkbox" bind:checked={s.tableRomaji} /></label
+      ><span>{t('table.romajiToggle')}</span><input
+        type="checkbox"
+        bind:checked={s.tableRomaji}
+      /></label
     >
     <label class="switch"
-      ><span>Mastery</span><input type="checkbox" bind:checked={s.tableMastery} /></label
+      ><span>{t('table.masteryToggle')}</span><input
+        type="checkbox"
+        bind:checked={s.tableMastery}
+      /></label
     >
     {#if s.tableLayout === 'combined' && s.tableMastery}
       <label class="select">
-        <span class="visually-hidden">Colour by deck</span>
-        <select bind:value={s.tableMasteryDeck} aria-label="Colour mastery by deck">
-          <option value="combined">Combined deck</option>
-          <option value="hiragana">Hiragana deck</option>
-          <option value="katakana">Katakana deck</option>
+        <span class="visually-hidden">{t('table.colourByDeck')}</span>
+        <select bind:value={s.tableMasteryDeck} aria-label={t('table.colourMasteryByDeck')}>
+          <option value="combined">{t('table.deckCombined')}</option>
+          <option value="hiragana">{t('table.deckHiragana')}</option>
+          <option value="katakana">{t('table.deckKatakana')}</option>
         </select>
       </label>
     {/if}
@@ -92,21 +108,22 @@
             aria-expanded={openGroups.includes(g.group)}
             onclick={() => toggleGroup(g.group)}
           >
-            <h2>{g.title} <span class="jp" lang="ja">{g.jp}</span></h2>
+            <h2>{t(g.key)} <span class="jp" lang="ja">{g.jp}</span></h2>
             <span class="chev" aria-hidden="true">{openGroups.includes(g.group) ? '−' : '+'}</span>
           </button>
           {#if openGroups.includes(g.group)}
             <div class="grids" class:two={tables.length === 2 && g.group !== 'extended'}>
-              {#each tables as t (t.script)}
-                {#if !(g.group === 'extended' && t.script !== 'katakana' && tables.length === 2)}
+              {#each tables as tbl (tbl.script)}
+                {#if !(g.group === 'extended' && tbl.script !== 'katakana' && tables.length === 2)}
                   <div>
                     {#if tables.length === 2}<h3>
-                        {t.title} <span class="jp" lang="ja">{t.jp}</span>
+                        {t(SCRIPT_TITLE_KEY[tbl.script])}
+                        <span class="jp" lang="ja">{SCRIPT_JP[tbl.script]}</span>
                       </h3>{/if}
                     <KanaTable
                       group={g.group}
-                      script={g.group === 'extended' ? 'katakana' : t.script}
-                      cards={cardsFor(g.group === 'extended' ? 'katakana' : t.script)}
+                      script={g.group === 'extended' ? 'katakana' : tbl.script}
+                      cards={cardsFor(g.group === 'extended' ? 'katakana' : tbl.script)}
                       selected={selected?.id}
                       onselect={select}
                     />
@@ -120,7 +137,7 @@
     {/each}
     {#if !s.groups.includes('extended') && !openGroups.includes('extended')}
       <button class="btn small ghost show-ext" onclick={() => toggleGroup('extended')}
-        >Show extended katakana</button
+        >{t('table.showExtended')}</button
       >
     {/if}
   </div>
@@ -134,12 +151,12 @@
       />
     {:else}
       <div class="panel hint">
-        <p><strong>Tap a kana</strong> to hear it and see how well you know it.</p>
+        <p><strong>{t('table.tapHintBold')}</strong>{t('table.tapHintDetail')}</p>
         {#if s.tableMastery}
           <ul class="legend">
-            <li><span class="dot learning"></span> Learning</li>
-            <li><span class="dot young"></span> Young</li>
-            <li><span class="dot mature"></span> Mastered (21+ days)</li>
+            <li><span class="dot learning"></span> {t('table.legendLearning')}</li>
+            <li><span class="dot young"></span> {t('table.legendYoung')}</li>
+            <li><span class="dot mature"></span> {t('table.legendMastered')}</li>
           </ul>
         {/if}
       </div>
@@ -148,13 +165,13 @@
 </div>
 
 {#if selected}
-  <Modal bind:open={strokesOpen} title="Stroke order">
+  <Modal bind:open={strokesOpen} title={t('table.strokeOrder')}>
     <div class="strokes">
       {#if selected.hiragana}<StrokeOrder text={selected.hiragana} size={180} />{/if}
       <StrokeOrder text={selected.katakana} size={180} />
     </div>
   </Modal>
-  <Modal bind:open={fontsOpen} title="Font gallery" wide>
+  <Modal bind:open={fontsOpen} title={t('table.fontGallery')} wide>
     <FontGallery
       text={selected.hiragana || selected.katakana}
       fonts={FONTS.map((f) => f.id)}

@@ -1,2 +1,30 @@
 /** Interface text: home. */
-export default {} as const
+export default {
+  'home.greeting.morning': 'Good morning',
+  'home.greeting.day': 'Hello',
+  'home.greeting.evening': 'Good evening',
+  'home.lead':
+    "Learn to read hiragana and katakana with spaced repetition — a few minutes a day, and the cards come back right before you'd forget them.",
+  'home.goal.title': 'Daily goal: {goal} answers',
+  'home.goal.label': 'Daily goal: {done} of {goal}',
+  'home.goal.today': '{done}/{goal} today',
+  'home.streak.title': 'Days in a row',
+  'home.streak': '{n} {n|day|days} streak',
+  'home.mastered': '{count} mastered',
+  'home.decks.ariaLabel': 'Decks',
+  'home.deck.due': 'Due',
+  'home.deck.newToday': 'New today',
+  'home.deck.mastered': 'Mastered',
+  'home.deck.study': 'Study {count}',
+  'home.deck.allDone': 'All done',
+  'home.deck.inOrder': 'In order',
+  'home.more.ariaLabel': 'More',
+  'home.tile.confusable': 'Confusable pairs',
+  'home.tile.confusableSub': 'Tell look-alikes apart',
+  'home.tile.listening': 'Listening',
+  'home.tile.listeningSub': 'Hear it, find the kana',
+  'home.tile.reading': 'Reading practice',
+  'home.tile.readingSub': 'Real words you can read',
+  'home.tile.table': 'Kana table',
+  'home.tile.tableSub': 'See and hear them all',
+} as const

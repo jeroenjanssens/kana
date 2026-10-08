@@ -4,6 +4,7 @@
   import { deckSummary } from '../lib/study/summary'
   import { unlockedWords } from '../lib/study/reading'
   import { store } from '../state/app.svelte'
+  import { t } from '../state/i18n.svelte'
 
   const listenDue = $derived(
     (['listen-hiragana', 'listen-katakana'] as const)
@@ -14,50 +15,49 @@
 </script>
 
 <header class="page-head">
-  <p class="eyebrow light">練習 · Practice</p>
-  <h1>Practice</h1>
-  <p class="lead">Beyond flashcards: train your eyes, ears and reading.</p>
+  <p class="eyebrow light">{t('practice.eyebrow')}</p>
+  <h1>{t('practice.heading')}</h1>
+  <p class="lead">{t('practice.lead')}</p>
 </header>
 
 <div class="grid">
   <a class="card panel" href="#/drills">
     <span class="art" lang="ja">シツ</span>
-    <h2>Confusable pairs</h2>
+    <h2>{t('practice.drillsHeading')}</h2>
     <p>
-      Compare look-alikes such as シ/ツ and ぬ/め, then quiz yourself. {confusableSets.length} sets.
+      {t('practice.drillsDesc', { count: confusableSets.length })}
     </p>
   </a>
   <a class="card panel" href="#/listen">
     <span class="art"><Icon name="ear" size={40} /></span>
-    <h2>Listening</h2>
+    <h2>{t('practice.listenHeading')}</h2>
     <p>
-      Hear a sound and pick the kana. {listenDue
-        ? `${listenDue} ready today.`
-        : 'All done for today.'}
+      {t('practice.listenDesc')}
+      {listenDue ? t('practice.listenDue', { count: listenDue }) : t('practice.allDoneToday')}
     </p>
   </a>
   <a class="card panel" href="#/write">
     <span class="art"><Icon name="brush" size={40} /></span>
-    <h2>Writing</h2>
-    <p>See the romaji, write the kana — stroke order and direction are checked.</p>
+    <h2>{t('practice.writeHeading')}</h2>
+    <p>{t('practice.writeDesc')}</p>
   </a>
   <a class="card panel" href="#/sprint">
     <span class="art" lang="ja">60</span>
-    <h2>One-minute sprint</h2>
-    <p>Read as many kana as you can in 60 seconds, and beat your best.</p>
+    <h2>{t('practice.sprintHeading')}</h2>
+    <p>{t('practice.sprintDesc')}</p>
   </a>
   <a class="card panel" href="#/reading">
     <span class="art" lang="ja">ねこ</span>
-    <h2>Reading practice</h2>
+    <h2>{t('practice.readingHeading')}</h2>
     <p>
-      Real words made of kana you know.
-      {words ? `${words} words unlocked.` : 'Learn a couple of rows to unlock your first words.'}
+      {t('practice.readingDesc')}
+      {words ? t('practice.readingUnlocked', { count: words }) : t('practice.readingHint')}
     </p>
   </a>
   <a class="card panel" href="#/study/hiragana?mode=order">
     <span class="art" lang="ja">あ→ん</span>
-    <h2>Study in order</h2>
-    <p>Go through rows one by one, without affecting your schedule.</p>
+    <h2>{t('practice.studyInOrderHeading')}</h2>
+    <p>{t('practice.studyInOrderDesc')}</p>
   </a>
 </div>
 

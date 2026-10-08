@@ -19,13 +19,15 @@
   import { UndoStack } from '../lib/study/undo'
   import { isStreakMilestone, rowMastered } from '../lib/study/milestones'
   import { streak as dayStreak } from '../lib/study/stats'
-  import { GRADE_LABELS, checkKana, kanaForAnswer, suggestGrade } from '../lib/study/answer'
+  import { checkKana, kanaForAnswer, suggestGrade } from '../lib/study/answer'
   import { DECK_INFO, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { cardDone } from '../state/photos.svelte'
   import { toast, ui } from '../state/ui.svelte'
+  import { t, lang } from '../state/i18n.svelte'
+  import type { MessageKey } from '../lib/i18n/messages'
 
   const deckParam = route.segments[1] as StudyDeckId | undefined
   const deck: StudyDeckId = deckParam && STUDY_DECKS.includes(deckParam) ? deckParam : 'hiragana'
@@ -202,7 +204,7 @@
     const after = dayStreak(store.data.log).current
     if (after > before && isStreakMilestone(after)) {
       setTimeout(() => void audio.playSfx('milestone'), 900)
-      toast(`${after}-day streak — keep it up!`)
+      toast(t('study.toast.streak', { n: String(after) }))
     }
   }
 
@@ -251,9 +253,7 @@
     feedback(g)
     cardDone()
     if (becameLeech(result.before, result.after, settings().leechThreshold)) {
-      toast(
-        `You keep forgetting ${frontOf(current)} — it's marked as tricky. Try the hint or a drill.`,
-      )
+      toast(t('study.toast.leech', { kana: frontOf(current) }))
     }
     if (result.becameMature) {
       celebrate = true
@@ -264,7 +264,7 @@
         const first = kanaById(row[0])
         const name = deck === 'katakana' ? first.katakana : first.hiragana
         setTimeout(() => void audio.playSfx('milestone'), 1100)
-        toast(`You've mastered the ${name} row! 🎉`)
+        toast(t('study.toast.rowMastered', { row: name }))
       }
       await new Promise((r) => setTimeout(r, 1300))
     } else {
@@ -437,8 +437,8 @@
     <button
       class="btn icon ghost"
       onclick={exit}
-      aria-label="Leave session (Esc)"
-      title="Leave (Esc)"
+      aria-label={t('study.leave.label')}
+      title={t('common.leave')}
     >
       <Icon name="close" />
     </button>
@@ -446,8 +446,10 @@
       <strong>{info.title}</strong>
       <span class="muted"
         >{mode === 'srs'
-          ? 'Spaced repetition'
-          : `In order${pass > 1 ? ` · pass ${pass}` : ''}`}</span
+          ? t('study.mode.srs')
+          : pass > 1
+            ? t('study.mode.pass', { n: String(pass) })
+            : t('study.mode.order')}</span
       >
     </div>
     <div
@@ -464,27 +466,24 @@
         class="btn icon ghost"
         onclick={undoLast}
         disabled={!canUndo}
-        aria-label="Undo last answer (U)"
-        title="Undo (U)"
+        aria-label={t('common.undo')}
+        title={t('common.undo')}
       >
         <Icon name="undo" />
       </button>
     {/if}
     <span class="count">
-      {#if mode === 'srs'}{counts.unseen} left{#if counts.repeating}
-          · <span title="Cards you're still learning come back in a few minutes"
-            >{counts.repeating} again</span
+      {#if mode === 'srs'}{t('common.left', { count: counts.unseen })}{#if counts.repeating}
+          · <span title={t('study.repeatingTitle')}
+            >{t('common.repeating', { count: counts.repeating })}</span
           >{/if}{:else if orderList.length}{orderIndex + 1} / {orderList.length}{/if}
     </span>
   </div>
 
   {#if phase === 'setup'}
     <section class="setup panel" in:fly={{ y: 12 }}>
-      <h2>Study in order</h2>
-      <p class="muted">
-        Go through the kana one by one, in table order. This doesn't affect your spaced-repetition
-        schedule.
-      </p>
+      <h2>{t('study.setup.title')}</h2>
+      <p class="muted">{t('study.setup.desc')}</p>
       <div class="rows">
         {#each rowOptions as r (r.key)}
           <label class="row-chip" class:on={selectedRows.includes(r.key)}>
@@ -506,16 +505,21 @@
       <div class="setup-actions">
         <button
           class="btn small ghost"
-          onclick={() => (selectedRows = rowOptions.map((r) => r.key))}>Select all</button
+          onclick={() => (selectedRows = rowOptions.map((r) => r.key))}
+          >{t('study.setup.selectAll')}</button
         >
-        <button class="btn small ghost" onclick={() => (selectedRows = [])}>Clear</button>
+        <button class="btn small ghost" onclick={() => (selectedRows = [])}
+          >{t('study.setup.clear')}</button
+        >
         <label class="switch inline"
-          ><span>Loop</span><input type="checkbox" bind:checked={loop} /></label
+          ><span>{t('study.setup.loop')}</span><input type="checkbox" bind:checked={loop} /></label
         >
         <button class="btn primary" disabled={!selectedRows.length} onclick={startOrderFromRows}>
-          Start · {rowOptions
-            .filter((r) => selectedRows.includes(r.key))
-            .reduce((n, r) => n + r.kana.length, 0)} kana
+          {t('study.setup.start', {
+            count: rowOptions
+              .filter((r) => selectedRows.includes(r.key))
+              .reduce((n, r) => n + r.kana.length, 0),
+          })}
         </button>
       </div>
     </section>
@@ -575,29 +579,32 @@
               autocomplete="off"
               autocapitalize="off"
               spellcheck="false"
-              placeholder="Type the romaji…"
-              aria-label="Your answer in romaji"
+              placeholder={t('study.card.typePlaceholder')}
+              aria-label={t('study.card.typeLabel')}
             />
-            <button class="btn primary" type="submit">Check</button>
+            <button class="btn primary" type="submit">{t('study.card.checkBtn')}</button>
           </form>
         {:else if mode === 'srs' && !flipped}
-          <button class="btn primary wide" onclick={reveal}>Show answer <kbd>Space</kbd></button>
+          <button class="btn primary wide" onclick={reveal}
+            >{t('study.card.showAnswer')} <kbd>Space</kbd></button
+          >
         {:else if mode === 'srs'}
-          <div class="grades" role="group" aria-label="How well did you know it?">
+          <div class="grades" role="group" aria-label={t('study.card.gradeLabel')}>
             {#each [1, 2, 3, 4] as const as g (g)}
               <button
                 class="btn grade g{g}"
                 class:suggested={suggested === g}
                 onclick={() => grade(g)}
               >
-                <span class="label">{GRADE_LABELS[g]}</span>
-                {#if intervals}<span class="interval">{formatInterval(intervals[g])}</span>{/if}
+                <span class="label">{t(`grade.${g}` as MessageKey)}</span>
+                {#if intervals}<span class="interval">{formatInterval(intervals[g], lang())}</span
+                  >{/if}
                 <kbd>{g}</kbd>
               </button>
             {/each}
           </div>
           {#if suggested}<p class="muted small">
-              Press <kbd>Enter</kbd> to accept the suggested grade.
+              {t('study.card.enterHint')}
             </p>{/if}
         {:else}
           <div class="order-nav">
@@ -605,24 +612,27 @@
               class="btn"
               onclick={() => move(-1)}
               disabled={orderIndex === 0}
-              aria-label="Previous (←)"
+              aria-label={t('study.order.prev')}
             >
               <Icon name="left" />
             </button>
             {#if !flipped}
-              <button class="btn primary wide" onclick={reveal}>Show answer <kbd>Space</kbd></button
+              <button class="btn primary wide" onclick={reveal}
+                >{t('study.card.showAnswer')} <kbd>Space</kbd></button
               >
             {:else if !typed}
               <button class="btn missed" onclick={() => selfCheck(false)}
-                >Missed <kbd>1</kbd></button
+                >{t('study.order.missed')} <kbd>1</kbd></button
               >
-              <button class="btn got" onclick={() => selfCheck(true)}>Got it <kbd>2</kbd></button>
+              <button class="btn got" onclick={() => selfCheck(true)}
+                >{t('study.order.gotIt')} <kbd>2</kbd></button
+              >
             {/if}
             <button
               class="btn"
               class:primary={flipped}
               onclick={() => move(1)}
-              aria-label="Next (→)"
+              aria-label={t('study.order.next')}
             >
               <Icon name="right" />
             </button>
@@ -632,45 +642,48 @@
     </div>
   {:else if phase === 'done'}
     <section class="done panel" in:fly={{ y: 12 }}>
-      <p class="eyebrow">おつかれさま · Well done</p>
+      <p class="eyebrow">{t('study.done.eyebrow')}</p>
       {#if answered === 0 && mode === 'srs'}
-        <h2>Nothing to study right now</h2>
+        <h2>{t('study.done.nothingTitle')}</h2>
         <p>
-          You've done all reviews and new cards for today in this deck.
-          {#if nextDue}The next review is due
-            {nextDue < startOfNextDay(Date.now())
-              ? `in ${formatInterval(Math.max(60_000, nextDue - Date.now()))}`
-              : `on ${new Date(nextDue).toLocaleDateString()}`}.{/if}
+          {t('study.done.nothingDesc')}
+          {#if nextDue}{nextDue < startOfNextDay(Date.now())
+              ? t('study.done.nextDueToday', {
+                  interval: formatInterval(Math.max(60_000, nextDue - Date.now()), lang()),
+                })
+              : t('study.done.nextDueLater', {
+                  date: new Date(nextDue).toLocaleDateString(lang() === 'nl' ? 'nl-NL' : 'en-GB'),
+                })}{/if}
         </p>
       {:else}
-        <h2>Session complete</h2>
+        <h2>{t('study.done.completeTitle')}</h2>
         <dl class="summary">
           <div>
-            <dt>Cards</dt>
+            <dt>{t('study.done.cards')}</dt>
             <dd>{mode === 'order' ? Math.max(viewed, answered) : answered}</dd>
           </div>
           <div>
-            <dt>Correct</dt>
+            <dt>{t('study.done.correct')}</dt>
             <dd>{answered ? `${Math.round((correctCount / answered) * 100)}%` : '—'}</dd>
           </div>
           <div>
-            <dt>Time</dt>
-            <dd>{minutes} min</dd>
+            <dt>{t('study.done.time')}</dt>
+            <dd>{t('study.done.minutes', { n: minutes })}</dd>
           </div>
         </dl>
       {/if}
       <div class="done-actions">
-        <a class="btn primary" href="#/">Back home</a>
-        <a class="btn" href="#/study/{deck}?mode=order">Study in order</a>
-        <a class="btn" href="#/table">Kana table</a>
-        <a class="btn" href="#/practice">Practice</a>
+        <a class="btn primary" href="#/">{t('study.done.backHome')}</a>
+        <a class="btn" href="#/study/{deck}?mode=order">{t('study.done.inOrder')}</a>
+        <a class="btn" href="#/table">{t('study.done.table')}</a>
+        <a class="btn" href="#/practice">{t('study.done.practice')}</a>
       </div>
     </section>
   {/if}
 </div>
 
 {#if current}
-  <Modal bind:open={strokesOpen} title="Stroke order">
+  <Modal bind:open={strokesOpen} title={t('study.modal.strokeOrder')}>
     <StrokeOrder
       text={deck === 'combined'
         ? current.hiragana
@@ -682,7 +695,7 @@
       <StrokeOrder text={current.katakana} />
     {/if}
   </Modal>
-  <Modal bind:open={fontsOpen} title="Font gallery" wide>
+  <Modal bind:open={fontsOpen} title={t('study.modal.fontGallery')} wide>
     <FontGallery
       text={deck === 'combined'
         ? current.hiragana + current.katakana

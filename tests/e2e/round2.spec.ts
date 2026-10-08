@@ -211,3 +211,21 @@ test('progress syncs through a GitHub gist', async ({ page }) => {
   await page.getByRole('button', { name: 'Disconnect' }).click()
   expect(await page.evaluate(() => localStorage.getItem('kana:gist-token'))).toBeNull()
 })
+
+test('the interface can be switched to Dutch', async ({ page }) => {
+  await page.goto('./#/settings')
+  await page
+    .getByRole('group', { name: 'Language' })
+    .getByRole('button', { name: 'Nederlands' })
+    .click()
+  const nav = page.getByRole('navigation', { name: 'Hoofdmenu' })
+  for (const label of ['Leren', 'Tabel', 'Oefenen', 'Statistieken']) {
+    await expect(nav.getByRole('link', { name: label })).toBeVisible()
+  }
+  await expect(page.locator('html')).toHaveAttribute('lang', 'nl')
+  // Learning content is Dutch too: the memory hint in the table.
+  await page.goto('./#/table')
+  await page.getByRole('button', { name: /^き, ki/ }).click()
+  await expect(page.locator('.details .hints')).toContainText('kiwi')
+  expect((await savedData(page)).settings.language).toBe('nl')
+})

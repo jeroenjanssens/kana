@@ -1,27 +1,41 @@
 <script lang="ts">
   import Modal from './Modal.svelte'
+  import { t } from '../state/i18n.svelte'
 
   let { open = $bindable(false) }: { open?: boolean } = $props()
 
-  const SHORTCUTS: [string, string][] = [
-    ['Space', 'Reveal the answer'],
-    ['1 – 4', 'Grade: Again, Hard, Good, Easy'],
-    ['Enter', 'Accept the suggested grade (typed answers)'],
-    ['P', 'Play the pronunciation'],
-    ['S', 'Show the stroke order'],
-    ['F', 'Show the font gallery'],
-    ['← / →', 'Previous / next card (in order)'],
-    ['M', 'Mute or unmute sound effects'],
-    ['Esc', 'Leave the session'],
-    ['?', 'Show this list'],
-  ]
+  const SHORTCUT_KEYS = [
+    'Space',
+    '1 – 4',
+    'Enter',
+    'P',
+    'S',
+    'F',
+    '← / →',
+    'M',
+    'Esc',
+    '?',
+  ] as const
+
+  const SHORTCUT_DESC_KEY = [
+    'misc.shortcutReveal',
+    'misc.shortcutGrade',
+    'misc.shortcutAccept',
+    'misc.shortcutPlay',
+    'misc.shortcutStrokes',
+    'misc.shortcutFonts',
+    'misc.shortcutNav',
+    'misc.shortcutMute',
+    'misc.shortcutLeave',
+    'misc.shortcutHelp',
+  ] as const
 </script>
 
-<Modal bind:open title="Keyboard shortcuts">
+<Modal bind:open title={t('misc.shortcutsTitle')}>
   <dl class="shortcuts">
-    {#each SHORTCUTS as [key, what] (key)}
+    {#each SHORTCUT_KEYS as key, i (key)}
       <dt><kbd>{key}</kbd></dt>
-      <dd>{what}</dd>
+      <dd>{t(SHORTCUT_DESC_KEY[i])}</dd>
     {/each}
   </dl>
 </Modal>
