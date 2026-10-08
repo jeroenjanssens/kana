@@ -140,8 +140,8 @@ describe('confusions', () => {
       entry(0, { id: 'so', correct: true, answer: 'so' }),
     ]
     expect(confusions(log)).toEqual([
-      { shown: 'shi', answered: 'tsu', count: 2 },
-      { shown: 'so', answered: 'n', count: 1 },
+      { shown: 'shi', answered: 'tsu', count: 2, deck: 'hiragana' },
+      { shown: 'so', answered: 'n', count: 1, deck: 'hiragana' },
     ])
   })
 })

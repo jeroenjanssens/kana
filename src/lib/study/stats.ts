@@ -173,6 +173,8 @@ export interface Confusion {
   /** The kana that was answered instead. */
   answered: string
   count: number
+  /** The deck the mix-up first happened in. */
+  deck?: DeckId
 }
 
 /** Pairs of kana that were mixed up, from wrong answers that name another kana id. */
@@ -187,7 +189,7 @@ export function confusions(log: readonly ReviewEntry[], n = 10): Confusion[] {
     }
     const [a, b] = [e.id, e.answer].sort()
     const key = `${a}|${b}`
-    const c = counts.get(key) ?? { shown: e.id, answered: e.answer, count: 0 }
+    const c = counts.get(key) ?? { shown: e.id, answered: e.answer, count: 0, deck: e.deck }
     c.count++
     counts.set(key, c)
   }
