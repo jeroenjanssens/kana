@@ -42,6 +42,7 @@
   let startedAt = 0
   let streak = 0
   let sincePhoto = 0
+  let advance: ReturnType<typeof setTimeout> | undefined
 
   onMount(() => {
     if (!deck) return
@@ -63,6 +64,9 @@
   }
 
   async function next() {
+    // A manual "next" cancels the automatic one after a correct answer.
+    clearTimeout(advance)
+    advance = undefined
     if (!session || !deck) return
     const id = session.next()
     remaining = session.remaining
@@ -112,7 +116,7 @@
       sincePhoto = 0
       nextPhoto()
     }
-    if (correct) setTimeout(next, 750)
+    if (correct) advance = setTimeout(next, 750)
   }
 
   function onKeydown(e: KeyboardEvent) {

@@ -46,3 +46,15 @@ test('shortcut help opens with ?', async ({ page, isMobile }) => {
   await page.keyboard.press('Shift+?')
   await expect(page.getByRole('heading', { name: 'Keyboard shortcuts' })).toBeVisible()
 })
+
+test('the background photo is visible behind the content', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'content covers the edges on phones')
+  await page.goto('./#/stats')
+  await expect(page.locator('.backdrop img')).toBeVisible()
+  // Whatever is painted at the left edge must be the photo, not an opaque page background.
+  await expect
+    .poll(() =>
+      page.evaluate(() => !!document.elementFromPoint(8, innerHeight - 120)?.closest('.backdrop')),
+    )
+    .toBe(true)
+})

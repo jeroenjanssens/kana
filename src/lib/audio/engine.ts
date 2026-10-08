@@ -197,6 +197,9 @@ export class AudioEngine {
   private applyGains(): void {
     if (!this.master || !this.voiceBus || !this.sfxBus) return
     const s = this.settings
+    // Changing volumes cancels any pending ducking ramp, which would restore the old level.
+    const now = this.ctx?.currentTime ?? 0
+    for (const bus of [this.master, this.voiceBus, this.sfxBus]) bus.gain.cancelScheduledValues(now)
     this.master.gain.value = s.silent ? 0 : 1
     this.voiceBus.gain.value = s.voiceVolume
     this.sfxBus.gain.value = s.sfx ? s.sfxVolume : 0

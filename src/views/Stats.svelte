@@ -139,7 +139,9 @@
             <span class="glyph" lang="ja">{label(w.deck, w.id)}</span>
             <span class="romaji">{kanaById(w.id).romaji}</span>
             <span class="muted small">{DECK_INFO[w.deck].title}</span>
-            <span class="acc" title="Accuracy">{Math.round(w.accuracy * 100)}%</span>
+            <span class="acc" class:low={w.accuracy < 0.7} title="Accuracy"
+              >{Math.round(w.accuracy * 100)}%</span
+            >
           </li>
         {/each}
       </ol>
@@ -302,8 +304,12 @@
 
   .acc {
     font-variant-numeric: tabular-nums;
-    color: var(--shu);
+    color: var(--ink-soft);
     font-weight: 600;
+  }
+
+  .acc.low {
+    color: var(--shu);
   }
 
   .mixups li {

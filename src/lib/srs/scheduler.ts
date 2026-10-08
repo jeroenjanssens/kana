@@ -261,9 +261,12 @@ export class Session {
       this.fresh.shift()
       this.sinceNew = 0
     } else {
+      // Only reviews count towards the "one new card every few reviews" rhythm.
       const i = this.reviews.indexOf(id)
-      if (i >= 0) this.reviews.splice(i, 1)
-      this.sinceNew++
+      if (i >= 0) {
+        this.reviews.splice(i, 1)
+        this.sinceNew++
+      }
     }
     this.done++
     const inLearning = record.state === State.Learning || record.state === State.Relearning

@@ -187,6 +187,20 @@ describe('AudioEngine', () => {
     expect(sfx.gain.value).toBe(0.3)
   })
 
+  test('changing volumes cancels a pending ducking ramp', async () => {
+    const { engine, audio } = makeEngine()
+    engine.configure(settings)
+    await engine.playVoice('a')
+    const sfxBus = audio.gains[2]
+    const cancel = vi.spyOn(
+      sfxBus.gain as unknown as { cancelScheduledValues: () => void },
+      'cancelScheduledValues',
+    )
+    engine.configure({ ...settings, sfxVolume: 0.2 })
+    expect(cancel).toHaveBeenCalled()
+    expect(sfxBus.gain.value).toBe(0.2)
+  })
+
   test('is a no-op without Web Audio support', async () => {
     const engine = new AudioEngine('/', () => undefined)
     expect(engine.available).toBe(false)

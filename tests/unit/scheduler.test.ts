@@ -269,6 +269,21 @@ describe('Session', () => {
     expect(s.remaining).toBe(0)
   })
 
+  test('learning cards do not count towards the new-card rhythm', () => {
+    const s = new Session({
+      learning: ['l1', 'l2', 'l3'],
+      review: ['r1', 'r2', 'r3', 'r4'],
+      fresh: ['n1'],
+    })
+    const reviewed: CardRecord = { ...newRecord(T0), state: 2, due: T0 + 5 * DAY }
+    const order: string[] = []
+    for (let id = s.next(T0); id; id = s.next(T0)) {
+      order.push(id)
+      s.answer(id, reviewed, T0)
+    }
+    expect(order).toEqual(['l1', 'l2', 'l3', 'r1', 'r2', 'r3', 'n1', 'r4'])
+  })
+
   test('shows learning cards first', () => {
     const s = new Session({ learning: ['l1'], review: ['r1'], fresh: [] })
     expect(s.next(T0)).toBe('l1')

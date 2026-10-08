@@ -51,6 +51,8 @@
   let streak = 0
   let sincePhoto = 0
   let answered = $state(0)
+  /** Cards seen in order mode, whether or not they were self-checked. */
+  let viewed = $state(0)
   let correctCount = $state(0)
   let sessionStart = Date.now()
   let strokesOpen = $state(false)
@@ -169,9 +171,10 @@
   }
 
   function finish() {
+    if (mode === 'order' && flipped) viewed++
     phase = 'done'
     current = undefined
-    if (answered === 0) return
+    if (answered === 0 && viewed === 0) return
     void audio.playSfx('complete')
     const before = dayStreak(store.data.log.filter((e) => e.t < sessionStart)).current
     const after = dayStreak(store.data.log).current
@@ -185,8 +188,11 @@
     if (!current || flipped) return
     flipped = true
     void audio.playSfx('flip')
-    if (settings().autoplay && current.audio)
-      setTimeout(() => current && audio.playVoice(current.id), 280)
+    const id = current.id
+    // Only play if the same card is still showing (a fast grade may already have moved on).
+    if (settings().autoplay && current.audio) {
+      setTimeout(() => current?.id === id && flipped && audio.playVoice(id), 280)
+    }
   }
 
   function submitTyped() {
@@ -286,6 +292,7 @@
       pass++
     }
     if (next < 0) next = 0
+    if (delta > 0 && flipped) viewed++
     orderIndex = next
     advancePhoto()
     void show(orderList[next], false)
@@ -543,11 +550,11 @@
         <dl class="summary">
           <div>
             <dt>Cards</dt>
-            <dd>{answered}</dd>
+            <dd>{mode === 'order' ? Math.max(viewed, answered) : answered}</dd>
           </div>
           <div>
             <dt>Correct</dt>
-            <dd>{answered ? Math.round((correctCount / answered) * 100) : 0}%</dd>
+            <dd>{answered ? `${Math.round((correctCount / answered) * 100)}%` : '—'}</dd>
           </div>
           <div>
             <dt>Time</dt>
