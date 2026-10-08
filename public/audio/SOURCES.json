@@ -1,0 +1,428 @@
+{
+  "a": {
+    "file": "Ja-A.oga",
+    "url": "https://commons.wikimedia.org/wiki/File:Ja-A.oga",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "i": {
+    "file": "Japanese I.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_I.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "u": {
+    "file": "Japanese U.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_U.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "e": {
+    "file": "Ja-E.oga",
+    "url": "https://commons.wikimedia.org/wiki/File:Ja-E.oga",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "o": {
+    "file": "Japanese O.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_O.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ka": {
+    "file": "Japanese ka.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Ja-Ka.oga",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ki": {
+    "file": "Japanese ki.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ki.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ku": {
+    "file": "Japanese ku.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ku.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ke": {
+    "file": "Japanese ke.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ke.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ko": {
+    "file": "Japanese ko.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ko.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "sa": {
+    "file": "Japanese sa.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_sa.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "shi": {
+    "file": "Japanese shi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_shi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "su": {
+    "file": "Japanese su.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_su.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "se": {
+    "file": "Japanese se.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_se.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "so": {
+    "file": "Japanese so.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Ja-So.oga",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ta": {
+    "file": "Japanese ta.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ta.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "chi": {
+    "file": "Japanese ti.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ti.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "tsu": {
+    "file": "Japanese tsu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_tsu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "te": {
+    "file": "Japanese te.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_te.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "to": {
+    "file": "Japanese to.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_to.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "na": {
+    "file": "Japanese na.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_na.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ni": {
+    "file": "Japanese ni.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ni.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "nu": {
+    "file": "Japanese nu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_nu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ne": {
+    "file": "Japanese ne.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ne.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "no": {
+    "file": "Japanese no.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_no.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ha": {
+    "file": "Japanese ha.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ha.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "hi": {
+    "file": "Japanese hi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_hi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "fu": {
+    "file": "Japanese hu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_hu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "he": {
+    "file": "Japanese he.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_he.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ho": {
+    "file": "Japanese ho.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ho.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ma": {
+    "file": "Japanese ma.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ma.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "mi": {
+    "file": "Japanese mi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_mi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "mu": {
+    "file": "Japanese mu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_mu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "me": {
+    "file": "Japanese me.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_me.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "mo": {
+    "file": "Japanese mo.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_mo.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ya": {
+    "file": "Japanese ya.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ya.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "yu": {
+    "file": "Japanese yu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_yu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "yo": {
+    "file": "Japanese yo.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_yo.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ra": {
+    "file": "Japanese ra.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ra.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ri": {
+    "file": "Japanese ri.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ri.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ru": {
+    "file": "Japanese ru.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ru.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "re": {
+    "file": "Japanese re.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_re.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ro": {
+    "file": "Japanese ro.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ro.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "wa": {
+    "file": "Japanese wa.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_wa.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "wo": {
+    "file": "Japanese wo.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_wo.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "n": {
+    "file": "Japanese N.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_N.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ga": {
+    "file": "Japanese ga.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ga.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "gi": {
+    "file": "Japanese gi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_gi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "gu": {
+    "file": "Japanese gu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_gu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ge": {
+    "file": "Japanese ge.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ge.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "go": {
+    "file": "Japanese go.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_go.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "za": {
+    "file": "Japanese za.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_za.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ji": {
+    "file": "Japanese zi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_zi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "zu": {
+    "file": "Japanese zu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_zu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ze": {
+    "file": "Japanese ze.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ze.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "zo": {
+    "file": "Japanese zo.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_zo.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "da": {
+    "file": "Japanese da.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_da.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "di": {
+    "file": "Japanese di.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_di.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "du": {
+    "file": "Japanese du.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_du.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "de": {
+    "file": "Japanese de.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_de.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "do": {
+    "file": "Japanese do.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_do.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "ba": {
+    "file": "Japanese ba.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_ba.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "bi": {
+    "file": "Japanese bi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_bi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "bu": {
+    "file": "Japanese bu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_bu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "be": {
+    "file": "Japanese be.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_be.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "bo": {
+    "file": "Japanese bo.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_bo.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "pa": {
+    "file": "Japanese pa.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_pa.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "pi": {
+    "file": "Japanese pi.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_pi.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "pu": {
+    "file": "Japanese pu.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_pu.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "pe": {
+    "file": "Japanese pe.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_pe.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  },
+  "po": {
+    "file": "Japanese po.ogg",
+    "url": "https://commons.wikimedia.org/wiki/File:Japanese_po.ogg",
+    "author": "Hakatanoshio117117",
+    "license": "Public domain"
+  }
+}
