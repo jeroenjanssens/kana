@@ -1,6 +1,7 @@
 <script lang="ts">
   import { washiStyle } from '../lib/ui/washi'
-  import { displayRomaji, type Kana } from '../lib/data/kana'
+  import { hasDrawing, showDrawing, toggleDrawing } from '../lib/data/drawings'
+  import { displayRomaji, glyph, type Kana } from '../lib/data/kana'
   import { formatInterval, masteryLevel, type MasteryLevel } from '../lib/srs/queue'
   import { retrievability } from '../lib/srs/scheduler'
   import type { DeckId } from '../lib/storage/schema'
@@ -11,6 +12,8 @@
   import Hanko from './Hanko.svelte'
   import Hint from './Hint.svelte'
   import Icon from './Icon.svelte'
+  import DrawingToggle from './DrawingToggle.svelte'
+  import KanaDrawing from './KanaDrawing.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
 
   let {
@@ -26,6 +29,12 @@
     young: 'table.levelYoung',
     mature: 'table.levelMature',
   }
+
+  const scripts = $derived(
+    kana.hiragana ? (['hiragana', 'katakana'] as const) : (['katakana'] as const),
+  )
+  const drawable = $derived(scripts.some((script) => hasDrawing(kana, script)))
+  const drawn = $derived(drawable && showDrawing(settings().drawings, 'back'))
 
   const DECK_LABEL_KEY: Record<DeckId, MessageKey> = {
     hiragana: 'table.detailDeckHiragana',
@@ -68,12 +77,17 @@
   {/if}
   <div class="top">
     <div class="glyphs washi turn" style={washiStyle(kana.id)}>
-      {#if kana.hiragana}<KanaGlyph
-          text={kana.hiragana}
-          font={settings().font}
-          size="3.4rem"
-        />{/if}
-      <KanaGlyph text={kana.katakana} font={settings().font} size="3.4rem" />
+      {#each scripts as script (script)}
+        {#if drawn && hasDrawing(kana, script)}
+          <KanaDrawing id={kana.id} {script} text={glyph(kana, script)} size="4.2rem" />
+        {:else}
+          <KanaGlyph
+            text={glyph(kana, script)}
+            font={settings().font}
+            size={drawn ? '4.2rem' : '3.4rem'}
+          />
+        {/if}
+      {/each}
     </div>
     <p class="romaji">{displayRomaji(kana, settings().romaji)}</p>
   </div>
@@ -88,10 +102,21 @@
     <button class="btn small" onclick={onfonts}
       ><Icon name="fonts" size={14} /> {t('common.fonts')}</button
     >
+    {#if drawable}
+      <DrawingToggle
+        on={drawn}
+        ontoggle={() => (settings().drawings = toggleDrawing(settings().drawings, 'back'))}
+      />
+    {/if}
   </div>
   <ul class="hints">
-    {#if kana.hiragana}<li><Hint text={mnemonicFor(kana, 'hiragana', lang())} /></li>{/if}
-    <li><Hint text={mnemonicFor(kana, 'katakana', lang())} /></li>
+    {#each scripts as script (script)}
+      <li>
+        <span class="script"
+          >{t(script === 'hiragana' ? 'common.hiragana' : 'common.katakana')}</span
+        ><Hint text={mnemonicFor(kana, script, lang())} />
+      </li>
+    {/each}
   </ul>
   <ul class="decks">
     {#each decks as d (d.deck)}
@@ -141,6 +166,7 @@
   .glyphs {
     position: relative;
     display: flex;
+    align-items: center;
     gap: 0.4rem;
     padding: 0.4rem 0.8rem;
     border-radius: 12px;
@@ -171,9 +197,20 @@
     margin: 0.75rem 0 0;
     padding: 0;
     display: grid;
-    gap: 0.35rem;
+    gap: 0.75rem;
     font-size: 0.82rem;
+    line-height: 1.45;
     color: var(--ink-soft);
+    text-wrap: pretty;
+  }
+
+  .script {
+    display: block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 0.1rem;
   }
 
   .decks {
@@ -204,6 +241,10 @@
 
     .glyphs :global(.glyph) {
       font-size: 2.4rem !important;
+    }
+
+    .glyphs :global(.drawing) {
+      font-size: 3rem !important;
     }
 
     .romaji {

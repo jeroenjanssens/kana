@@ -11,6 +11,7 @@ export default {
   'common.listen': 'Listen',
   'common.strokes': 'Strokes',
   'common.fonts': 'Fonts',
+  'common.drawing': 'Drawing',
   'common.next': 'Next',
   'common.back': 'Back',
   'common.home': 'Home',

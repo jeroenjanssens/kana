@@ -12,6 +12,10 @@ export default {
   'misc.strokeOrderHeading': 'Stroke order',
   'misc.strokeDataFrom': 'Stroke data from',
   'misc.byContributors': 'by Ulrich Apel and contributors, licensed under',
+  'misc.hintsHeading': 'Memory hints and drawings',
+  'misc.hintsFrom': 'The memory hints and drawings for the basic kana are from',
+  'misc.hintsAnd': 'and',
+  'misc.hintsBy': 'by Tofugu, used with credit. The drawings were traced for kana.',
   'misc.fontsHeading': 'Fonts',
   'misc.japaneseFontsFrom': 'Japanese fonts from',
   'misc.fontsLicenseNote':
@@ -37,6 +41,7 @@ export default {
   'misc.shortcutPlay': 'Play the pronunciation',
   'misc.shortcutStrokes': 'Show the stroke order',
   'misc.shortcutFonts': 'Show the font gallery',
+  'misc.shortcutDrawing': 'Show or hide the memory-hint drawing',
   'misc.shortcutNav': 'Previous / next card (in order)',
   'misc.shortcutMute': 'Mute or unmute sound effects',
   'misc.shortcutLeave': 'Leave the session',

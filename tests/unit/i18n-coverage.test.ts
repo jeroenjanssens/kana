@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { describe, expect, test } from 'vitest'
 import { confusableSets } from '../../src/lib/data/confusables'
 import { KANA } from '../../src/lib/data/kana'
-import { KANA_NOTES } from '../../src/lib/data/mnemonics'
+import { KANA_NOTES, mnemonicFor } from '../../src/lib/data/mnemonics'
 import { hintsNl } from '../../src/lib/data/nl/confusables'
 import { mnemonicsNl } from '../../src/lib/data/nl/mnemonics'
 import { kanaNotesNl, readingNotesNl } from '../../src/lib/data/nl/notes'
@@ -30,6 +30,8 @@ const ALLOWED = new Set([
   'KanjiVG',
   'Google Fonts',
   'Freesound',
+  'Learn Hiragana',
+  'Learn Katakana',
   'Hepburn (shi)',
   'Kunrei (si)',
   'Romaji',
@@ -98,12 +100,17 @@ describe('Dutch learning content', () => {
     expect(Object.keys(meaningsNl).filter((k) => !words.some((w) => w.kana === k))).toEqual([])
   })
 
-  test('every basic kana has Dutch memory hints with an emphasised sound', () => {
+  test('every basic kana has Dutch memory hints, emphasising the sound where English does', () => {
+    const emphasis = /\*[^*]+\*/
     for (const k of KANA.filter((k) => k.group === 'basic')) {
       const nl = mnemonicsNl[k.id]
       expect(nl, k.id).toBeDefined()
-      expect(nl.hiragana).toMatch(/\*[^*]+\*/)
-      expect(nl.katakana).toMatch(/\*[^*]+\*/)
+      for (const script of ['hiragana', 'katakana'] as const) {
+        expect(nl[script], `${k.id} ${script}`).toBeTruthy()
+        expect(emphasis.test(nl[script]), `${k.id} ${script}`).toBe(
+          emphasis.test(mnemonicFor(k, script)),
+        )
+      }
     }
   })
 

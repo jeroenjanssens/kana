@@ -12,6 +12,7 @@ export default {
   'common.listen': 'Luister',
   'common.strokes': 'Streken',
   'common.fonts': 'Lettertypen',
+  'common.drawing': 'Tekening',
   'common.next': 'Volgende',
   'common.back': 'Terug',
   'common.home': 'Start',

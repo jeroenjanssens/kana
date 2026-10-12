@@ -52,6 +52,11 @@ export default {
   'settings.introduceNote': 'eerst klank, schrijfstreken en een ezelsbruggetje',
   'settings.autoplay': 'Uitspraak afspelen bij het omdraaien van een kaart',
   'settings.showOtherScript': 'Toon het andere schrift op de achterkant',
+  'settings.drawings': 'Tekeningen bij ezelsbruggetjes',
+  'settings.drawingsNote': 'van Tofugu',
+  'settings.drawingsOff': 'Uit',
+  'settings.drawingsBack': 'Na het antwoord',
+  'settings.drawingsAlways': 'Altijd',
 
   // Fonts
   'settings.cardFont': 'Kaartlettertype',

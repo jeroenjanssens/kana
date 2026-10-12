@@ -30,6 +30,9 @@ export type AnswerStyle = 'self' | 'typed'
 export type Theme = 'system' | 'light' | 'dark'
 export type RomajiSystem = 'hepburn' | 'kunrei'
 export type TableLayout = 'separate' | 'combined'
+/** When to draw the memory-hint drawing over a kana: never, once the answer shows, or always. */
+export type DrawingMode = 'off' | 'back' | 'always'
+export const DRAWING_MODES: readonly DrawingMode[] = ['off', 'back', 'always']
 
 /** An FSRS card in a JSON-friendly shape (dates as epoch milliseconds). */
 export interface CardRecord {
@@ -95,6 +98,8 @@ export interface Settings {
   writeStyle: 'draw' | 'choose'
   autoplay: boolean
   showOtherScript: boolean
+  /** Tofugu's memory-hint drawings over the kana (intro, card back, details; front if 'always'). */
+  drawings: DrawingMode
   romaji: RomajiSystem
   theme: Theme
   tableLayout: TableLayout
@@ -149,6 +154,7 @@ export const DEFAULT_SETTINGS: Settings = {
   writeStyle: 'draw',
   autoplay: true,
   showOtherScript: true,
+  drawings: 'back',
   romaji: 'hepburn',
   theme: 'system',
   tableLayout: 'separate',
@@ -172,6 +178,11 @@ export const DEFAULT_SETTINGS: Settings = {
   haptics: true,
   silent: false,
   reducedMotion: 'system',
+}
+
+/** Settings that only take one of a few values; anything else falls back to the default. */
+export const SETTING_CHOICES: Partial<Record<keyof Settings, readonly string[]>> = {
+  drawings: DRAWING_MODES,
 }
 
 export interface WordProgress {

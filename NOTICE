@@ -15,6 +15,13 @@ Stroke-order data — src/lib/data/kanjivg/
   and contributors. Licensed under CC BY-SA 3.0
   (https://creativecommons.org/licenses/by-sa/3.0/). See src/lib/data/kanjivg/LICENSE.
 
+Memory hints and drawings — src/lib/data/tofugu/, src/lib/data/mnemonics.ts
+  The memory hints and drawings for the basic hiragana and katakana are from
+  Tofugu's Learn Hiragana Book (https://www.tofugu.com/japanese/learn-hiragana-book/)
+  and Learn Katakana Book (https://www.tofugu.com/japanese/learn-katakana-book/),
+  copyright Tofugu, used with credit. The drawings were traced into SVG by
+  scripts/tofugu-drawings.ts; the Dutch hints are translations.
+
 Fonts — public/fonts/
   Japanese fonts from the Google Fonts repository (https://github.com/google/fonts),
   subsetted to kana by scripts/subset-fonts.ts. Licensed under the SIL Open Font

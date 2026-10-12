@@ -13,6 +13,11 @@ export default {
   'misc.strokeOrderHeading': 'Pennenstreken',
   'misc.strokeDataFrom': 'Pennenstreepgegevens van',
   'misc.byContributors': 'door Ulrich Apel en bijdragers, gelicentieerd onder',
+  'misc.hintsHeading': 'Ezelsbruggetjes en tekeningen',
+  'misc.hintsFrom': 'De ezelsbruggetjes en tekeningen voor de basiskana komen uit',
+  'misc.hintsAnd': 'en',
+  'misc.hintsBy':
+    'van Tofugu, gebruikt met bronvermelding. De tekeningen zijn voor kana overgetrokken.',
   'misc.fontsHeading': 'Lettertypen',
   'misc.japaneseFontsFrom': 'Japanse lettertypen van',
   'misc.fontsLicenseNote':
@@ -38,6 +43,7 @@ export default {
   'misc.shortcutPlay': 'Uitspraak afspelen',
   'misc.shortcutStrokes': 'Pennenstreken tonen',
   'misc.shortcutFonts': 'Lettertypengalerij tonen',
+  'misc.shortcutDrawing': 'Tekening bij het ezelsbruggetje tonen of verbergen',
   'misc.shortcutNav': 'Vorige / volgende kaart (op volgorde)',
   'misc.shortcutMute': 'Geluid dempen of herstellen',
   'misc.shortcutLeave': 'Sessie verlaten',

@@ -1,8 +1,9 @@
 <script lang="ts">
   import { confusableSets } from '../lib/data/confusables'
+  import { hasDrawing, showDrawing, toggleDrawing } from '../lib/data/drawings'
   import { mnemonicFor } from '../lib/data/mnemonics'
   import Hint from './Hint.svelte'
-  import { displayRomaji, glyph, type Kana } from '../lib/data/kana'
+  import { displayRomaji, glyph, type Kana, type Script } from '../lib/data/kana'
   import { FONT_STYLES, fontById } from '../lib/data/fonts'
   import type { DeckId } from '../lib/storage/schema'
   import { settings } from '../state/app.svelte'
@@ -10,6 +11,8 @@
   import FontGallery from './FontGallery.svelte'
   import Hanko from './Hanko.svelte'
   import Icon from './Icon.svelte'
+  import DrawingToggle from './DrawingToggle.svelte'
+  import KanaDrawing from './KanaDrawing.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
   import PaperCard from './PaperCard.svelte'
 
@@ -56,12 +59,18 @@
   const otherScript = $derived(
     deck === 'hiragana' ? kana.katakana : deck === 'katakana' ? kana.hiragana : '',
   )
-  const fontInfo = $derived(fontById(font))
   const hintScripts = $derived(
     deck === 'combined'
       ? (['hiragana', 'katakana'] as const)
       : ([deck === 'katakana' ? 'katakana' : 'hiragana'] as const),
   )
+  /** This kana has a drawing on this deck's cards. */
+  const drawable = $derived(hintScripts.some((script) => hasDrawing(kana, script)))
+  const drawFront = $derived(drawable && showDrawing(s.drawings, 'front'))
+  const drawBack = $derived(drawable && showDrawing(s.drawings, 'back'))
+  /** The kana on the back, as big as its drawing so showing or hiding it doesn't move things. */
+  const backSize = $derived(frontText.length > 2 ? '3.6rem' : '5.6rem')
+  const fontInfo = $derived(fontById(font))
   /** A confusable-pairs drill containing this kana, offered for tricky cards. */
   const drill = $derived(
     confusableSets.find(
@@ -92,26 +101,33 @@
   )
 </script>
 
+{#snippet face(script: Script, size: string, drawn: boolean)}
+  {#if drawn && hasDrawing(kana, script)}
+    <KanaDrawing id={kana.id} {script} text={glyph(kana, script)} {size} />
+  {:else}
+    <KanaGlyph text={glyph(kana, script)} {font} {size} />
+  {/if}
+{/snippet}
+
 <PaperCard {flipped} {tilt} {paper} label={cardLabel} {onflip}>
   {#snippet front()}
     {#if isNew}<span class="chip new">{t('study.flashCard.new')}</span>{/if}
     <div class="front-glyph" class:pair={deck === 'combined'}>
-      {#if deck === 'combined'}
-        <KanaGlyph text={kana.hiragana} {font} size={frontSize} />
-        <span class="divider" aria-hidden="true"></span>
-        <KanaGlyph text={kana.katakana} {font} size={frontSize} />
-      {:else}
-        <KanaGlyph text={frontText} {font} size={frontSize} />
-      {/if}
+      {#each hintScripts as script, i (script)}
+        {#if i > 0}<span class="divider" aria-hidden="true"></span>{/if}
+        {@render face(script, frontSize, drawFront)}
+      {/each}
     </div>
     <span class="hint muted">{t('study.flashCard.tapHintPre')}<kbd>Space</kbd></span>
   {/snippet}
   {#snippet back()}
     <div class="back-top">
-      <KanaGlyph text={frontText} {font} size="2.6rem" />
+      {#each hintScripts as script (script)}
+        {@render face(script, backSize, drawBack)}
+      {/each}
       {#if s.showOtherScript && otherScript}
         <span class="other" title={t('study.flashCard.otherScriptTitle')}>
-          <KanaGlyph text={otherScript} {font} size="1.6rem" ink={false} />
+          <KanaGlyph text={otherScript} {font} size="2.4rem" ink={false} />
         </span>
       {/if}
     </div>
@@ -135,11 +151,13 @@
       </p>
     {/if}
     <p class="romaji" class:inked={flipped}>{displayRomaji(kana, s.romaji)}</p>
-    <p class="mnemonic">
-      {#each hintScripts as script (script)}<span
-          ><Hint text={mnemonicFor(kana, script, lang())} /></span
-        >{/each}
-    </p>
+    <div class="mnemonic">
+      {#each hintScripts as script (script)}<p>
+          {#if hintScripts.length > 1}<span class="script"
+              >{t(script === 'hiragana' ? 'common.hiragana' : 'common.katakana')}</span
+            >{/if}<Hint text={mnemonicFor(kana, script, lang())} />
+        </p>{/each}
+    </div>
     <div class="tools">
       <button
         class="btn small"
@@ -168,6 +186,12 @@
         aria-label={t('study.flashCard.fontsLabel')}
         ><Icon name="fonts" size={14} /> {t('common.fonts')}</button
       >
+      {#if drawable}
+        <DrawingToggle
+          on={drawBack}
+          ontoggle={() => (s.drawings = toggleDrawing(s.drawings, 'back'))}
+        />
+      {/if}
     </div>
     <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_static_element_interactions -->
     <div class="strip" onclick={(e) => e.stopPropagation()}>
@@ -219,8 +243,9 @@
 
   .back-top {
     display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 1.1rem;
+    margin-bottom: 0.2rem;
   }
 
   .other {
@@ -254,14 +279,28 @@
   }
 
   .mnemonic {
-    margin: -0.3rem 0 0.7rem;
-    max-width: 34ch;
-    font-size: 0.78rem;
-    line-height: 1.35;
+    margin: -0.3rem 0 0.8rem;
+    max-width: 40ch;
+    font-size: 0.8rem;
+    line-height: 1.4;
     color: var(--ink-soft);
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.55rem;
+    text-wrap: pretty;
+  }
+
+  .mnemonic p {
+    margin: 0;
+  }
+
+  .script {
+    display: block;
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    margin-bottom: 0.1rem;
   }
 
   .tricky {

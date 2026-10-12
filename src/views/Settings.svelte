@@ -1,5 +1,6 @@
 <script lang="ts">
   import { washiStyle } from '../lib/ui/washi'
+  import KanaDrawing from '../components/KanaDrawing.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import { FONTS, SYSTEM_FONT_ID } from '../lib/data/fonts'
   import type { KanaGroup } from '../lib/data/kana'
@@ -9,7 +10,7 @@
   import { resetProgress } from '../lib/study/actions'
   import { reminderIcs } from '../lib/study/goal'
   import { MIN_REVIEWS, scheduledReviews, trainingData } from '../lib/srs/optimizer'
-  import type { ReviewEntry } from '../lib/storage/schema'
+  import { DRAWING_MODES, type DrawingMode, type ReviewEntry } from '../lib/storage/schema'
   import { loadFont } from '../lib/ui/fontLoader'
   import type { PhotoMode } from '../lib/ui/photos'
   import { install, isStandalone, onInstallAvailable } from '../lib/ui/pwa'
@@ -19,6 +20,12 @@
   import { toast } from '../state/ui.svelte'
   import { t, lang } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+
+  const DRAWING_LABEL: Record<DrawingMode, MessageKey> = {
+    off: 'settings.drawingsOff',
+    back: 'settings.drawingsBack',
+    always: 'settings.drawingsAlways',
+  }
 
   const s = $derived(settings())
   let fileInput = $state<HTMLInputElement>()
@@ -322,6 +329,23 @@
         bind:checked={s.showOtherScript}
       /></label
     >
+    <div class="field drawings">
+      <span>{t('settings.drawings')} <small class="muted">{t('settings.drawingsNote')}</small></span
+      >
+      {#if s.drawings !== 'off'}<KanaDrawing
+          id="a"
+          script="hiragana"
+          text="あ"
+          size="2.2rem"
+        />{/if}
+      <div class="segmented" role="group" aria-label={t('settings.drawings')}>
+        {#each DRAWING_MODES as mode (mode)}
+          <button aria-pressed={s.drawings === mode} onclick={() => (s.drawings = mode)}
+            >{t(DRAWING_LABEL[mode])}</button
+          >
+        {/each}
+      </div>
+    </div>
   </section>
 
   <section class="panel block">
@@ -685,6 +709,10 @@
     gap: 1rem;
     min-height: 44px;
     flex-wrap: wrap;
+  }
+
+  .drawings > span {
+    flex: 1;
   }
 
   .field:has(input[type='number']) {

@@ -82,6 +82,7 @@ export default {
   'study.flashCard.playLabel': 'Uitspraak afspelen (P)',
   'study.flashCard.strokesLabel': 'Schrijfvolgorde (S)',
   'study.flashCard.fontsLabel': 'Lettertype-galerij (F)',
+  'study.flashCard.drawingTitle': 'Tekening bij het ezelsbruggetje tonen of verbergen (D)',
   'study.flashCard.cardLabelFront': '{script}-kaart, tik om te onthullen',
   'study.flashCard.cardLabelBack': '{script}-kaart, {romaji}',
   // KanaIntro component

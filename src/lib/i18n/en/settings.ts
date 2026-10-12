@@ -51,6 +51,11 @@ export default {
   'settings.introduceNote': 'sound, strokes and a memory hint first',
   'settings.autoplay': 'Play pronunciation when revealing a card',
   'settings.showOtherScript': 'Show the other script on the back',
+  'settings.drawings': 'Memory-hint drawings',
+  'settings.drawingsNote': 'by Tofugu',
+  'settings.drawingsOff': 'Off',
+  'settings.drawingsBack': 'After the answer',
+  'settings.drawingsAlways': 'Always',
 
   // Fonts
   'settings.cardFont': 'Card font',

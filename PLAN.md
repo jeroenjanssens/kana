@@ -423,6 +423,8 @@ interface SaveFile {
   - Audio: **public domain** (Hakatanoshio117117, Wikimedia Commons).
   - Photos: **Unsplash License**, credited per photo.
   - Sound effects: **CC0** (Freesound), credited per sound.
+  - Memory hints and drawings: from Tofugu's *Learn Hiragana* and *Learn Katakana* books, credited (see
+    `docs/plan-tofugu-mnemonics.md`).
   - Everything is listed in `NOTICE` and on the in-app credits page.
 - **Deploy:** GitHub Actions workflow (`configure-pages` → `upload-pages-artifact` → `deploy-pages`) on every push to `main`, gated on lint, typecheck, unit tests and the Playwright smoke tests.
 - Commits are authored by Jeroen Janssens.

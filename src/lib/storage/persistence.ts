@@ -1,4 +1,4 @@
-import { DECK_IDS, DEFAULT_SETTINGS, SCHEMA_VERSION, emptySave } from './schema'
+import { DECK_IDS, DEFAULT_SETTINGS, SCHEMA_VERSION, SETTING_CHOICES, emptySave } from './schema'
 import type { CardRecord, ReviewEntry, SaveFile, Settings } from './schema'
 
 export const STORAGE_KEY = 'kana:save'
@@ -18,6 +18,8 @@ export function sanitizeSettings(raw: unknown): Settings {
     const value = raw[key]
     const fallback = settings[key]
     if (value === undefined) continue
+    const choices = SETTING_CHOICES[key]
+    if (choices && !choices.includes(value as string)) continue
     if (Array.isArray(fallback)) {
       const type = key === 'fsrsWeights' ? 'number' : 'string'
       if (Array.isArray(value) && value.every((v) => typeof v === type)) {

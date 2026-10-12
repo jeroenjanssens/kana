@@ -8,6 +8,7 @@
   import Modal from '../components/Modal.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import type { VoiceId } from '../lib/audio/voices'
+  import { hasDrawing, toggleDrawing } from '../lib/data/drawings'
   import { FONTS, randomFontId } from '../lib/data/fonts'
   import { BASIC_ROWS, kanaById, rowsOf, type Kana, type KanaGroup } from '../lib/data/kana'
   import { Session, deckKana, formatInterval, startOfNextDay } from '../lib/srs/queue'
@@ -348,6 +349,13 @@
     navigate('/')
   }
 
+  /** Show or hide the memory-hint drawing on the side in view (D). */
+  function toggleDrawingOn(side: 'front' | 'back') {
+    const scripts = deck === 'combined' ? (['hiragana', 'katakana'] as const) : [deck]
+    if (!current || !scripts.some((script) => hasDrawing(current!, script))) return
+    settings().drawings = toggleDrawing(settings().drawings, side)
+  }
+
   function onKeydown(e: KeyboardEvent) {
     const isUndo =
       (e.key === 'z' && (e.metaKey || e.ctrlKey)) || (e.key === 'u' && !e.metaKey && !e.ctrlKey)
@@ -372,6 +380,7 @@
         e.preventDefault()
         void doneIntroducing()
       } else if (e.key.toLowerCase() === 'p' && current) void audio.playVoice(current.id, voice)
+      else if (e.key.toLowerCase() === 'd') toggleDrawingOn('back')
       return
     }
     const inInput = (e.target as HTMLElement).tagName === 'INPUT'
@@ -395,6 +404,7 @@
     if (key === 'p' && current) void audio.playVoice(current.id, voice)
     else if (key === 's') strokesOpen = true
     else if (key === 'f') fontsOpen = true
+    else if (key === 'd') toggleDrawingOn(flipped ? 'back' : 'front')
     else if (mode === 'srs' && ['1', '2', '3', '4'].includes(key)) void grade(Number(key) as Grade)
     else if (mode === 'order' && key === 'arrowright') move(1)
     else if (mode === 'order' && key === 'arrowleft') move(-1)

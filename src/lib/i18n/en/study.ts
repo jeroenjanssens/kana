@@ -80,6 +80,7 @@ export default {
   'study.flashCard.playLabel': 'Play pronunciation (P)',
   'study.flashCard.strokesLabel': 'Stroke order (S)',
   'study.flashCard.fontsLabel': 'Font gallery (F)',
+  'study.flashCard.drawingTitle': 'Show or hide the memory-hint drawing (D)',
   'study.flashCard.cardLabelFront': '{script} card, tap to reveal',
   'study.flashCard.cardLabelBack': '{script} card, {romaji}',
   // KanaIntro component

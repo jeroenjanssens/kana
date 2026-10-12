@@ -66,6 +66,21 @@
   </section>
 
   <section class="panel block">
+    <h2>{t('misc.hintsHeading')}</h2>
+    <p>
+      {t('misc.hintsFrom')}
+      <a href="https://www.tofugu.com/japanese/learn-hiragana-book/" target="_blank" rel="noopener"
+        ><cite>Learn Hiragana</cite></a
+      >
+      {t('misc.hintsAnd')}
+      <a href="https://www.tofugu.com/japanese/learn-katakana-book/" target="_blank" rel="noopener"
+        ><cite>Learn Katakana</cite></a
+      >
+      {t('misc.hintsBy')}
+    </p>
+  </section>
+
+  <section class="panel block">
     <h2>{t('misc.fontsHeading')}</h2>
     <p>
       {t('misc.japaneseFontsFrom')}

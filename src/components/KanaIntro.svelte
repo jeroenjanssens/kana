@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { hasDrawing, showDrawing, toggleDrawing } from '../lib/data/drawings'
   import { displayRomaji, type Kana } from '../lib/data/kana'
   import { kanaNote, mnemonicFor, type KanaNote } from '../lib/data/mnemonics'
   import type { StudyDeckId } from '../lib/storage/schema'
@@ -7,6 +8,8 @@
   import { t, lang } from '../state/i18n.svelte'
   import Hint from './Hint.svelte'
   import Icon from './Icon.svelte'
+  import DrawingToggle from './DrawingToggle.svelte'
+  import KanaDrawing from './KanaDrawing.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
   import StrokeOrder from './StrokeOrder.svelte'
 
@@ -35,6 +38,18 @@
   )
   const text = (script: 'hiragana' | 'katakana') =>
     script === 'hiragana' ? kana.hiragana : kana.katakana
+  /** Big enough to study the shape (and the drawing), and still side by side on phones. */
+  const glyphSize = $derived(
+    kana.hiragana.length > 1
+      ? scripts.length > 1
+        ? 'min(8.8rem, 20vw)'
+        : 'min(8.8rem, 36vw)'
+      : scripts.length > 1
+        ? 'min(12rem, 36vw)'
+        : 'min(12rem, 64vw)',
+  )
+  const drawable = $derived(scripts.some((script) => hasDrawing(kana, script)))
+  const drawn = $derived(drawable && showDrawing(settings().drawings, 'back'))
 </script>
 
 <article
@@ -45,14 +60,26 @@
   <p class="eyebrow">{t('study.kanaIntro.eyebrow')}</p>
   <div class="glyphs">
     {#each scripts as script (script)}
-      <KanaGlyph text={text(script)} {font} size={kana.hiragana.length > 1 ? '4.4rem' : '6rem'} />
+      {#if drawn && hasDrawing(kana, script)}
+        <KanaDrawing id={kana.id} {script} text={text(script)} size={glyphSize} />
+      {:else}
+        <KanaGlyph text={text(script)} {font} size={glyphSize} />
+      {/if}
     {/each}
   </div>
   <p class="romaji">{displayRomaji(kana, settings().romaji)}</p>
-  <button class="btn small" onclick={onplay} aria-label={t('study.kanaIntro.playLabel')}>
-    <Icon name="play" size={14} filled />
-    {t('common.listen')}
-  </button>
+  <div class="actions">
+    <button class="btn small" onclick={onplay} aria-label={t('study.kanaIntro.playLabel')}>
+      <Icon name="play" size={14} filled />
+      {t('common.listen')}
+    </button>
+    {#if drawable}
+      <DrawingToggle
+        on={drawn}
+        ontoggle={() => (settings().drawings = toggleDrawing(settings().drawings, 'back'))}
+      />
+    {/if}
+  </div>
   <div class="strokes">
     {#each scripts as script (script)}
       <StrokeOrder text={text(script)} size={120} />
@@ -103,7 +130,13 @@
 
   .glyphs {
     display: flex;
+    align-items: center;
     gap: 1.25rem;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.4rem;
   }
 
   .romaji {
@@ -125,8 +158,10 @@
     margin: 0.25rem 0 0;
     padding: 0;
     display: grid;
-    gap: 0.4rem;
-    max-width: 44ch;
+    gap: 0.75rem;
+    max-width: 46ch;
+    line-height: 1.45;
+    text-wrap: pretty;
   }
 
   .script {

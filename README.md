@@ -15,8 +15,11 @@ stroke-order animations and flashcards that look like ink on washi paper.
   both side by side. Self-grade like Anki, or type the romaji and get a suggested grade. **Undo**
   any answer, and optionally **personalise the intervals** to your own memory with the FSRS
   optimizer.
-- **An introduction for every new kana**: its sound, an animated stroke order and an original
-  memory hint, before it's quizzed.
+- **An introduction for every new kana**: its sound, an animated stroke order and a memory
+  hint, before it's quizzed. The hints and drawings come from Tofugu's
+  [Learn Hiragana](https://www.tofugu.com/japanese/learn-hiragana-book/) and
+  [Learn Katakana](https://www.tofugu.com/japanese/learn-katakana-book/) books, with the drawing
+  shown over the kana after the answer (or always, or never).
 - **Writing practice**: see the romaji and draw the kana; stroke count, order and direction are
   checked stroke by stroke. Or choose the right kana from look-alikes.
 - **In-order mode** to go through rows one by one without touching your schedule.
@@ -50,10 +53,11 @@ just e2e       # end-to-end tests (Playwright)
 just ci        # lint, type-check, unit tests, build and e2e — what CI runs
 ```
 
-Run `just` to see all tasks. The asset pipelines (`just audio` with `just voicevox`, `just fonts`, `just kanjivg`,
-`just photos`, `just sfx`, `just icons`) regenerate the files in `public/` and
-`src/lib/data/kanjivg/` from their sources; their output is committed, so you only need them
-when changing assets.
+Run `just` to see all tasks. The asset pipelines (`just audio` with `just voicevox`, `just fonts`,
+`just kanjivg`, `just tofugu`, `just photos`, `just sfx`, `just icons`) regenerate the files in
+`public/`, `src/lib/data/kanjivg/` and `src/lib/data/tofugu/` from their sources; their output
+is committed, so you only need them when changing assets. `just tofugu` needs poppler and potrace
+(`brew install poppler potrace`).
 
 ### Project layout
 
@@ -74,7 +78,8 @@ See [PLAN.md](PLAN.md) for the design and decisions.
 ## Credits
 
 kana builds on the generous work of others — see [NOTICE](NOTICE) and the in-app credits page:
-pronunciation generated with VOICEVOX (VOICEVOX:春日部つむぎ, VOICEVOX:青山龍星), stroke data from
+memory hints and drawings from Tofugu's Learn Hiragana and Learn Katakana books, pronunciation
+generated with VOICEVOX (VOICEVOX:春日部つむぎ, VOICEVOX:青山龍星), stroke data from
 KanjiVG (CC BY-SA 3.0), fonts from Google Fonts (OFL), photos from Unsplash, and sound effects
 from Freesound (CC0) and a koto recording by Torsodog (Wikimedia Commons, CC BY 3.0).
 

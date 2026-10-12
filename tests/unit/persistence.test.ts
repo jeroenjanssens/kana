@@ -37,6 +37,12 @@ describe('sanitizeSettings', () => {
     expect(s.groups).toEqual(DEFAULT_SETTINGS.groups)
     expect('bogus' in s).toBe(false)
   })
+  test('drawings keep only a known mode', () => {
+    expect(sanitizeSettings({ drawings: 'always' }).drawings).toBe('always')
+    expect(sanitizeSettings({ drawings: 'sometimes' }).drawings).toBe('back')
+    expect(sanitizeSettings({}).drawings).toBe('back')
+  })
+
   test('old saves get the new photo settings', () => {
     const s = sanitizeSettings({ photoEvery: 20 })
     expect(s).toMatchObject({ photoMode: 'cards', photoEvery: 20, photoMinutes: 5, photoSlug: '' })

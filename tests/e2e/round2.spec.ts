@@ -79,7 +79,7 @@ test('a new kana is introduced first, then comes back as a quiz', async ({ page 
   const intro = page.getByRole('article', { name: 'New kana: a' })
   await expect(intro).toBeVisible()
   await expect(intro.getByRole('img', { name: /Stroke order for あ/ })).toBeVisible()
-  await expect(intro).toContainText('antenna')
+  await expect(intro).toContainText('find the letter A')
   await intro.getByRole('button', { name: /Got it/ }).click()
   // Only that card is left: it comes back as a quiz (learning ahead).
   await expect(page.getByRole('button', { name: /Hiragana card/ })).toBeVisible()
@@ -226,6 +226,6 @@ test('the interface can be switched to Dutch', async ({ page }) => {
   // Learning content is Dutch too: the memory hint in the table.
   await page.goto('./#/table')
   await page.getByRole('button', { name: /^き, ki/ }).click()
-  await expect(page.locator('.details .hints')).toContainText('kiwi')
+  await expect(page.locator('.details .hints')).toContainText('sleutel')
   expect((await savedData(page)).settings.language).toBe('nl')
 })

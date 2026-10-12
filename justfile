@@ -74,6 +74,14 @@ sfx:
 kanjivg:
     npx tsx scripts/fetch-kanjivg.ts
 
+# Trace the memory-hint drawings from Tofugu's Learn Hiragana and Katakana books (needs poppler and potrace)
+tofugu:
+    npx tsx scripts/tofugu-drawings.ts
+
+# Build drawings-preview/index.html to compare the traced drawings with the originals
+tofugu-preview:
+    npx tsx scripts/tofugu-drawings.ts --preview
+
 # Download and subset the Japanese fonts
 fonts:
     npx tsx scripts/subset-fonts.ts

@@ -3,6 +3,7 @@ node_modules
 package-lock.json
 public
 src/lib/data/kanjivg
+src/lib/data/tofugu
 playwright-report
 test-results
 PLAN.md

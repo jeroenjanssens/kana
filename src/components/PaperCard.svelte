@@ -46,18 +46,20 @@
 </div>
 
 <style>
+  /* At least 5 : 6, taller when a side needs it, up to what fits on screen (then it scrolls). */
   .scene {
+    --width: min(88vw, 400px);
     perspective: 1400px;
-    width: min(88vw, 400px);
-    aspect-ratio: 5 / 6;
+    width: var(--width);
+    min-height: calc(var(--width) * 1.2);
+    display: grid;
     transform: rotate(var(--tilt));
     transition: transform 0.4s var(--ease);
   }
 
   .card {
     position: relative;
-    width: 100%;
-    height: 100%;
+    display: grid;
     transform-style: preserve-3d;
     transition: transform 0.7s var(--ease);
     cursor: pointer;
@@ -70,12 +72,16 @@
   }
 
   .face {
-    position: absolute;
-    inset: 0;
+    grid-area: 1 / 1;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: safe center;
+    max-height: max(calc(var(--width) * 1.2), calc(100dvh - 17rem));
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
     padding: 1.5rem;
     border-radius: 18px;
     backface-visibility: hidden;
@@ -86,7 +92,6 @@
       0 30px 60px rgb(30 20 5 / 0.18),
       inset 0 0 0 1px rgb(255 255 255 / 0.35),
       inset 0 0 40px rgb(120 90 40 / 0.08);
-    overflow: hidden;
   }
 
   /* Faint deckle edge and a soft vignette, as on handmade paper. */
