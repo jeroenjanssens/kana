@@ -59,6 +59,22 @@
     drawing = undefined
   }
 
+  // A finger on the pad draws instead of scrolling the page. touch-action alone isn't enough on
+  // iOS Safari: the touches themselves must be cancelled, which needs a non-passive listener.
+  $effect(() => {
+    if (!svg) return
+    const el = svg
+    const block = (e: TouchEvent) => {
+      if (!disabled && e.cancelable) e.preventDefault()
+    }
+    el.addEventListener('touchstart', block, { passive: false })
+    el.addEventListener('touchmove', block, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', block)
+      el.removeEventListener('touchmove', block)
+    }
+  })
+
   const path = (points: Point[]) =>
     points.length === 1
       ? `M${points[0][0]},${points[0][1]}l0.01,0`
@@ -137,6 +153,7 @@
   }
 
   svg {
+    display: block;
     max-width: 92vw;
     height: auto;
     border-radius: 16px;

@@ -18,6 +18,27 @@ async function drawOnPad(page: Page, strokes: Point[][]) {
   }
 }
 
+test('touching the writing pad never scrolls the page', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'touch')
+  await quizOnly(page)
+  await page.goto('./#/write/hiragana')
+  const pad = page.getByRole('img', { name: /Drawing area/ })
+  await expect(pad).toBeVisible()
+  // iOS Safari scrolls unless the touches themselves are cancelled (touch-action isn't enough).
+  const cancelled = (el: Element) => {
+    const touch = new Touch({ identifier: 1, target: el, clientX: 10, clientY: 10 })
+    const results: boolean[] = []
+    for (const type of ['touchstart', 'touchmove']) {
+      const e = new TouchEvent(type, { touches: [touch], cancelable: true, bubbles: true })
+      el.dispatchEvent(e)
+      results.push(e.defaultPrevented)
+    }
+    return results
+  }
+  expect(await pad.evaluate(cancelled)).toEqual([true, true])
+  expect(await page.locator('h1, .topbar').first().evaluate(cancelled)).toEqual([false, false])
+})
+
 test('writing あ stroke by stroke is accepted', async ({ page }) => {
   await quizOnly(page)
   await page.goto('./#/write/hiragana')
