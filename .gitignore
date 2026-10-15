@@ -35,3 +35,11 @@ scripts/font-sources/
 voice-preview/
 scripts/tofugu-source/
 drawings-preview/
+
+# Speech model: generated data and the Python environment
+ml/data/
+ml/.venv/
+ml/runs/
+__pycache__/
+ml/.pytest_cache/
+ml/.ruff_cache/

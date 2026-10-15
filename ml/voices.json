@@ -1,0 +1,428 @@
+[
+ {
+  "id": 2,
+  "character": "四国めたん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 0,
+  "character": "四国めたん",
+  "style": "あまあま",
+  "split": "train"
+ },
+ {
+  "id": 6,
+  "character": "四国めたん",
+  "style": "ツンツン",
+  "split": "train"
+ },
+ {
+  "id": 4,
+  "character": "四国めたん",
+  "style": "セクシー",
+  "split": "train"
+ },
+ {
+  "id": 36,
+  "character": "四国めたん",
+  "style": "ささやき",
+  "split": "train"
+ },
+ {
+  "id": 37,
+  "character": "四国めたん",
+  "style": "ヒソヒソ",
+  "split": "train"
+ },
+ {
+  "id": 3,
+  "character": "ずんだもん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 1,
+  "character": "ずんだもん",
+  "style": "あまあま",
+  "split": "train"
+ },
+ {
+  "id": 7,
+  "character": "ずんだもん",
+  "style": "ツンツン",
+  "split": "train"
+ },
+ {
+  "id": 5,
+  "character": "ずんだもん",
+  "style": "セクシー",
+  "split": "train"
+ },
+ {
+  "id": 22,
+  "character": "ずんだもん",
+  "style": "ささやき",
+  "split": "train"
+ },
+ {
+  "id": 38,
+  "character": "ずんだもん",
+  "style": "ヒソヒソ",
+  "split": "train"
+ },
+ {
+  "id": 75,
+  "character": "ずんだもん",
+  "style": "ヘロヘロ",
+  "split": "train"
+ },
+ {
+  "id": 76,
+  "character": "ずんだもん",
+  "style": "なみだめ",
+  "split": "train"
+ },
+ {
+  "id": 8,
+  "character": "春日部つむぎ",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 10,
+  "character": "雨晴はう",
+  "style": "ノーマル",
+  "split": "test"
+ },
+ {
+  "id": 9,
+  "character": "波音リツ",
+  "style": "ノーマル",
+  "split": "test"
+ },
+ {
+  "id": 65,
+  "character": "波音リツ",
+  "style": "クイーン",
+  "split": "test"
+ },
+ {
+  "id": 14,
+  "character": "冥鳴ひまり",
+  "style": "ノーマル",
+  "split": "test"
+ },
+ {
+  "id": 16,
+  "character": "九州そら",
+  "style": "ノーマル",
+  "split": "val"
+ },
+ {
+  "id": 15,
+  "character": "九州そら",
+  "style": "あまあま",
+  "split": "val"
+ },
+ {
+  "id": 18,
+  "character": "九州そら",
+  "style": "ツンツン",
+  "split": "val"
+ },
+ {
+  "id": 17,
+  "character": "九州そら",
+  "style": "セクシー",
+  "split": "val"
+ },
+ {
+  "id": 19,
+  "character": "九州そら",
+  "style": "ささやき",
+  "split": "val"
+ },
+ {
+  "id": 21,
+  "character": "剣崎雌雄",
+  "style": "ノーマル",
+  "split": "test"
+ },
+ {
+  "id": 29,
+  "character": "No.7",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 30,
+  "character": "No.7",
+  "style": "アナウンス",
+  "split": "train"
+ },
+ {
+  "id": 31,
+  "character": "No.7",
+  "style": "読み聞かせ",
+  "split": "train"
+ },
+ {
+  "id": 43,
+  "character": "櫻歌ミコ",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 44,
+  "character": "櫻歌ミコ",
+  "style": "第二形態",
+  "split": "train"
+ },
+ {
+  "id": 45,
+  "character": "櫻歌ミコ",
+  "style": "ロリ",
+  "split": "train"
+ },
+ {
+  "id": 46,
+  "character": "小夜/SAYO",
+  "style": "ノーマル",
+  "split": "val"
+ },
+ {
+  "id": 51,
+  "character": "†聖騎士 紅桜†",
+  "style": "ノーマル",
+  "split": "val"
+ },
+ {
+  "id": 54,
+  "character": "春歌ナナ",
+  "style": "ノーマル",
+  "split": "val"
+ },
+ {
+  "id": 61,
+  "character": "中国うさぎ",
+  "style": "ノーマル",
+  "split": "test"
+ },
+ {
+  "id": 62,
+  "character": "中国うさぎ",
+  "style": "おどろき",
+  "split": "test"
+ },
+ {
+  "id": 63,
+  "character": "中国うさぎ",
+  "style": "こわがり",
+  "split": "test"
+ },
+ {
+  "id": 64,
+  "character": "中国うさぎ",
+  "style": "へろへろ",
+  "split": "test"
+ },
+ {
+  "id": 67,
+  "character": "栗田まろん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 68,
+  "character": "あいえるたん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 69,
+  "character": "満別花丸",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 70,
+  "character": "満別花丸",
+  "style": "元気",
+  "split": "train"
+ },
+ {
+  "id": 71,
+  "character": "満別花丸",
+  "style": "ささやき",
+  "split": "train"
+ },
+ {
+  "id": 72,
+  "character": "満別花丸",
+  "style": "ぶりっ子",
+  "split": "train"
+ },
+ {
+  "id": 73,
+  "character": "満別花丸",
+  "style": "ボーイ",
+  "split": "train"
+ },
+ {
+  "id": 94,
+  "character": "中部つるぎ",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 95,
+  "character": "中部つるぎ",
+  "style": "怒り",
+  "split": "train"
+ },
+ {
+  "id": 96,
+  "character": "中部つるぎ",
+  "style": "ヒソヒソ",
+  "split": "train"
+ },
+ {
+  "id": 97,
+  "character": "中部つるぎ",
+  "style": "おどおど",
+  "split": "train"
+ },
+ {
+  "id": 98,
+  "character": "中部つるぎ",
+  "style": "絶望と敗北",
+  "split": "train"
+ },
+ {
+  "id": 102,
+  "character": "ユーレイちゃん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 103,
+  "character": "ユーレイちゃん",
+  "style": "甘々",
+  "split": "train"
+ },
+ {
+  "id": 104,
+  "character": "ユーレイちゃん",
+  "style": "哀しみ",
+  "split": "train"
+ },
+ {
+  "id": 105,
+  "character": "ユーレイちゃん",
+  "style": "ささやき",
+  "split": "train"
+ },
+ {
+  "id": 106,
+  "character": "ユーレイちゃん",
+  "style": "ツクモちゃん",
+  "split": "train"
+ },
+ {
+  "id": 107,
+  "character": "東北ずん子",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 108,
+  "character": "東北きりたん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 109,
+  "character": "東北イタコ",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 113,
+  "character": "あんこもん",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 114,
+  "character": "あんこもん",
+  "style": "つよつよ",
+  "split": "train"
+ },
+ {
+  "id": 115,
+  "character": "あんこもん",
+  "style": "よわよわ",
+  "split": "train"
+ },
+ {
+  "id": 116,
+  "character": "あんこもん",
+  "style": "けだるげ",
+  "split": "train"
+ },
+ {
+  "id": 117,
+  "character": "あんこもん",
+  "style": "ささやき",
+  "split": "train"
+ },
+ {
+  "id": 118,
+  "character": "夜語トバリ",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 119,
+  "character": "夜語トバリ",
+  "style": "明るい",
+  "split": "train"
+ },
+ {
+  "id": 120,
+  "character": "夜語トバリ",
+  "style": "哀しみ",
+  "split": "train"
+ },
+ {
+  "id": 121,
+  "character": "夜語トバリ",
+  "style": "呆れ",
+  "split": "train"
+ },
+ {
+  "id": 122,
+  "character": "暁記ミタマ",
+  "style": "ノーマル",
+  "split": "train"
+ },
+ {
+  "id": 123,
+  "character": "暁記ミタマ",
+  "style": "怒り",
+  "split": "train"
+ },
+ {
+  "id": 124,
+  "character": "暁記ミタマ",
+  "style": "哀しみ",
+  "split": "train"
+ },
+ {
+  "id": 125,
+  "character": "暁記ミタマ",
+  "style": "ささやき",
+  "split": "train"
+ }
+]

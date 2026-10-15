@@ -8,3 +8,11 @@ playwright-report
 test-results
 PLAN.md
 docs/*.md
+ml/.venv
+ml/data
+ml/runs
+ml/.pytest_cache
+ml/classes.json
+ml/voices.json
+tests/fixtures
+ml/reports

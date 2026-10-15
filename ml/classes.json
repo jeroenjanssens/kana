@@ -1,0 +1,816 @@
+{
+  "noKana": "_",
+  "classes": [
+    {
+      "id": "a",
+      "kana": [
+        "a"
+      ],
+      "hiragana": "あ",
+      "notation": "ア'"
+    },
+    {
+      "id": "i",
+      "kana": [
+        "i"
+      ],
+      "hiragana": "い",
+      "notation": "イ'"
+    },
+    {
+      "id": "u",
+      "kana": [
+        "u"
+      ],
+      "hiragana": "う",
+      "notation": "ウ'"
+    },
+    {
+      "id": "e",
+      "kana": [
+        "e"
+      ],
+      "hiragana": "え",
+      "notation": "エ'"
+    },
+    {
+      "id": "o",
+      "kana": [
+        "o",
+        "wo"
+      ],
+      "hiragana": "お",
+      "notation": "オ'"
+    },
+    {
+      "id": "ka",
+      "kana": [
+        "ka"
+      ],
+      "hiragana": "か",
+      "notation": "カ'"
+    },
+    {
+      "id": "ki",
+      "kana": [
+        "ki"
+      ],
+      "hiragana": "き",
+      "notation": "キ'"
+    },
+    {
+      "id": "ku",
+      "kana": [
+        "ku"
+      ],
+      "hiragana": "く",
+      "notation": "ク'"
+    },
+    {
+      "id": "ke",
+      "kana": [
+        "ke"
+      ],
+      "hiragana": "け",
+      "notation": "ケ'"
+    },
+    {
+      "id": "ko",
+      "kana": [
+        "ko"
+      ],
+      "hiragana": "こ",
+      "notation": "コ'"
+    },
+    {
+      "id": "sa",
+      "kana": [
+        "sa"
+      ],
+      "hiragana": "さ",
+      "notation": "サ'"
+    },
+    {
+      "id": "shi",
+      "kana": [
+        "shi"
+      ],
+      "hiragana": "し",
+      "notation": "シ'"
+    },
+    {
+      "id": "su",
+      "kana": [
+        "su"
+      ],
+      "hiragana": "す",
+      "notation": "ス'"
+    },
+    {
+      "id": "se",
+      "kana": [
+        "se"
+      ],
+      "hiragana": "せ",
+      "notation": "セ'"
+    },
+    {
+      "id": "so",
+      "kana": [
+        "so"
+      ],
+      "hiragana": "そ",
+      "notation": "ソ'"
+    },
+    {
+      "id": "ta",
+      "kana": [
+        "ta"
+      ],
+      "hiragana": "た",
+      "notation": "タ'"
+    },
+    {
+      "id": "chi",
+      "kana": [
+        "chi"
+      ],
+      "hiragana": "ち",
+      "notation": "チ'"
+    },
+    {
+      "id": "tsu",
+      "kana": [
+        "tsu"
+      ],
+      "hiragana": "つ",
+      "notation": "ツ'"
+    },
+    {
+      "id": "te",
+      "kana": [
+        "te"
+      ],
+      "hiragana": "て",
+      "notation": "テ'"
+    },
+    {
+      "id": "to",
+      "kana": [
+        "to"
+      ],
+      "hiragana": "と",
+      "notation": "ト'"
+    },
+    {
+      "id": "na",
+      "kana": [
+        "na"
+      ],
+      "hiragana": "な",
+      "notation": "ナ'"
+    },
+    {
+      "id": "ni",
+      "kana": [
+        "ni"
+      ],
+      "hiragana": "に",
+      "notation": "ニ'"
+    },
+    {
+      "id": "nu",
+      "kana": [
+        "nu"
+      ],
+      "hiragana": "ぬ",
+      "notation": "ヌ'"
+    },
+    {
+      "id": "ne",
+      "kana": [
+        "ne"
+      ],
+      "hiragana": "ね",
+      "notation": "ネ'"
+    },
+    {
+      "id": "no",
+      "kana": [
+        "no"
+      ],
+      "hiragana": "の",
+      "notation": "ノ'"
+    },
+    {
+      "id": "ha",
+      "kana": [
+        "ha"
+      ],
+      "hiragana": "は",
+      "notation": "ハ'"
+    },
+    {
+      "id": "hi",
+      "kana": [
+        "hi"
+      ],
+      "hiragana": "ひ",
+      "notation": "ヒ'"
+    },
+    {
+      "id": "fu",
+      "kana": [
+        "fu"
+      ],
+      "hiragana": "ふ",
+      "notation": "フ'"
+    },
+    {
+      "id": "he",
+      "kana": [
+        "he"
+      ],
+      "hiragana": "へ",
+      "notation": "ヘ'"
+    },
+    {
+      "id": "ho",
+      "kana": [
+        "ho"
+      ],
+      "hiragana": "ほ",
+      "notation": "ホ'"
+    },
+    {
+      "id": "ma",
+      "kana": [
+        "ma"
+      ],
+      "hiragana": "ま",
+      "notation": "マ'"
+    },
+    {
+      "id": "mi",
+      "kana": [
+        "mi"
+      ],
+      "hiragana": "み",
+      "notation": "ミ'"
+    },
+    {
+      "id": "mu",
+      "kana": [
+        "mu"
+      ],
+      "hiragana": "む",
+      "notation": "ム'"
+    },
+    {
+      "id": "me",
+      "kana": [
+        "me"
+      ],
+      "hiragana": "め",
+      "notation": "メ'"
+    },
+    {
+      "id": "mo",
+      "kana": [
+        "mo"
+      ],
+      "hiragana": "も",
+      "notation": "モ'"
+    },
+    {
+      "id": "ya",
+      "kana": [
+        "ya"
+      ],
+      "hiragana": "や",
+      "notation": "ヤ'"
+    },
+    {
+      "id": "yu",
+      "kana": [
+        "yu"
+      ],
+      "hiragana": "ゆ",
+      "notation": "ユ'"
+    },
+    {
+      "id": "yo",
+      "kana": [
+        "yo"
+      ],
+      "hiragana": "よ",
+      "notation": "ヨ'"
+    },
+    {
+      "id": "ra",
+      "kana": [
+        "ra"
+      ],
+      "hiragana": "ら",
+      "notation": "ラ'"
+    },
+    {
+      "id": "ri",
+      "kana": [
+        "ri"
+      ],
+      "hiragana": "り",
+      "notation": "リ'"
+    },
+    {
+      "id": "ru",
+      "kana": [
+        "ru"
+      ],
+      "hiragana": "る",
+      "notation": "ル'"
+    },
+    {
+      "id": "re",
+      "kana": [
+        "re"
+      ],
+      "hiragana": "れ",
+      "notation": "レ'"
+    },
+    {
+      "id": "ro",
+      "kana": [
+        "ro"
+      ],
+      "hiragana": "ろ",
+      "notation": "ロ'"
+    },
+    {
+      "id": "wa",
+      "kana": [
+        "wa"
+      ],
+      "hiragana": "わ",
+      "notation": "ワ'"
+    },
+    {
+      "id": "n",
+      "kana": [
+        "n"
+      ],
+      "hiragana": "ん",
+      "notation": "ン'"
+    },
+    {
+      "id": "ga",
+      "kana": [
+        "ga"
+      ],
+      "hiragana": "が",
+      "notation": "ガ'"
+    },
+    {
+      "id": "gi",
+      "kana": [
+        "gi"
+      ],
+      "hiragana": "ぎ",
+      "notation": "ギ'"
+    },
+    {
+      "id": "gu",
+      "kana": [
+        "gu"
+      ],
+      "hiragana": "ぐ",
+      "notation": "グ'"
+    },
+    {
+      "id": "ge",
+      "kana": [
+        "ge"
+      ],
+      "hiragana": "げ",
+      "notation": "ゲ'"
+    },
+    {
+      "id": "go",
+      "kana": [
+        "go"
+      ],
+      "hiragana": "ご",
+      "notation": "ゴ'"
+    },
+    {
+      "id": "za",
+      "kana": [
+        "za"
+      ],
+      "hiragana": "ざ",
+      "notation": "ザ'"
+    },
+    {
+      "id": "ji",
+      "kana": [
+        "ji",
+        "di"
+      ],
+      "hiragana": "じ",
+      "notation": "ジ'"
+    },
+    {
+      "id": "zu",
+      "kana": [
+        "zu",
+        "du"
+      ],
+      "hiragana": "ず",
+      "notation": "ズ'"
+    },
+    {
+      "id": "ze",
+      "kana": [
+        "ze"
+      ],
+      "hiragana": "ぜ",
+      "notation": "ゼ'"
+    },
+    {
+      "id": "zo",
+      "kana": [
+        "zo"
+      ],
+      "hiragana": "ぞ",
+      "notation": "ゾ'"
+    },
+    {
+      "id": "da",
+      "kana": [
+        "da"
+      ],
+      "hiragana": "だ",
+      "notation": "ダ'"
+    },
+    {
+      "id": "de",
+      "kana": [
+        "de"
+      ],
+      "hiragana": "で",
+      "notation": "デ'"
+    },
+    {
+      "id": "do",
+      "kana": [
+        "do"
+      ],
+      "hiragana": "ど",
+      "notation": "ド'"
+    },
+    {
+      "id": "ba",
+      "kana": [
+        "ba"
+      ],
+      "hiragana": "ば",
+      "notation": "バ'"
+    },
+    {
+      "id": "bi",
+      "kana": [
+        "bi"
+      ],
+      "hiragana": "び",
+      "notation": "ビ'"
+    },
+    {
+      "id": "bu",
+      "kana": [
+        "bu"
+      ],
+      "hiragana": "ぶ",
+      "notation": "ブ'"
+    },
+    {
+      "id": "be",
+      "kana": [
+        "be"
+      ],
+      "hiragana": "べ",
+      "notation": "ベ'"
+    },
+    {
+      "id": "bo",
+      "kana": [
+        "bo"
+      ],
+      "hiragana": "ぼ",
+      "notation": "ボ'"
+    },
+    {
+      "id": "pa",
+      "kana": [
+        "pa"
+      ],
+      "hiragana": "ぱ",
+      "notation": "パ'"
+    },
+    {
+      "id": "pi",
+      "kana": [
+        "pi"
+      ],
+      "hiragana": "ぴ",
+      "notation": "ピ'"
+    },
+    {
+      "id": "pu",
+      "kana": [
+        "pu"
+      ],
+      "hiragana": "ぷ",
+      "notation": "プ'"
+    },
+    {
+      "id": "pe",
+      "kana": [
+        "pe"
+      ],
+      "hiragana": "ぺ",
+      "notation": "ペ'"
+    },
+    {
+      "id": "po",
+      "kana": [
+        "po"
+      ],
+      "hiragana": "ぽ",
+      "notation": "ポ'"
+    },
+    {
+      "id": "kya",
+      "kana": [
+        "kya"
+      ],
+      "hiragana": "きゃ",
+      "notation": "キャ'"
+    },
+    {
+      "id": "kyu",
+      "kana": [
+        "kyu"
+      ],
+      "hiragana": "きゅ",
+      "notation": "キュ'"
+    },
+    {
+      "id": "kyo",
+      "kana": [
+        "kyo"
+      ],
+      "hiragana": "きょ",
+      "notation": "キョ'"
+    },
+    {
+      "id": "sha",
+      "kana": [
+        "sha"
+      ],
+      "hiragana": "しゃ",
+      "notation": "シャ'"
+    },
+    {
+      "id": "shu",
+      "kana": [
+        "shu"
+      ],
+      "hiragana": "しゅ",
+      "notation": "シュ'"
+    },
+    {
+      "id": "sho",
+      "kana": [
+        "sho"
+      ],
+      "hiragana": "しょ",
+      "notation": "ショ'"
+    },
+    {
+      "id": "cha",
+      "kana": [
+        "cha"
+      ],
+      "hiragana": "ちゃ",
+      "notation": "チャ'"
+    },
+    {
+      "id": "chu",
+      "kana": [
+        "chu"
+      ],
+      "hiragana": "ちゅ",
+      "notation": "チュ'"
+    },
+    {
+      "id": "cho",
+      "kana": [
+        "cho"
+      ],
+      "hiragana": "ちょ",
+      "notation": "チョ'"
+    },
+    {
+      "id": "nya",
+      "kana": [
+        "nya"
+      ],
+      "hiragana": "にゃ",
+      "notation": "ニャ'"
+    },
+    {
+      "id": "nyu",
+      "kana": [
+        "nyu"
+      ],
+      "hiragana": "にゅ",
+      "notation": "ニュ'"
+    },
+    {
+      "id": "nyo",
+      "kana": [
+        "nyo"
+      ],
+      "hiragana": "にょ",
+      "notation": "ニョ'"
+    },
+    {
+      "id": "hya",
+      "kana": [
+        "hya"
+      ],
+      "hiragana": "ひゃ",
+      "notation": "ヒャ'"
+    },
+    {
+      "id": "hyu",
+      "kana": [
+        "hyu"
+      ],
+      "hiragana": "ひゅ",
+      "notation": "ヒュ'"
+    },
+    {
+      "id": "hyo",
+      "kana": [
+        "hyo"
+      ],
+      "hiragana": "ひょ",
+      "notation": "ヒョ'"
+    },
+    {
+      "id": "mya",
+      "kana": [
+        "mya"
+      ],
+      "hiragana": "みゃ",
+      "notation": "ミャ'"
+    },
+    {
+      "id": "myu",
+      "kana": [
+        "myu"
+      ],
+      "hiragana": "みゅ",
+      "notation": "ミュ'"
+    },
+    {
+      "id": "myo",
+      "kana": [
+        "myo"
+      ],
+      "hiragana": "みょ",
+      "notation": "ミョ'"
+    },
+    {
+      "id": "rya",
+      "kana": [
+        "rya"
+      ],
+      "hiragana": "りゃ",
+      "notation": "リャ'"
+    },
+    {
+      "id": "ryu",
+      "kana": [
+        "ryu"
+      ],
+      "hiragana": "りゅ",
+      "notation": "リュ'"
+    },
+    {
+      "id": "ryo",
+      "kana": [
+        "ryo"
+      ],
+      "hiragana": "りょ",
+      "notation": "リョ'"
+    },
+    {
+      "id": "gya",
+      "kana": [
+        "gya"
+      ],
+      "hiragana": "ぎゃ",
+      "notation": "ギャ'"
+    },
+    {
+      "id": "gyu",
+      "kana": [
+        "gyu"
+      ],
+      "hiragana": "ぎゅ",
+      "notation": "ギュ'"
+    },
+    {
+      "id": "gyo",
+      "kana": [
+        "gyo"
+      ],
+      "hiragana": "ぎょ",
+      "notation": "ギョ'"
+    },
+    {
+      "id": "ja",
+      "kana": [
+        "ja"
+      ],
+      "hiragana": "じゃ",
+      "notation": "ジャ'"
+    },
+    {
+      "id": "ju",
+      "kana": [
+        "ju"
+      ],
+      "hiragana": "じゅ",
+      "notation": "ジュ'"
+    },
+    {
+      "id": "jo",
+      "kana": [
+        "jo"
+      ],
+      "hiragana": "じょ",
+      "notation": "ジョ'"
+    },
+    {
+      "id": "bya",
+      "kana": [
+        "bya"
+      ],
+      "hiragana": "びゃ",
+      "notation": "ビャ'"
+    },
+    {
+      "id": "byu",
+      "kana": [
+        "byu"
+      ],
+      "hiragana": "びゅ",
+      "notation": "ビュ'"
+    },
+    {
+      "id": "byo",
+      "kana": [
+        "byo"
+      ],
+      "hiragana": "びょ",
+      "notation": "ビョ'"
+    },
+    {
+      "id": "pya",
+      "kana": [
+        "pya"
+      ],
+      "hiragana": "ぴゃ",
+      "notation": "ピャ'"
+    },
+    {
+      "id": "pyu",
+      "kana": [
+        "pyu"
+      ],
+      "hiragana": "ぴゅ",
+      "notation": "ピュ'"
+    },
+    {
+      "id": "pyo",
+      "kana": [
+        "pyo"
+      ],
+      "hiragana": "ぴょ",
+      "notation": "ピョ'"
+    }
+  ]
+}

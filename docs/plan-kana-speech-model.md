@@ -4,8 +4,9 @@ Recognise which kana you said with a small model of our own that runs in the bro
 practice works offline, privately, in every browser (including Vivaldi), and for single kana —
 where general speech recognition (Safari, Chrome, Whisper) is at its weakest.
 
-Status: **plan**, not started. The speech test page (`#/speech`) and record & compare exist and
-are the starting point.
+Status: **built** (phases 0–5), **model v1 is a NO-GO**: 52% right on new voices (clean), 45%
+with noise, far below the 90% bar. Shipped as an experiment to try on real voices. See "How it
+turned out" at the end.
 
 ## Decisions
 
@@ -266,3 +267,62 @@ Commands: `just ml-classes`, `just ml-data` (needs `just voicevox`), `just ml-tr
    plus ~3 hours of unattended generation).
 3. **Phase 3–4:** browser runtime and the test page column (≈ 2 sessions).
 4. **Phase 5:** Say it practice (≈ 1 session).
+
+## How it turned out
+
+- **Licences (Phase 0)**: the check is in `ml/VOICES.md`. 25 characters (71 styles) may be
+  used: one allows machine learning explicitly, the others don't mention it. 18 are left out:
+  most forbid it, among them all six VirVox characters (and so the app's own male voice, 青山龍星),
+  one asks to be contacted first, and two had unclear or unreadable terms. The usable voices
+  lean female and young; frequency warping (vocal tract length) in training makes up for some of
+  that, and a male voice (剣崎雌雄) is among the test voices.
+- **Splits**: train 54 styles, validation 8 (九州そら, 春歌ナナ, 小夜/SAYO, †聖騎士 紅桜†), test 9
+  (中国うさぎ, 雨晴はう, 波音リツ, 冥鳴ひまり, 剣崎雌雄).
+- **Generation**: VOICEVOX on the CPU is the bottleneck: six engines with 2 threads each keep all
+  cores busy at about 6 clips a second, so the 71 styles (≈ 45,000 clips) take about 2 hours.
+- **Noise and rooms are synthetic**: MUSAN (11 GB) didn't fit on the disk, so noise is generated
+  (white to brown, mains hum, babble from other clips) and so are room impulse responses
+  (decaying noise, RT60 0.1–0.6 s).
+- **No codec simulation**: the app records raw samples through an AudioWorklet, never AAC or
+  Opus, so the model never hears a codec.
+- **Features in both languages agree** to 1e-4 (`tests/unit/speech-model.test.ts` against
+  `tests/fixtures/speech/parity.json`, written by `just ml-fixtures` from a network with fixed
+  random weights, so the check doesn't depend on training).
+- **Commands**: `just ml-classes`, `ml-engines`, `ml-data`, `ml-train`, `ml-eval`, `ml-export`,
+  `ml-fixtures`, `ml-test`, `ml-engines-stop`.
+- **Whispered styles are left out**: ささやき and ヒソヒソ (10 styles) have no voicing, so だ and た
+  sound the same in them; they taught the model that voiced and voiceless kana are one sound.
+- **Morphed voices**: VOICEVOX can morph between voices that allow it; 23 in-between voices of
+  training characters were added. They didn't measurably help (30.5% vs 30.2% in a short run).
+
+### Model v1 and why it's a no-go
+
+`ml/reports/v1.md`: 192 channels, 6 blocks, 10 ms steps, mean and max pooling (283,000
+parameters, 292 KB, about 120 ms per guess on the M4 in plain TypeScript), 50 epochs.
+
+| Test voices (never heard) | Top-1 | Top-3 |
+| --- | --- | --- |
+| clean | 52% | 78% |
+| noisy | 45% | 71% |
+| room and noise | 39% | 65% |
+
+す/つ is right 71% of the time and し/ち 74%; silence and noise are answered "no kana" 85% of the
+time; probabilities are well calibrated. Most mistakes are voiced heard as voiceless (じ→ち, ぐ→く,
+ど→と) and missed onsets (お→ほ).
+
+What limits it is **too few distinct voices**, not the network: trained on 5 of the 6 variants of
+each training voice, it gets 78% of the 6th variant right, but only 45% of new voices. Bigger
+models, finer time steps, per-band normalisation, stronger regularisation and morphed voices each
+changed the score by a few points at most. 25 characters (about 15 in training) is far from the
+thousands of speakers such models usually learn from.
+
+### Next steps
+
+1. **Try it on real voices**: the speech test page shows the model's guesses next to the
+   browser's; real voices may do better or worse than synthetic ones.
+2. **Real speech**: Mozilla Common Voice Japanese (CC0, thousands of speakers), cut into kana
+   with forced alignment, to train or fine-tune on.
+3. **A pretrained speech encoder**: features from a model trained on many real voices (e.g. a
+   small Whisper or wav2vec2 encoder) generalise across speakers far better; the cost is a much
+   larger download (tens of MB) and a runtime such as ONNX Runtime Web.
+
