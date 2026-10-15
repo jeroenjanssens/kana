@@ -9,6 +9,7 @@ import {
   fontById,
   fontFamily,
   fontUrl,
+  nextCardFont,
   randomFontId,
 } from '../../src/lib/data/fonts'
 
@@ -52,6 +53,18 @@ describe('randomFontId', () => {
 
   test('falls back to the default font when none are enabled', () => {
     expect(randomFontId([])).toBe(DEFAULT_FONT_ID)
+  })
+})
+
+describe('nextCardFont', () => {
+  test('uses the chosen font in fixed mode', () => {
+    expect(nextCardFont({ fontMode: 'fixed', font: 'x', randomFonts: ['a', 'b'] }, 'x')).toBe('x')
+  })
+
+  test('picks a different font from the rotation in random mode', () => {
+    const s = { fontMode: 'random' as const, font: 'x', randomFonts: ['a', 'b'] }
+    expect(nextCardFont(s, 'a')).toBe('b')
+    expect(nextCardFont(s, 'b')).toBe('a')
   })
 
   test('is deterministic with an injected random source', () => {

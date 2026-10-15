@@ -9,6 +9,7 @@
   import WritingPad from '../components/WritingPad.svelte'
   import type { VoiceId } from '../lib/audio/voices'
   import { confusableSets } from '../lib/data/confusables'
+  import { nextCardFont } from '../lib/data/fonts'
   import { displayRomaji, glyph, kanaByChar, kanaById, type Kana } from '../lib/data/kana'
   import { strokesFor } from '../lib/data/strokes'
   import { Session, deckKana } from '../lib/srs/queue'
@@ -45,6 +46,7 @@
   let canUndo = $state(false)
   let counts = $state({ progress: 0, unseen: 0, repeating: 0 })
   let current = $state<Kana | undefined>()
+  let font = $state(settings().font)
   let voice: VoiceId = audio.pickVoice()
   let startedAt = 0
   let done = $state(false)
@@ -106,7 +108,9 @@
       return
     }
     const k = kanaById(id)
-    await loadFontWithin(s.font)
+    const nextFont = nextCardFont(s, font)
+    await loadFontWithin(nextFont)
+    font = nextFont
     strokes = []
     result = undefined
     suggested = undefined
@@ -309,12 +313,7 @@
                   disabled={!!picked}
                   onclick={() => pick(o)}
                 >
-                  <KanaGlyph
-                    text={glyph(o, script ?? 'hiragana')}
-                    font={s.font}
-                    size="3rem"
-                    ink={false}
-                  />
+                  <KanaGlyph text={glyph(o, script ?? 'hiragana')} {font} size="3rem" ink={false} />
                   <kbd>{i + 1}</kbd>
                 </button>
               {/each}

@@ -5,6 +5,7 @@
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import MissedKana from '../components/MissedKana.svelte'
+  import { nextCardFont } from '../lib/data/fonts'
   import { displayRomaji, glyph, type Kana, type Script } from '../lib/data/kana'
   import { logPractice } from '../lib/study/actions'
   import { kanaForAnswer } from '../lib/study/answer'
@@ -34,6 +35,7 @@
   let phase = $state<'ready' | 'running' | 'done'>('ready')
   let pool: Kana[] = []
   let current = $state<Kana | undefined>()
+  let font = $state(settings().font)
   let options = $state<Kana[]>([])
   let input = $state('')
   let score = $state(0)
@@ -59,7 +61,11 @@
     if (!script) return
     pool = sprintPool(store.data, script)
     previousBest = bestSprint(store.data, script)
-    await loadFontWithin(settings().font)
+    // Load every font up front: the clock can't wait for one to download mid-sprint.
+    const s = settings()
+    await Promise.all(
+      (s.fontMode === 'random' ? s.randomFonts : [s.font]).map((f) => loadFontWithin(f)),
+    )
     score = 0
     mistakes = 0
     missed = []
@@ -77,6 +83,7 @@
 
   function show(k: Kana) {
     current = k
+    font = nextCardFont(settings(), font)
     input = ''
     shownAt = performance.now()
     if (touch) options = chooseOptions(k, pool, 4)
@@ -187,7 +194,7 @@
     {:else if phase === 'running' && current}
       {#key current.id + score + mistakes}
         <div class="question washi" in:fly={{ y: 10, duration: 160 }}>
-          <KanaGlyph text={glyph(current, script)} font={settings().font} size="7rem" />
+          <KanaGlyph text={glyph(current, script)} {font} size="7rem" />
           {#if reveal}<span class="reveal">{reveal}</span>{/if}
         </div>
       {/key}

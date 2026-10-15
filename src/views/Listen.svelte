@@ -6,6 +6,7 @@
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import MasteryBar from '../components/MasteryBar.svelte'
   import { confusableSets } from '../lib/data/confusables'
+  import { nextCardFont } from '../lib/data/fonts'
   import { displayRomaji, glyph, kanaById, kanaByChar, type Kana } from '../lib/data/kana'
   import { Session, deckKana } from '../lib/srs/queue'
   import type { VoiceId } from '../lib/audio/voices'
@@ -30,6 +31,7 @@
 
   let session: Session | undefined
   let current = $state<Kana | undefined>()
+  let font = $state(settings().font)
   let options = $state<Kana[]>([])
   let picked = $state<Kana | undefined>()
   let done = $state(false)
@@ -82,7 +84,9 @@
       return
     }
     const k = kanaById(id)
-    await loadFontWithin(settings().font)
+    const nextFont = nextCardFont(settings(), font)
+    await loadFontWithin(nextFont)
+    font = nextFont
     picked = undefined
     current = k
     voice = audio.pickVoice()
@@ -247,12 +251,7 @@
                 disabled={!!picked}
                 onclick={() => pick(o)}
               >
-                <KanaGlyph
-                  text={glyph(o, script ?? 'hiragana')}
-                  font={settings().font}
-                  size="3.2rem"
-                  ink={false}
-                />
+                <KanaGlyph text={glyph(o, script ?? 'hiragana')} {font} size="3.2rem" ink={false} />
                 {#if picked}<span class="romaji">{displayRomaji(o, settings().romaji)}</span>{/if}
                 <kbd>{i + 1}</kbd>
               </button>

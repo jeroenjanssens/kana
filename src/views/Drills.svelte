@@ -5,7 +5,7 @@
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import { confusableSets, confusableHint, type ConfusableSet } from '../lib/data/confusables'
-  import { randomFontId } from '../lib/data/fonts'
+  import { nextCardFont } from '../lib/data/fonts'
   import { logPractice } from '../lib/study/actions'
   import { drillDeck, kanaOf, personalSets, quizOptions, quizRounds } from '../lib/study/drills'
   import { confusions } from '../lib/study/stats'
@@ -58,7 +58,7 @@
   async function nextRound(i: number) {
     picked = undefined
     const s = settings()
-    const f = s.fontMode === 'random' ? randomFontId(s.randomFonts, font) : s.font
+    const f = nextCardFont(s, font)
     await loadFontWithin(f)
     font = f
     index = i

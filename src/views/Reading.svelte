@@ -5,7 +5,7 @@
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import PaperCard from '../components/PaperCard.svelte'
   import type { VoiceId } from '../lib/audio/voices'
-  import { randomFontId } from '../lib/data/fonts'
+  import { nextCardFont } from '../lib/data/fonts'
   import { segment } from '../lib/data/kana'
   import { words, type Word } from '../lib/data/words'
   import { logPractice, markNoteSeen, recordWord } from '../lib/study/actions'
@@ -66,7 +66,7 @@
   }
 
   async function show(i: number) {
-    const f = s.fontMode === 'random' ? randomFontId(s.randomFonts, font) : s.font
+    const f = nextCardFont(s, font)
     await loadFontWithin(f)
     font = f
     voice = audio.pickVoice()

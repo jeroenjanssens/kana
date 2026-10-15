@@ -10,7 +10,7 @@
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import type { VoiceId } from '../lib/audio/voices'
   import { hasDrawing, toggleDrawing } from '../lib/data/drawings'
-  import { FONTS, randomFontId } from '../lib/data/fonts'
+  import { FONTS, nextCardFont } from '../lib/data/fonts'
   import { BASIC_ROWS, kanaById, rowsOf, type Kana, type KanaGroup } from '../lib/data/kana'
   import { Session, deckKana, formatInterval, startOfNextDay } from '../lib/srs/queue'
   import { previewIntervals } from '../lib/srs/scheduler'
@@ -161,10 +161,7 @@
   }
 
   async function show(kana: Kana, isNew: boolean) {
-    const nextFont =
-      settings().fontMode === 'random'
-        ? randomFontId(settings().randomFonts, font)
-        : settings().font
+    const nextFont = nextCardFont(settings(), font)
     await loadFontWithin(nextFont)
     flipped = false
     verdict = undefined

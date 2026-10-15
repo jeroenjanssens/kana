@@ -186,3 +186,14 @@ export function randomFontId(enabled: readonly string[], previous?: string, rand
   if (pool.length === 0) return DEFAULT_FONT_ID
   return pool[Math.floor(rand() * pool.length)]
 }
+
+/** The font for the next card: the chosen one, or (in random mode) a different one each time. */
+export function nextCardFont(
+  settings: { fontMode: 'fixed' | 'random'; font: string; randomFonts: readonly string[] },
+  previous?: string,
+  rand = Math.random,
+): string {
+  return settings.fontMode === 'random'
+    ? randomFontId(settings.randomFonts, previous, rand)
+    : settings.font
+}

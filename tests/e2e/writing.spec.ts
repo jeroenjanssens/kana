@@ -106,6 +106,24 @@ const ROMAJI: Record<string, string> = Object.fromEntries(
   KANA.filter((k) => k.group === 'basic').map((k) => [k.hiragana, k.romaji]),
 )
 
+test('a sprint shows each kana in a font from the random rotation', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'typing version')
+  const fonts = ['klee-one', 'yomogi']
+  await quizOnly(page, { settings: { fontMode: 'random', randomFonts: fonts } })
+  await page.goto('./#/sprint/hiragana')
+  await page.getByRole('button', { name: /Start/ }).click()
+  const input = page.getByRole('textbox', { name: 'Romaji' })
+  const seen = new Set<string>()
+  for (let i = 0; i < 4; i++) {
+    const glyph = page.locator('.question .glyph')
+    seen.add(await glyph.evaluate((el) => (el as HTMLElement).style.fontFamily))
+    await input.pressSequentially(ROMAJI[(await glyph.textContent())!.trim()])
+    await expect(page.getByLabel('Score')).toHaveText(String(i + 1))
+  }
+  // Two fonts, never the same one twice in a row.
+  expect(seen.size).toBe(2)
+})
+
 test('on phones the sprint is answered with buttons', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'touch version')
   await page.goto('./#/sprint/katakana')
