@@ -1,9 +1,14 @@
 <script lang="ts">
   import { onDestroy, tick } from 'svelte'
   import { fly } from 'svelte/transition'
+  import FontGallery from '../components/FontGallery.svelte'
   import Hanko from '../components/Hanko.svelte'
   import Icon from '../components/Icon.svelte'
+  import KanaDetails from '../components/KanaDetails.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
+  import Modal from '../components/Modal.svelte'
+  import StrokeOrder from '../components/StrokeOrder.svelte'
+  import { FONTS } from '../lib/data/fonts'
   import { displayRomaji, glyph, type Kana, type Script } from '../lib/data/kana'
   import { logPractice } from '../lib/study/actions'
   import { kanaForAnswer } from '../lib/study/answer'
@@ -37,6 +42,12 @@
   let input = $state('')
   let score = $state(0)
   let mistakes = $state(0)
+  /** What went wrong this sprint, in order: the kana and the romaji that was typed or chosen. */
+  let missed = $state<{ kana: Kana; typed: string }[]>([])
+  let selected = $state<Kana | undefined>()
+  let strokesOpen = $state(false)
+  let fontsOpen = $state(false)
+  let fullEl = $state<HTMLDivElement>()
   let endsAt = 0
   let left = $state(SPRINT_MS)
   let reveal = $state<string | undefined>()
@@ -58,6 +69,8 @@
     await loadFontWithin(settings().font)
     score = 0
     mistakes = 0
+    missed = []
+    selected = undefined
     record = false
     endsAt = performance.now() + SPRINT_MS
     left = SPRINT_MS
@@ -78,7 +91,7 @@
     void tick().then(() => inputEl?.focus())
   }
 
-  function answer(correct: boolean, answered?: Kana) {
+  function answer(correct: boolean, answered?: Kana, typed = '') {
     if (!current || !script) return
     logPractice(store.data, {
       mode: 'sprint',
@@ -94,12 +107,13 @@
       show(nextSprintKana(pool, current))
     } else {
       mistakes++
+      missed.push({ kana: current, typed })
       endsAt -= PENALTY_MS
       reveal = displayRomaji(current, settings().romaji)
-      const missed = current
+      const wrong = current
       setTimeout(() => {
         reveal = undefined
-        if (phase === 'running' && current === missed) show(nextSprintKana(pool, missed))
+        if (phase === 'running' && current === wrong) show(nextSprintKana(pool, wrong))
       }, 800)
     }
   }
@@ -108,7 +122,7 @@
     if (!current || reveal) return
     const verdict = judge(input, current)
     if (verdict === 'correct') answer(true)
-    else if (verdict === 'wrong') answer(false, kanaForAnswer(input, pool))
+    else if (verdict === 'wrong') answer(false, kanaForAnswer(input, pool), input.trim())
   }
 
   function finish() {
@@ -120,8 +134,18 @@
     void audio.playSfx(record ? 'milestone' : 'complete')
   }
 
+  function select(k: Kana) {
+    selected = k
+    void audio.playVoice(k.id)
+    void tick().then(() => fullEl?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
+  }
+
   function onKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape') {
+    // Escape and Enter belong to an open dialog.
+    if (strokesOpen || fontsOpen) return
+    if (e.key === 'Escape' && selected) {
+      selected = undefined
+    } else if (e.key === 'Escape') {
       clearInterval(timer)
       navigate('/sprint')
     } else if (phase !== 'running' && e.key === 'Enter' && script) {
@@ -190,7 +214,7 @@
             <button
               class="btn option"
               disabled={!!reveal}
-              onclick={() => answer(o.id === current?.id, o)}
+              onclick={() => answer(o.id === current?.id, o, displayRomaji(o, settings().romaji))}
               >{displayRomaji(o, settings().romaji)}</button
             >
           {/each}
@@ -227,8 +251,77 @@
           <a class="btn" href="#/practice">{t('nav.practice')}</a>
         </div>
       </section>
+      {#if missed.length}
+        <section class="panel card" in:fly={{ y: 12, delay: 80 }}>
+          <h3>{t('sprint.reviewHeading')}</h3>
+          <p class="muted small">{t('sprint.reviewHint')}</p>
+          <ul class="missed">
+            {#each missed as m, i (i)}
+              <li>
+                <button
+                  class="miss"
+                  class:active={selected?.id === m.kana.id}
+                  aria-pressed={selected?.id === m.kana.id}
+                  aria-label={t('sprint.showCard', {
+                    kana: glyph(m.kana, script),
+                    romaji: displayRomaji(m.kana, settings().romaji),
+                  })}
+                  onclick={() =>
+                    selected?.id === m.kana.id ? (selected = undefined) : select(m.kana)}
+                >
+                  <KanaGlyph text={glyph(m.kana, script)} font={settings().font} size="2.4rem" />
+                </button>
+                <span class="answers">
+                  <span class="typed"
+                    ><span class="label muted">{t('sprint.typed')}</span>
+                    <s>{m.typed || '—'}</s></span
+                  >
+                  <span class="expected"
+                    ><span class="label muted">{t('sprint.expected')}</span>
+                    <strong>{displayRomaji(m.kana, settings().romaji)}</strong></span
+                  >
+                </span>
+              </li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
+      {#if selected}
+        <div class="card full" bind:this={fullEl}>
+          <KanaDetails
+            kana={selected}
+            onstrokes={() => (strokesOpen = true)}
+            onfonts={() => (fontsOpen = true)}
+            onclose={() => (selected = undefined)}
+          />
+        </div>
+      {/if}
     {/if}
   </div>
+{/if}
+
+{#if selected}
+  <Modal bind:open={strokesOpen} title={t('table.strokeOrder')}>
+    <div class="strokes">
+      {#if selected.hiragana}<StrokeOrder text={selected.hiragana} size={180} />{/if}
+      <StrokeOrder text={selected.katakana} size={180} />
+    </div>
+  </Modal>
+  <Modal bind:open={fontsOpen} title={t('table.fontGallery')} wide>
+    <FontGallery
+      text={selected.hiragana || selected.katakana}
+      fonts={FONTS.map((f) => f.id)}
+      current={settings().font}
+    />
+    {#if selected.hiragana}
+      <div style="height: 1rem"></div>
+      <FontGallery
+        text={selected.katakana}
+        fonts={FONTS.map((f) => f.id)}
+        current={settings().font}
+      />
+    {/if}
+  </Modal>
 {/if}
 
 <style>
@@ -369,5 +462,76 @@
   .row {
     display: flex;
     gap: 0.5rem;
+  }
+
+  .card h3 {
+    margin: 0;
+  }
+
+  .small {
+    font-size: 0.9rem;
+    margin: 0.2rem 0 0.8rem;
+  }
+
+  .missed {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .missed li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .miss {
+    width: 3.6rem;
+    height: 3.6rem;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ink) 4%, transparent);
+    cursor: pointer;
+    transition:
+      border-color 0.15s,
+      background 0.15s;
+  }
+
+  .miss:hover,
+  .miss.active {
+    border-color: var(--shu);
+    background: color-mix(in srgb, var(--shu) 10%, transparent);
+  }
+
+  .answers {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+  }
+
+  .label {
+    font-size: 0.75rem;
+  }
+
+  .typed s {
+    font-weight: 650;
+    color: var(--shu);
+  }
+
+  .full {
+    padding: 0;
+  }
+
+  .strokes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
   }
 </style>
