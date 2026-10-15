@@ -143,11 +143,6 @@ export default {
   'sprint.newRecord': 'Nieuw record! (was {previous})',
   'sprint.newRecordTitle': 'Nieuw record',
   'sprint.whichRomaji': 'Welke romaji?',
-  'sprint.reviewHeading': 'Je fouten',
-  'sprint.reviewHint': 'Tik op een kana om de hele kaart te zien.',
-  'sprint.typed': 'Jij typte',
-  'sprint.expected': 'Moet zijn',
-  'sprint.showCard': 'Toon de kaart van {kana} ({romaji})',
 
   // ── WritingPad component ─────────────────────────────────────────────────────
   'writingpad.areaLabel': 'Tekengebied: {count} {count|streek|streken} getekend',

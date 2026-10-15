@@ -35,4 +35,10 @@ export default {
   'grade.2': 'Hard',
   'grade.3': 'Good',
   'grade.4': 'Easy',
+  // MissedKana.svelte
+  'missed.heading': 'Your mistakes',
+  'missed.hint': 'Tap a kana to see its full card.',
+  'missed.typed': 'You typed',
+  'missed.expected': 'Should be',
+  'missed.showCard': 'Show the card for {kana} ({romaji})',
 } as const

@@ -87,7 +87,7 @@ test('a one-minute sprint counts correct answers and keeps the best score', asyn
   await input.pressSequentially('q')
   await page.clock.runFor(61_000)
   await expect(page.getByRole('heading', { name: '3 kana in one minute' })).toBeVisible()
-  const missed = page.locator('.missed li')
+  const missed = page.locator('.review li')
   await expect(missed).toHaveCount(1)
   await expect(missed.locator('.wrong')).toHaveText('q')
   await expect(missed.locator('strong')).toHaveText(ROMAJI[wrong])

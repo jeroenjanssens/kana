@@ -36,4 +36,10 @@ export default {
   'grade.2': 'Moeilijk',
   'grade.3': 'Goed',
   'grade.4': 'Makkelijk',
+  // MissedKana.svelte
+  'missed.heading': 'Je fouten',
+  'missed.hint': 'Tik op een kana om de hele kaart te zien.',
+  'missed.typed': 'Jij typte',
+  'missed.expected': 'Moet zijn',
+  'missed.showCard': 'Toon de kaart van {kana} ({romaji})',
 } satisfies Record<keyof typeof en, string>

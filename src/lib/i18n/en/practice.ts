@@ -141,11 +141,6 @@ export default {
   'sprint.newRecord': 'New record! (was {previous})',
   'sprint.newRecordTitle': 'New record',
   'sprint.whichRomaji': 'Which romaji?',
-  'sprint.reviewHeading': 'Your mistakes',
-  'sprint.reviewHint': 'Tap a kana to see its full card.',
-  'sprint.typed': 'You typed',
-  'sprint.expected': 'Should be',
-  'sprint.showCard': 'Show the card for {kana} ({romaji})',
 
   // ── WritingPad component ─────────────────────────────────────────────────────
   'writingpad.areaLabel': 'Drawing area: {count} {count|stroke|strokes} drawn',

@@ -109,6 +109,23 @@ test('in-order mode can shuffle the chosen rows', async ({ page }) => {
   expect(seen).not.toEqual(table)
 })
 
+test('in-order mode ends with an overview of the missed kana', async ({ page }) => {
+  await page.goto('./#/study/katakana?mode=order&ids=shi,tsu,so,n')
+  for (const knew of [false, true, false, true]) {
+    await page.getByRole('button', { name: /Show answer/ }).click()
+    await page.getByRole('button', { name: knew ? /Got it/ : /Missed/ }).click()
+  }
+  await expect(page.getByRole('heading', { name: 'Session complete' })).toBeVisible()
+  const missed = page.locator('.review li')
+  await expect(missed).toHaveCount(2)
+  await expect(missed).toHaveText(['シ shi', 'ソ so'])
+  await missed.first().getByRole('button').click()
+  await expect(page.locator('article.details')).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('article.details')).toBeHidden()
+  await expect(page.getByRole('heading', { name: 'Session complete' })).toBeVisible()
+})
+
 test('in-order mode can start from a list of ids', async ({ page }) => {
   await page.goto('./#/study/katakana?mode=order&ids=shi,tsu,so,n')
   await expect(page.getByText('1 / 4')).toBeVisible()

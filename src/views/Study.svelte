@@ -5,6 +5,7 @@
   import FontGallery from '../components/FontGallery.svelte'
   import KanaIntro from '../components/KanaIntro.svelte'
   import Icon from '../components/Icon.svelte'
+  import MissedKana from '../components/MissedKana.svelte'
   import Modal from '../components/Modal.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import type { VoiceId } from '../lib/audio/voices'
@@ -87,6 +88,9 @@
   let orderList = $state<Kana[]>([])
   let orderIndex = $state(0)
   let pass = $state(1)
+  /** Kana missed in order mode, in order, with what was typed when answering by typing. */
+  let missed = $state<{ kana: Kana; text: string; typed?: string }[]>([])
+  let review = $state<MissedKana>()
   let loop = $state(route.query.loop === '1')
   let shuffled = $state(route.query.shuffle === '1')
   const groupsWithRows: KanaGroup[] = (
@@ -141,6 +145,7 @@
     orderList = shuffled ? shuffle(list) : list
     orderIndex = 0
     pass = 1
+    missed = []
     phase = 'card'
     if (!list.length) {
       phase = 'setup'
@@ -323,6 +328,7 @@
     })
     answered++
     if (correct) correctCount++
+    else missed.push({ kana: current, text: frontOf(current), typed: verdict?.typed })
     feedback(grade)
   }
 
@@ -365,6 +371,7 @@
   }
 
   function onKeydown(e: KeyboardEvent) {
+    if (phase === 'done' && review?.handleKey(e)) return
     const isUndo =
       (e.key === 'z' && (e.metaKey || e.ctrlKey)) || (e.key === 'u' && !e.metaKey && !e.ctrlKey)
     if (
@@ -703,6 +710,7 @@
         <a class="btn" href="#/practice">{t('study.done.practice')}</a>
       </div>
     </section>
+    <MissedKana bind:this={review} {missed} width="720px" />
   {/if}
 </div>
 
