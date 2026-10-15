@@ -15,10 +15,13 @@
   let {
     missed,
     width = '520px',
+    typedLabel,
   }: {
     /** `text` is how the kana was shown; `typed` what was typed instead, if anything. */
     missed: { kana: Kana; text: string; typed?: string }[]
     width?: string
+    /** Instead of "You typed", e.g. "Sounded like" for speaking. */
+    typedLabel?: string
   } = $props()
 
   let selected = $state<Kana | undefined>()
@@ -78,7 +81,7 @@
             <span class="answers">
               {#if m.typed !== undefined}
                 <span
-                  ><span class="label muted">{t('missed.typed')}</span>
+                  ><span class="label muted">{typedLabel ?? t('missed.typed')}</span>
                   <span class="wrong">{m.typed || '—'}</span></span
                 >
                 <span

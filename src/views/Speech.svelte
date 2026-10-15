@@ -1,7 +1,12 @@
 <script lang="ts">
+  import '../lib/i18n/speech'
   import { onDestroy } from 'svelte'
   import Icon from '../components/Icon.svelte'
   import RecordCompare from '../components/RecordCompare.svelte'
+  import SayButton from '../components/SayButton.svelte'
+  import { SOUND_CLASSES, soundOf } from '../lib/speech/classes'
+  import { judge } from '../lib/speech/judge'
+  import type { KanaResult } from '../lib/speech/recognize'
   import { recordingSupported } from '../lib/audio/recorder'
   import {
     SpeechError,
@@ -27,6 +32,8 @@
     text: string
     romaji: string
     play: () => Promise<void>
+    /** The kana's sound class, for the offline model (single kana only). */
+    sound?: string
   }
 
   const canListen = speechRecognitionSupported()
@@ -38,6 +45,7 @@
     text: k.hiragana,
     romaji: k.romaji,
     play: () => audio.playVoice(k.id),
+    sound: soundOf(k),
   }))
 
   function someWords(): Target[] {
@@ -51,7 +59,7 @@
   let listening = $state(false)
   let live = $state<Heard[]>([])
   let stop: (() => void) | undefined
-  let attempts = $state<{ target: string; heard: Heard[]; match: boolean }[]>([])
+  let attempts = $state<{ target: string; heard: Heard[]; match: boolean; offline?: boolean }[]>([])
   let error = $state<SpeechErrorCode | undefined>()
 
   onDestroy(() => stop?.())
@@ -85,6 +93,20 @@
       live = []
       stop = undefined
     }
+  }
+
+  /** The offline model's guesses, shown like the browser's: written kana and probability. */
+  function heardOffline(result: KanaResult) {
+    const sound = target.sound
+    if (!sound) return
+    const v = judge(result, sound)
+    const heard = v.nothing
+      ? []
+      : v.heard.map((g) => ({
+          transcript: kanaById(SOUND_CLASSES.find((c) => c.id === g.sound)!.kana[0]).hiragana,
+          confidence: g.p,
+        }))
+    attempts = [{ target: target.text, heard, match: v.correct, offline: true }, ...attempts]
   }
 
   function pick(next: Target) {
@@ -170,6 +192,21 @@
       {#if error}<p class="error" role="alert">{t(ERROR_KEY[error])}</p>{/if}
     {/if}
 
+    <div class="offline">
+      <h3>{t('speech.offlineHeading')}</h3>
+      <p class="muted small">{t('speech.offlineDesc')}</p>
+      {#if target.sound}
+        {#key target.text}
+          <SayButton
+            label={t('speech.offlineSay', { text: target.text })}
+            onresult={heardOffline}
+          />
+        {/key}
+      {:else}
+        <p class="muted small">{t('speech.offlineKanaOnly')}</p>
+      {/if}
+    </div>
+
     {#key target.text}
       <div class="record">
         <span class="muted small">{t('speech.recordHint')}</span>
@@ -185,6 +222,9 @@
         {#each attempts as a, i (attempts.length - i)}
           <li>
             <span class="said" lang="ja">{a.target}</span>
+            <span class="source"
+              >{a.offline ? t('speech.sourceOffline') : t('speech.sourceBrowser')}</span
+            >
             <span class="verdict" class:match={a.match}
               >{a.match ? t('speech.match') : t('speech.noMatch')}</span
             >
@@ -352,6 +392,33 @@
     font-family: var(--font-kana);
     font-size: 1.4rem;
     margin-right: 0.5rem;
+  }
+
+  .offline {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .offline h3 {
+    margin: 0;
+    font-size: 1rem;
+  }
+
+  .offline p {
+    margin: 0;
+  }
+
+  .source {
+    margin-right: 0.5rem;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
   }
 
   .verdict {

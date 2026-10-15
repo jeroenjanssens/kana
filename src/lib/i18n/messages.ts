@@ -15,6 +15,7 @@ import enSettings from './en/settings'
 import nlSettings from './nl/settings'
 import enMisc from './en/misc'
 import nlMisc from './nl/misc'
+import type enSpeech from './en/speech'
 
 /**
  * All interface text. Each area has an English file (the source of truth) and a Dutch file that
@@ -31,9 +32,14 @@ export const en = {
   ...enMisc,
 }
 
-export type MessageKey = keyof typeof en
+/** Every message, including the ones loaded later with the features that use them. */
+export type MessageKey = keyof typeof en | keyof typeof enSpeech
 
-export const messages: Record<Lang, Record<MessageKey, string>> = {
+/**
+ * The messages loaded so far. Texts used only by features that are loaded on demand (speaking)
+ * come with those features, through `addMessages`, to keep the first load small.
+ */
+export const messages: Record<Lang, Partial<Record<MessageKey, string>>> = {
   en,
   nl: {
     ...nlCommon,
@@ -45,4 +51,9 @@ export const messages: Record<Lang, Record<MessageKey, string>> = {
     ...nlSettings,
     ...nlMisc,
   },
+}
+
+/** Add messages that come with a feature loaded on demand (see src/lib/i18n/speech.ts). */
+export function addMessages(extra: Record<Lang, Partial<Record<MessageKey, string>>>): void {
+  for (const lang of Object.keys(extra) as Lang[]) Object.assign(messages[lang], extra[lang])
 }

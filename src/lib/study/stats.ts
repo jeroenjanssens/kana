@@ -198,11 +198,11 @@ export function confusions(log: readonly ReviewEntry[], n = 10): Confusion[] {
 }
 
 /**
- * Introductions and tracing (with the strokes shown) are activity, but not answers: they don't
- * count towards accuracy.
+ * Introductions, tracing (with the strokes shown) and speaking (judged by a model that can be
+ * wrong) are activity, but not answers: they don't count towards accuracy.
  */
 export function isAnswer(e: ReviewEntry): boolean {
-  return e.mode !== 'intro' && e.mode !== 'trace'
+  return e.mode !== 'intro' && e.mode !== 'trace' && e.mode !== 'speak'
 }
 
 export function totalAnswers(log: readonly ReviewEntry[]): { total: number; correct: number } {

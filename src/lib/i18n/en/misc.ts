@@ -9,6 +9,10 @@ export default {
   'misc.femaleVoice': 'female voice',
   'misc.maleVoice': 'male voice',
   'misc.terms': 'terms',
+  'misc.speechModelHeading': 'Speech model',
+  'misc.speechModelTrained': 'The "Say it" speech model learned from speech generated with',
+  'misc.speechModelVoices':
+    'by these voices, whose terms allow it. Only the trained model is included, not the speech.',
   'misc.strokeOrderHeading': 'Stroke order',
   'misc.strokeDataFrom': 'Stroke data from',
   'misc.byContributors': 'by Ulrich Apel and contributors, licensed under',

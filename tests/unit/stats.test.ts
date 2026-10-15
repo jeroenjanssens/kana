@@ -154,4 +154,6 @@ test('tracing over a guide is activity, not an answer', () => {
   const traced = entry(0, { mode: 'trace', deck: 'write-hiragana' })
   expect(totalAnswers([entry(0, { correct: false }), traced])).toEqual({ total: 1, correct: 0 })
   expect(dailyCounts([traced]).size).toBe(1)
+  const spoken = entry(0, { mode: 'speak', deck: 'hiragana' })
+  expect(totalAnswers([spoken])).toEqual({ total: 0, correct: 0 })
 })

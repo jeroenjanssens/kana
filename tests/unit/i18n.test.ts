@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { format, placeholders, resolveLang } from '../../src/lib/i18n/format'
 import { messages } from '../../src/lib/i18n/messages'
+import '../../src/lib/i18n/speech'
 
 describe('format', () => {
   test('fills in placeholders', () => {
@@ -31,7 +32,7 @@ describe('translations', () => {
     for (const [key, english] of Object.entries(messages.en)) {
       const dutch = messages.nl[key as keyof typeof messages.nl]
       expect(dutch, key).toBeTruthy()
-      expect(placeholders(dutch), key).toEqual(placeholders(english))
+      expect(placeholders(dutch!), key).toEqual(placeholders(english!))
     }
     expect(Object.keys(messages.nl).sort()).toEqual(Object.keys(messages.en).sort())
   })

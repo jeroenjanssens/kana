@@ -12,5 +12,5 @@ export function lang(): Lang {
 
 /** Translate a message, filling in `{placeholders}`. */
 export function t(key: MessageKey, params?: Params): string {
-  return format(messages[lang()][key] ?? messages.en[key], params)
+  return format(messages[lang()][key] ?? messages.en[key] ?? key, params)
 }

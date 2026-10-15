@@ -67,6 +67,12 @@ export default defineConfig({
             },
           },
           {
+            // The speech model is downloaded on first use, then kept for offline use.
+            urlPattern: ({ url }) => url.pathname.startsWith(`${BASE}models/`),
+            handler: 'CacheFirst',
+            options: { cacheName: 'kana-speech-model', expiration: { maxEntries: 4 } },
+          },
+          {
             // Photos are large, so only the ones you have seen are kept for offline use.
             urlPattern: ({ url }) => url.pathname.startsWith(`${BASE}photos/`),
             handler: 'CacheFirst',

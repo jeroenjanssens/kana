@@ -10,6 +10,17 @@ Pronunciation audio — public/audio/
   Male voice:   VOICEVOX:青山龍星 (terms: https://www.virvoxproject.com/voicevoxの利用規約)
   Voice details: public/audio/SOURCES.json
 
+Speech model — public/models/
+  Trained (ml/) on speech generated with VOICEVOX (https://voicevox.hiroshiba.jp), from the
+  voices whose terms allow it (see ml/VOICES.md for the check and the terms of each):
+  VOICEVOX:四国めたん, VOICEVOX:ずんだもん, VOICEVOX:春日部つむぎ, VOICEVOX:雨晴はう,
+  VOICEVOX:波音リツ, VOICEVOX:冥鳴ひまり, VOICEVOX:九州そら, VOICEVOX:剣崎雌雄, VOICEVOX:No.7,
+  VOICEVOX:櫻歌ミコ, VOICEVOX:小夜/SAYO, VOICEVOX:†聖騎士 紅桜†, VOICEVOX:春歌ナナ,
+  VOICEVOX:中国うさぎ, VOICEVOX:栗田まろん, VOICEVOX:あいえるたん, VOICEVOX:満別花丸,
+  VOICEVOX:中部つるぎ, VOICEVOX:ユーレイちゃん, VOICEVOX:東北ずん子, VOICEVOX:東北きりたん,
+  VOICEVOX:東北イタコ, VOICEVOX:あんこもん, VOICEVOX:夜語トバリ, VOICEVOX:暁記ミタマ.
+  Only the trained weights are included, not the generated speech.
+
 Stroke-order data — src/lib/data/kanjivg/
   Derived from KanjiVG (https://kanjivg.tagaini.net), copyright (C) Ulrich Apel
   and contributors. Licensed under CC BY-SA 3.0

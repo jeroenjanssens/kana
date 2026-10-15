@@ -1,4 +1,5 @@
 <script lang="ts">
+  import '../lib/i18n/speech'
   import { onDestroy } from 'svelte'
   import { recordingSupported, startRecording } from '../lib/audio/recorder'
   import { audio } from '../state/app.svelte'

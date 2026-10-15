@@ -10,6 +10,10 @@ export default {
   'misc.femaleVoice': 'vrouwelijke stem',
   'misc.maleVoice': 'mannelijke stem',
   'misc.terms': 'voorwaarden',
+  'misc.speechModelHeading': 'Spraakmodel',
+  'misc.speechModelTrained': 'Het spraakmodel van "Zeg het" leerde van spraak gemaakt met',
+  'misc.speechModelVoices':
+    'door deze stemmen, waarvan de voorwaarden dat toestaan. Alleen het getrainde model zit in de app, niet de spraak.',
   'misc.strokeOrderHeading': 'Pennenstreken',
   'misc.strokeDataFrom': 'Pennenstreepgegevens van',
   'misc.byContributors': 'door Ulrich Apel en bijdragers, gelicentieerd onder',

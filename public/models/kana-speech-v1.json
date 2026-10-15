@@ -1,0 +1,493 @@
+{
+ "version": "v1",
+ "classes": [
+  "a",
+  "i",
+  "u",
+  "e",
+  "o",
+  "ka",
+  "ki",
+  "ku",
+  "ke",
+  "ko",
+  "sa",
+  "shi",
+  "su",
+  "se",
+  "so",
+  "ta",
+  "chi",
+  "tsu",
+  "te",
+  "to",
+  "na",
+  "ni",
+  "nu",
+  "ne",
+  "no",
+  "ha",
+  "hi",
+  "fu",
+  "he",
+  "ho",
+  "ma",
+  "mi",
+  "mu",
+  "me",
+  "mo",
+  "ya",
+  "yu",
+  "yo",
+  "ra",
+  "ri",
+  "ru",
+  "re",
+  "ro",
+  "wa",
+  "n",
+  "ga",
+  "gi",
+  "gu",
+  "ge",
+  "go",
+  "za",
+  "ji",
+  "zu",
+  "ze",
+  "zo",
+  "da",
+  "de",
+  "do",
+  "ba",
+  "bi",
+  "bu",
+  "be",
+  "bo",
+  "pa",
+  "pi",
+  "pu",
+  "pe",
+  "po",
+  "kya",
+  "kyu",
+  "kyo",
+  "sha",
+  "shu",
+  "sho",
+  "cha",
+  "chu",
+  "cho",
+  "nya",
+  "nyu",
+  "nyo",
+  "hya",
+  "hyu",
+  "hyo",
+  "mya",
+  "myu",
+  "myo",
+  "rya",
+  "ryu",
+  "ryo",
+  "gya",
+  "gyu",
+  "gyo",
+  "ja",
+  "ju",
+  "jo",
+  "bya",
+  "byu",
+  "byo",
+  "pya",
+  "pyu",
+  "pyo",
+  "_"
+ ],
+ "temperature": 0.9432289600372314,
+ "features": {
+  "sampleRate": 16000,
+  "window": 16000,
+  "frame": 400,
+  "hop": 160,
+  "nFft": 512,
+  "nMels": 40,
+  "fMin": 60.0,
+  "fMax": 7600.0,
+  "eps": 1e-06
+ },
+ "network": {
+  "classes": 102,
+  "channels": 192,
+  "blocks": 6,
+  "time_stride": 1,
+  "pool": "meanmax",
+  "tensors": [
+   {
+    "name": "conv.w",
+    "type": "int8",
+    "shape": [
+     192,
+     1,
+     10,
+     4
+    ],
+    "offset": 0
+   },
+   {
+    "name": "conv.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 7680
+   },
+   {
+    "name": "conv.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 8448
+   },
+   {
+    "name": "blocks.0.dw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     3,
+     3
+    ],
+    "offset": 9216
+   },
+   {
+    "name": "blocks.0.dw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 10944
+   },
+   {
+    "name": "blocks.0.dw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 11712
+   },
+   {
+    "name": "blocks.0.pw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     192
+    ],
+    "offset": 12480
+   },
+   {
+    "name": "blocks.0.pw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 49344
+   },
+   {
+    "name": "blocks.0.pw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 50112
+   },
+   {
+    "name": "blocks.1.dw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     3,
+     3
+    ],
+    "offset": 50880
+   },
+   {
+    "name": "blocks.1.dw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 52608
+   },
+   {
+    "name": "blocks.1.dw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 53376
+   },
+   {
+    "name": "blocks.1.pw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     192
+    ],
+    "offset": 54144
+   },
+   {
+    "name": "blocks.1.pw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 91008
+   },
+   {
+    "name": "blocks.1.pw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 91776
+   },
+   {
+    "name": "blocks.2.dw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     3,
+     3
+    ],
+    "offset": 92544
+   },
+   {
+    "name": "blocks.2.dw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 94272
+   },
+   {
+    "name": "blocks.2.dw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 95040
+   },
+   {
+    "name": "blocks.2.pw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     192
+    ],
+    "offset": 95808
+   },
+   {
+    "name": "blocks.2.pw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 132672
+   },
+   {
+    "name": "blocks.2.pw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 133440
+   },
+   {
+    "name": "blocks.3.dw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     3,
+     3
+    ],
+    "offset": 134208
+   },
+   {
+    "name": "blocks.3.dw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 135936
+   },
+   {
+    "name": "blocks.3.dw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 136704
+   },
+   {
+    "name": "blocks.3.pw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     192
+    ],
+    "offset": 137472
+   },
+   {
+    "name": "blocks.3.pw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 174336
+   },
+   {
+    "name": "blocks.3.pw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 175104
+   },
+   {
+    "name": "blocks.4.dw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     3,
+     3
+    ],
+    "offset": 175872
+   },
+   {
+    "name": "blocks.4.dw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 177600
+   },
+   {
+    "name": "blocks.4.dw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 178368
+   },
+   {
+    "name": "blocks.4.pw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     192
+    ],
+    "offset": 179136
+   },
+   {
+    "name": "blocks.4.pw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 216000
+   },
+   {
+    "name": "blocks.4.pw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 216768
+   },
+   {
+    "name": "blocks.5.dw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     3,
+     3
+    ],
+    "offset": 217536
+   },
+   {
+    "name": "blocks.5.dw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 219264
+   },
+   {
+    "name": "blocks.5.dw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 220032
+   },
+   {
+    "name": "blocks.5.pw.w",
+    "type": "int8",
+    "shape": [
+     192,
+     192
+    ],
+    "offset": 220800
+   },
+   {
+    "name": "blocks.5.pw.scale",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 257664
+   },
+   {
+    "name": "blocks.5.pw.b",
+    "type": "float32",
+    "shape": [
+     192
+    ],
+    "offset": 258432
+   },
+   {
+    "name": "fc.w",
+    "type": "int8",
+    "shape": [
+     102,
+     384
+    ],
+    "offset": 259200
+   },
+   {
+    "name": "fc.scale",
+    "type": "float32",
+    "shape": [
+     102
+    ],
+    "offset": 298368
+   },
+   {
+    "name": "fc.b",
+    "type": "float32",
+    "shape": [
+     102
+    ],
+    "offset": 298776
+   }
+  ]
+ },
+ "metrics": {
+  "top1": 0.4477,
+  "top3": 0.7107,
+  "clean_top1": 0.5244,
+  "noise_rejected": 0.8483,
+  "go": false
+ }
+}

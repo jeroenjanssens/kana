@@ -22,6 +22,11 @@ stroke-order animations and flashcards that look like ink on washi paper.
   shown over the kana after the answer (or always, or never).
 - **Writing practice**: see the romaji and draw the kana; stroke count, order and direction are
   checked stroke by stroke. Or choose the right kana from look-alikes.
+- **Tracing**: write each kana over a faint guide with numbered strokes and starting dots, with a
+  score for how closely you followed it.
+- **Say it** (experimental): say a kana out loud and a small speech model, trained for this app
+  on VOICEVOX voices and running offline on your device, tells you what it heard. Plus a speech
+  test page and record & compare on every kana card.
 - **In-order mode** to go through rows one by one without touching your schedule.
 - **Kana table** with separate or combined layouts, a romaji toggle, click-to-hear, memory hints
   and a mastery overlay that shows how well you know each kana.
@@ -68,8 +73,14 @@ src/
   components/ reusable UI (paper card, stroke order, font gallery, charts, …)
   views/      one component per page
 scripts/      asset pipelines (audio, fonts, photos, sound effects, stroke data, icons)
+ml/           the speech model: training data, training and export (Python, uv)
 tests/        unit/ (Vitest) and e2e/ (Playwright)
 ```
+
+The speech model is trained in `ml/` (see
+[docs/plan-kana-speech-model.md](docs/plan-kana-speech-model.md) and `ml/VOICES.md`): `just
+ml-engines`, `just ml-data`, `just ml-train`, `just ml-eval` and `just ml-export`. It needs
+Python with [uv](https://docs.astral.sh/uv/) and Docker for VOICEVOX.
 
 Pushing to `main` runs the full test suite and deploys to GitHub Pages.
 
@@ -79,7 +90,8 @@ See [PLAN.md](PLAN.md) for the design and decisions.
 
 kana builds on the generous work of others — see [NOTICE](NOTICE) and the in-app credits page:
 memory hints and drawings from Tofugu's Learn Hiragana and Learn Katakana books, pronunciation
-generated with VOICEVOX (VOICEVOX:春日部つむぎ, VOICEVOX:青山龍星), stroke data from
+generated with VOICEVOX (VOICEVOX:春日部つむぎ, VOICEVOX:青山龍星), a speech model trained on
+25 VOICEVOX voices (listed in NOTICE), stroke data from
 KanjiVG (CC BY-SA 3.0), fonts from Google Fonts (OFL), photos from Unsplash, and sound effects
 from Freesound (CC0) and a koto recording by Torsodog (Wikimedia Commons, CC BY 3.0).
 

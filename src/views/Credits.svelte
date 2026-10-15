@@ -10,11 +10,17 @@
   >([])
 
   let voices = $state<{ id: string; credit: string; terms: string }[]>([])
+  /** The voices the speech model learned from (see ml/VOICES.md). */
+  let trainingVoices = $state<{ credit: string; terms: string }[]>([])
 
   $effect(() => {
     fetch(`${base}audio/SOURCES.json`)
       .then((r) => r.json())
       .then((s) => (voices = Object.values(s.voices)))
+      .catch(() => {})
+    fetch(`${base}models/credits.json`)
+      .then((r) => r.json())
+      .then((v) => (trainingVoices = v))
       .catch(() => {})
     fetch(`${base}photos/credits.json`)
       .then((r) => r.json())
@@ -47,6 +53,25 @@
           <span class="muted"
             >· {v.id === 'female' ? t('misc.femaleVoice') : t('misc.maleVoice')} ·
             <a href={v.terms} target="_blank" rel="noopener">{t('misc.terms')}</a></span
+          >
+        </li>
+      {/each}
+    </ul>
+  </section>
+
+  <section class="panel block">
+    <h2>{t('misc.speechModelHeading')}</h2>
+    <p>
+      {t('misc.speechModelTrained')}
+      <a href="https://voicevox.hiroshiba.jp" target="_blank" rel="noopener">VOICEVOX</a>
+      {t('misc.speechModelVoices')}
+    </p>
+    <ul class="list voices">
+      {#each trainingVoices as v (v.credit)}
+        <li>
+          {v.credit}
+          <span class="muted"
+            >· <a href={v.terms} target="_blank" rel="noopener">{t('misc.terms')}</a></span
           >
         </li>
       {/each}

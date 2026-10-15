@@ -59,6 +59,11 @@
       {words ? t('practice.readingUnlocked', { count: words }) : t('practice.readingHint')}
     </p>
   </a>
+  <a class="card panel" href="#/speak">
+    <span class="art" lang="ja">いう</span>
+    <h2>{t('practice.speakHeading')}</h2>
+    <p>{t('practice.speakDesc')}</p>
+  </a>
   <a class="card panel" href="#/speech">
     <span class="art"><Icon name="mic" size={40} /></span>
     <h2>{t('practice.speechHeading')}</h2>
