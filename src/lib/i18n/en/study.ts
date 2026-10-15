@@ -9,10 +9,11 @@ export default {
   // Study.svelte — setup phase
   'study.setup.title': 'Study in order',
   'study.setup.desc':
-    "Go through the kana one by one, in table order. This doesn't affect your spaced-repetition schedule.",
+    "Go through the kana one by one, in table order or shuffled. This doesn't affect your spaced-repetition schedule.",
   'study.setup.selectAll': 'Select all',
   'study.setup.clear': 'Clear',
   'study.setup.loop': 'Loop',
+  'study.setup.shuffle': 'Shuffle',
   'study.setup.start': 'Start · {count} kana',
   // Study.svelte — card controls
   'study.card.showAnswer': 'Show answer',

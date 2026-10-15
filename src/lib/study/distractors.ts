@@ -1,4 +1,5 @@
 import type { Kana } from '../data/kana'
+import { shuffle } from '../ui/random'
 
 /** Sounds that learners commonly mix up by ear. */
 const SOUND_ALIKES: string[][] = [
@@ -29,15 +30,6 @@ const VOWEL = /([aiueo])$/
 
 function vowelOf(k: Kana): string | undefined {
   return k.romaji === 'n' ? undefined : VOWEL.exec(k.romaji)?.[1]
-}
-
-function shuffle<T>(items: T[], rand: () => number): T[] {
-  const a = [...items]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
 }
 
 export interface DistractorOptions {

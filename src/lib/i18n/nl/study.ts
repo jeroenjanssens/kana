@@ -10,10 +10,11 @@ export default {
   // Study.svelte — setup phase
   'study.setup.title': 'Op volgorde studeren',
   'study.setup.desc':
-    'Loop de kana één voor één door in tabelvolgorde. Dit heeft geen invloed op je schema voor gespreide herhaling.',
+    'Loop de kana één voor één door, in tabelvolgorde of gehusseld. Dit heeft geen invloed op je schema voor gespreide herhaling.',
   'study.setup.selectAll': 'Alles selecteren',
   'study.setup.clear': 'Wissen',
   'study.setup.loop': 'Herhalen',
+  'study.setup.shuffle': 'Husselen',
   'study.setup.start': 'Start · {count} kana',
   // Study.svelte — card controls
   'study.card.showAnswer': 'Antwoord tonen',

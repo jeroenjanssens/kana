@@ -23,6 +23,7 @@
   import { checkKana, kanaForAnswer, suggestGrade } from '../lib/study/answer'
   import { DECK_INFO, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
+  import { shuffle } from '../lib/ui/random'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { cardDone } from '../state/photos.svelte'
@@ -87,6 +88,7 @@
   let orderIndex = $state(0)
   let pass = $state(1)
   let loop = $state(route.query.loop === '1')
+  let shuffled = $state(route.query.shuffle === '1')
   const groupsWithRows: KanaGroup[] = (
     ['basic', 'dakuten', 'yoon', 'extended'] as KanaGroup[]
   ).filter((g) => s.groups.includes(g))
@@ -136,7 +138,7 @@
   }
 
   function startOrder(list: Kana[]) {
-    orderList = list
+    orderList = shuffled ? shuffle(list) : list
     orderIndex = 0
     pass = 1
     phase = 'card'
@@ -144,7 +146,7 @@
       phase = 'setup'
       return
     }
-    void show(list[0], false)
+    void show(orderList[0], false)
   }
 
   function startOrderFromRows() {
@@ -337,6 +339,12 @@
       if (!loop) return finish()
       next = 0
       pass++
+      // Each pass gets a new order, without starting on the card that just ended the last one.
+      if (shuffled && orderList.length > 1) {
+        const last = orderList[orderIndex]
+        do orderList = shuffle(orderList)
+        while (orderList[0] === last)
+      }
     }
     if (next < 0) next = 0
     if (delta > 0 && flipped) viewed++
@@ -523,6 +531,12 @@
         >
         <label class="switch inline"
           ><span>{t('study.setup.loop')}</span><input type="checkbox" bind:checked={loop} /></label
+        >
+        <label class="switch inline"
+          ><span>{t('study.setup.shuffle')}</span><input
+            type="checkbox"
+            bind:checked={shuffled}
+          /></label
         >
         <button class="btn primary" disabled={!selectedRows.length} onclick={startOrderFromRows}>
           {t('study.setup.start', {

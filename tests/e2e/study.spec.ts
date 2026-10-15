@@ -94,6 +94,21 @@ test('in-order mode: choose rows and step through', async ({ page }) => {
   errors.check()
 })
 
+test('in-order mode can shuffle the chosen rows', async ({ page }) => {
+  await page.goto('./#/study/hiragana?mode=order')
+  await page.getByRole('checkbox', { name: 'Shuffle' }).check()
+  await page.getByRole('button', { name: /Start · 10 kana/ }).click()
+  const seen: string[] = []
+  for (let i = 1; i <= 10; i++) {
+    await expect(page.getByText(`${i} / 10`)).toBeVisible()
+    seen.push((await page.locator('.glyph').first().textContent())!.trim())
+    await page.keyboard.press('ArrowRight')
+  }
+  const table = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ']
+  expect([...seen].sort()).toEqual([...table].sort())
+  expect(seen).not.toEqual(table)
+})
+
 test('in-order mode can start from a list of ids', async ({ page }) => {
   await page.goto('./#/study/katakana?mode=order&ids=shi,tsu,so,n')
   await expect(page.getByText('1 / 4')).toBeVisible()
