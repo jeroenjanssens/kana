@@ -152,10 +152,26 @@ export class AudioEngine {
     return this.playClip(wordAudioPath(voice, index))
   }
 
+  /** Play a recording (e.g. of yourself) on the voice channel. Resolves when playback ends. */
+  async playRecording(clip: Blob): Promise<void> {
+    if (this.settings.silent || this.settings.voiceVolume <= 0) return
+    this.unlock()
+    const ctx = this.ensure()
+    if (!ctx) return
+    try {
+      await this.playBuffer(await ctx.decodeAudioData(await clip.arrayBuffer()))
+    } catch {
+      // A clip the browser can't decode: nothing to play.
+    }
+  }
+
   private async playClip(path: string): Promise<void> {
     if (this.settings.silent || this.settings.voiceVolume <= 0) return
     this.unlock()
-    const buffer = await this.load(path)
+    await this.playBuffer(await this.load(path))
+  }
+
+  private async playBuffer(buffer: AudioBuffer | undefined): Promise<void> {
     const ctx = this.ctx
     if (!buffer || !ctx || !this.voiceBus) return
     this.currentVoice?.stop()

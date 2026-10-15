@@ -29,6 +29,8 @@
     keyboard: 'M3 6h18v12H3zM7 10h.01M11 10h.01M15 10h.01M7 14h10',
     image: 'M3 5h18v14H3zM3 16l5-5 5 5 3-3 5 5M15 9h.01',
     sparkle: 'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z',
+    mic: 'M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3M8 21h8',
+    stop: 'M7 7h10v10H7z',
   } as const
   export type IconName = keyof typeof PATHS
 </script>

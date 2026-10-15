@@ -18,6 +18,9 @@ export default {
   'practice.traceHeading': 'Overtrekken',
   'practice.traceDesc':
     'Trek kana streek voor streek over een vage hulplijn, zodat je de vormen in je vingers krijgt.',
+  'practice.speechHeading': 'Spreken (test)',
+  'practice.speechDesc':
+    'Spreek kana en woorden hardop uit: zie wat spraakherkenning hoort, of neem jezelf op en vergelijk.',
   'practice.sprintHeading': 'Sprint van een minuut',
   'practice.sprintDesc': 'Lees in 60 seconden zoveel kana als je kunt, en verbeter je beste score.',
   'practice.readingHeading': 'Leesoefening',
@@ -170,4 +173,48 @@ export default {
   'writingpad.undoStroke': 'Streek ongedaan maken',
   'writingpad.clear': 'Wissen',
   'writingpad.clearLabel': 'Tekening wissen',
+
+  // ── Speech view and record & compare ────────────────────────────────────────────
+  'speech.eyebrow': '話す · Spreken',
+  'speech.heading': 'Spreken (test)',
+  'speech.lead':
+    'Zeg een kana of woord en zie precies wat de spraakherkenning van je browser hoorde. Dit is een test om uit te vinden hoe goed het werkt op je apparaat. Je kunt jezelf ook opnemen en vergelijken met de stem van de app.',
+  'speech.statusHeading': 'Op dit apparaat',
+  'speech.recognitionYes': 'Spraakherkenning is beschikbaar',
+  'speech.recognitionNo':
+    'Spraakherkenning is niet beschikbaar in deze browser. Probeer Safari of Chrome.',
+  'speech.recordingYes': 'Opnemen is beschikbaar',
+  'speech.recordingNo': 'Opnemen is niet beschikbaar in deze browser',
+  'speech.privacy':
+    'Om spraak te herkennen stuurt je browser je stem naar Apple (Safari) of Google (Chrome). Opnames om te vergelijken blijven op dit apparaat en worden nooit bewaard.',
+  'speech.tryHeading': 'Probeer te zeggen',
+  'speech.kanaLabel': 'Kana om te proberen',
+  'speech.wordsLabel': 'Woorden om te proberen',
+  'speech.otherWords': 'Andere woorden',
+  'speech.say': 'Zeg {text}',
+  'speech.listening': 'Luistert… tik om te stoppen',
+  'speech.recordHint': 'Of neem jezelf op:',
+  'speech.resultsHeading': 'Wat er gehoord werd',
+  'speech.match': '✓ herkend',
+  'speech.noMatch': '✗ iets anders gehoord',
+  'speech.nothingHeard': 'Er werd niets gehoord.',
+  'speech.error.notAllowed':
+    'Toegang tot de microfoon of spraakherkenning is geblokkeerd. Sta het toe in je browserinstellingen (op iPhone: Instellingen → Safari → Microfoon).',
+  'speech.error.serviceNotAllowed':
+    'Spraakherkenning staat uit. Zet op iPhone Dicteren aan (Instellingen → Algemeen → Toetsenbord) en probeer het opnieuw.',
+  'speech.error.network':
+    'Spraakherkenning kon zijn dienst niet bereiken. Browsers die op Chrome gebouwd zijn, zoals Vivaldi en Brave, kunnen het niet gebruiken: probeer Safari of Chrome. Controleer anders je verbinding.',
+  'speech.error.noSpeech': 'Er werd niets gehoord. Spreek iets luider of dichter bij de microfoon.',
+  'speech.error.audioCapture': 'Er is geen microfoon gevonden.',
+  'speech.error.language': 'Deze browser kan geen Japans herkennen.',
+  'speech.error.other': 'Spraakherkenning stopte onverwacht. Probeer het opnieuw.',
+  'record.label': 'Opnemen en vergelijken',
+  'record.start': 'Neem jezelf op',
+  'record.stop': 'Stop',
+  'record.compare': 'Vergelijk',
+  'record.mine': 'De mijne',
+  'record.again': 'Opnieuw',
+  'record.denied':
+    'Toegang tot de microfoon is geblokkeerd. Sta het toe in je browserinstellingen.',
+  'record.failed': 'Opnemen lukte niet. Is er een microfoon aangesloten?',
 } satisfies Record<keyof typeof en, string>

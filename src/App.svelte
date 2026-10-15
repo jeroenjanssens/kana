@@ -27,6 +27,7 @@
     write: () => import('./views/Write.svelte'),
     sprint: () => import('./views/Sprint.svelte'),
     trace: () => import('./views/Trace.svelte'),
+    speech: () => import('./views/Speech.svelte'),
     reading: () => import('./views/Reading.svelte'),
     stats: () => import('./views/Stats.svelte'),
     settings: () => import('./views/Settings.svelte'),

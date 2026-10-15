@@ -59,6 +59,11 @@
       {words ? t('practice.readingUnlocked', { count: words }) : t('practice.readingHint')}
     </p>
   </a>
+  <a class="card panel" href="#/speech">
+    <span class="art"><Icon name="mic" size={40} /></span>
+    <h2>{t('practice.speechHeading')}</h2>
+    <p>{t('practice.speechDesc')}</p>
+  </a>
   <a class="card panel" href="#/study/hiragana?mode=order">
     <span class="art" lang="ja">あ→ん</span>
     <h2>{t('practice.studyInOrderHeading')}</h2>

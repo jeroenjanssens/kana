@@ -15,6 +15,7 @@
   import DrawingToggle from './DrawingToggle.svelte'
   import KanaDrawing from './KanaDrawing.svelte'
   import KanaGlyph from './KanaGlyph.svelte'
+  import RecordCompare from './RecordCompare.svelte'
 
   let {
     kana,
@@ -109,6 +110,9 @@
       />
     {/if}
   </div>
+  {#key kana.id}
+    <div class="speak"><RecordCompare reference={() => audio.playVoice(kana.id)} /></div>
+  {/key}
   <ul class="hints">
     {#each scripts as script (script)}
       <li>
@@ -144,6 +148,10 @@
 </article>
 
 <style>
+  .speak {
+    margin-top: 0.5rem;
+  }
+
   .details {
     position: relative;
     padding: 1.1rem 1.25rem;
