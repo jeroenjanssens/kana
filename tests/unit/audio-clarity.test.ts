@@ -46,12 +46,18 @@ function hissAndVowel(file: string): { hiss: number; vowel: number } {
 
 describe.skipIf(!hasFfmpeg())('pronunciation clarity', () => {
   // Japanese whispers u/i after voiceless consonants; on its own す can sound like a bare "s".
-  // The generator holds these vowels long enough that they clearly outlast the consonant.
+  // The generator holds these vowels long enough to be heard.
   test.each(['female/su', 'male/su', 'female/tsu', 'male/tsu'])(
     'the vowel in %s is clearly audible',
     (id) => {
       const { hiss, vowel } = hissAndVowel(`public/audio/${id}.mp3`)
-      expect(vowel - hiss, `hiss ${hiss} ms, vowel ${vowel} ms`).toBeGreaterThanOrEqual(20)
+      expect(vowel, `hiss ${hiss} ms, vowel ${vowel} ms`).toBeGreaterThanOrEqual(100)
     },
   )
+
+  // す and つ differ only in how they start, s against ts. A short s (110 ms) sounds like ts.
+  test.each(['female', 'male'])('the s in %s/su is long enough not to sound like ts', (voice) => {
+    const { hiss } = hissAndVowel(`public/audio/${voice}/su.mp3`)
+    expect(hiss).toBeGreaterThanOrEqual(140)
+  })
 })

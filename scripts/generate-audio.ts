@@ -53,7 +53,12 @@ async function post<T>(path: string, body?: unknown, raw = false): Promise<T> {
 }
 
 interface AccentPhrase {
-  moras: { vowel_length: number; vowel: string; consonant: string | null }[]
+  moras: {
+    vowel_length: number
+    vowel: string
+    consonant: string | null
+    consonant_length: number
+  }[]
 }
 
 interface AudioQuery {
@@ -75,10 +80,32 @@ export interface KanaStyle {
    * き…). Japanese whispers these, so on their own they can sound like a bare consonant.
    */
   minWeakVowel: number
+  /**
+   * Minimum length (seconds) of the hiss in s and sh (さ, す, し…). When it's short, す is hard to
+   * tell from つ, whose u is just as whispered.
+   */
+  minHiss?: number
+  /** Fade-in (seconds) at the start of kana that begin with s or sh, so the hiss doesn't start
+   * as abruptly as the t in ts. */
+  hissFadeIn?: number
 }
 
-/** Natural speed and length, with the weak u/i held long enough to be heard (chosen by ear). */
-export const KANA_STYLE: KanaStyle = { speed: 1, stretch: 1, minWeakVowel: 0.28 }
+/**
+ * Natural speed and length, with the weak u/i held long enough to be heard, and a longer, softly
+ * starting s so す doesn't sound like つ (chosen by ear).
+ */
+export const KANA_STYLE: KanaStyle = {
+  speed: 1,
+  stretch: 1,
+  minWeakVowel: 0.28,
+  minHiss: 0.18,
+  hissFadeIn: 0.08,
+}
+
+/** Whether a kana starts with the s or sh hiss. */
+export function startsWithHiss(kana: Kana): boolean {
+  return kana.romaji.startsWith('s')
+}
 
 const VOICELESS = new Set(['s', 'sh', 'k', 'ts', 'ch', 'h', 'f', 'p', 't'])
 
@@ -100,6 +127,9 @@ export async function synthesize(
       const weak = VOICELESS.has(mora.consonant ?? '') && (mora.vowel === 'u' || mora.vowel === 'i')
       mora.vowel_length *= style.stretch
       if (weak) mora.vowel_length = Math.max(mora.vowel_length, style.minWeakVowel)
+      if (mora.consonant === 's' || mora.consonant === 'sh') {
+        mora.consonant_length = Math.max(mora.consonant_length, style.minHiss ?? 0)
+      }
     }
     query.accent_phrases = phrases
   }
@@ -110,10 +140,21 @@ export async function synthesize(
   return post<Buffer>(`/synthesis?speaker=${speaker}`, query, true)
 }
 
-/** Trim silence at both ends, normalise loudness and encode to a small mono MP3. */
-export function encodeMp3(wav: Buffer, output: string) {
+/**
+ * Trim silence at both ends, normalise loudness and encode to a small mono MP3, optionally fading
+ * in over the first `fadeIn` seconds.
+ */
+export function encodeMp3(wav: Buffer, output: string, fadeIn = 0) {
   const trim = 'silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.03'
-  const filter = [trim, 'areverse', trim, 'areverse', 'loudnorm=I=-16:TP=-1.5:LRA=11'].join(',')
+  const fade = fadeIn > 0 ? [`afade=t=in:d=${fadeIn}`] : []
+  const filter = [
+    trim,
+    ...fade,
+    'areverse',
+    trim,
+    'areverse',
+    'loudnorm=I=-16:TP=-1.5:LRA=11',
+  ].join(',')
   execFileSync(
     'ffmpeg',
     [
@@ -161,7 +202,11 @@ async function generate(only?: string) {
     mkdirSync(join(dir, 'words'), { recursive: true })
     for (const kana of KANA) {
       const file = join('public', kanaAudioPath(voice.id, kana.id))
-      encodeMp3(await synthesize(kanaNotation(kana), voice.speaker, true), file)
+      encodeMp3(
+        await synthesize(kanaNotation(kana), voice.speaker, true),
+        file,
+        startsWithHiss(kana) ? (KANA_STYLE.hissFadeIn ?? 0) : 0,
+      )
     }
     for (const [i, word] of words.entries()) {
       encodeMp3(
@@ -272,7 +317,15 @@ const STYLES: { name: string; style: KanaStyle }[] = [
     name: 'B · natural (normal speed, no stretch)',
     style: { speed: 1, stretch: 1, minWeakVowel: 0 },
   },
-  { name: 'C · natural, clear weak u/i (current)', style: KANA_STYLE },
+  {
+    name: 'C · natural, clear weak u/i',
+    style: { speed: 1, stretch: 1, minWeakVowel: 0.28 },
+  },
+  {
+    name: 'F · C with a longer s (≥ 0.18 s)',
+    style: { speed: 1, stretch: 1, minWeakVowel: 0.28, minHiss: 0.18 },
+  },
+  { name: 'G · F with a soft start to the s (80 ms fade-in) (current)', style: KANA_STYLE },
   {
     name: 'D · slightly held (×1.2), clear weak u/i',
     style: { speed: 1, stretch: 1.2, minWeakVowel: 0.3 },
@@ -286,8 +339,11 @@ const STYLE_KANA = [
   'a',
   'ka',
   'su',
-  'shi',
   'tsu',
+  'sa',
+  'so',
+  'shi',
+  'chi',
   'ku',
   'fu',
   'hi',
@@ -313,6 +369,7 @@ async function previewStyles() {
         encodeMp3(
           await synthesize(kanaNotation(k), v.speaker, true, style),
           join(PREVIEW_DIR, file),
+          startsWithHiss(k) ? (style.hissFadeIn ?? 0) : 0,
         )
         cells.push(`<button data-src="${file}">${k.hiragana}</button>`)
       }
