@@ -197,9 +197,12 @@ export function confusions(log: readonly ReviewEntry[], n = 10): Confusion[] {
   return [...counts.values()].sort((a, b) => b.count - a.count).slice(0, n)
 }
 
-/** Introductions are activity, but not answers: they don't count towards accuracy. */
+/**
+ * Introductions and tracing (with the strokes shown) are activity, but not answers: they don't
+ * count towards accuracy.
+ */
 export function isAnswer(e: ReviewEntry): boolean {
-  return e.mode !== 'intro'
+  return e.mode !== 'intro' && e.mode !== 'trace'
 }
 
 export function totalAnswers(log: readonly ReviewEntry[]): { total: number; correct: number } {

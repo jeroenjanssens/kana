@@ -211,7 +211,7 @@
   <header class="page-head">
     <p class="eyebrow light">{t('write.eyebrow')}</p>
     <h1>{t('write.heading')}</h1>
-    <p class="lead">{t('write.lead')}</p>
+    <p class="lead">{t('write.lead')} <a href="#/trace">{t('write.traceLink')}</a></p>
   </header>
   <div class="style panel">
     <span>{t('write.answerBy')}</span>

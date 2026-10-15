@@ -205,6 +205,35 @@ export function checkWriting(
   return { correct: strokes.every((s) => s.ok), expected, drawn: usable.length, strokes }
 }
 
+/** Within this distance (grid units, of 109) of the guide a traced stroke scores full marks… */
+const TRACE_FULL = 2.5
+/** …and from this far away it scores nothing. */
+const TRACE_ZERO = 16
+
+/**
+ * How closely a drawing follows the reference strokes where they are, as a percentage: unlike
+ * `checkWriting`, position and size count, as when tracing over a guide. Each stroke scores by its
+ * mean distance from its reference stroke (point by point along both, so going the wrong way
+ * scores low); strokes are weighted by length, and missing or extra strokes score 0.
+ */
+export function traceScore(drawn: readonly Point[][], reference: readonly Point[][]): number {
+  const usable = drawn.filter((s) => s.length > 0)
+  if (!reference.length) return 0
+  const weights = reference.map((r) => Math.max(length(r), 1))
+  const average = weights.reduce((a, b) => a + b, 0) / weights.length
+  let score = 0
+  let total = 0
+  for (let i = 0; i < Math.max(reference.length, usable.length); i++) {
+    // An extra stroke weighs as much as an average one.
+    const weight = weights[i] ?? average
+    total += weight
+    if (!reference[i] || !usable[i]) continue
+    const d = strokeDistance(resample(usable[i], SAMPLES), resample(reference[i], SAMPLES))
+    score += weight * Math.min(1, Math.max(0, (TRACE_ZERO - d) / (TRACE_ZERO - TRACE_FULL)))
+  }
+  return Math.round((score / total) * 100)
+}
+
 /** Reference strokes for a kana from KanjiVG, laid out side by side for multi-character kana. */
 export function referenceStrokes(glyphs: { strokes: string[]; x: number }[]): Point[][] {
   return glyphs.flatMap((g) =>

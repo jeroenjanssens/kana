@@ -7,7 +7,14 @@ import { quizOnly, savedData } from './helpers'
 /** Draw strokes (in the 109-unit KanjiVG grid) on the writing pad with the mouse. */
 async function drawOnPad(page: Page, strokes: Point[][]) {
   const pad = page.getByRole('img', { name: /Drawing area/ })
-  const box = (await pad.boundingBox())!
+  // Wait for the card's slide-in to finish: tracing scores depend on where the strokes land.
+  let box = (await pad.boundingBox())!
+  await expect(async () => {
+    const before = box
+    await page.waitForTimeout(50)
+    box = (await pad.boundingBox())!
+    expect(box).toEqual(before)
+  }).toPass()
   const scale = box.height / 109
   for (const stroke of strokes) {
     const pts = resample(stroke, 14)
@@ -158,4 +165,50 @@ test('on phones the sprint is answered with buttons', async ({ page, isMobile })
     .first()
     .click()
   await expect(page.getByLabel('Score')).toHaveText('1')
+})
+
+test('tracing over a faint guide, without touching the schedule', async ({ page }) => {
+  await quizOnly(page)
+  await page.goto('./#/trace')
+  await page.getByRole('button', { name: 'Clear' }).click()
+  await page.locator('.row-chip', { hasText: 'あ' }).click()
+  await page.getByRole('button', { name: /Start · 5 kana/ }).click()
+  for (const char of ['あ', 'い', 'う', 'え', 'お']) {
+    // The guide: every stroke, with its number and a dot where it starts.
+    const n = strokesFor(char)[0].strokes.length
+    await expect(page.locator('.guide path')).toHaveCount(n)
+    await expect(page.locator('.guide circle')).toHaveCount(n)
+    await expect(page.locator('.guide text')).toHaveText(
+      Array.from({ length: n }, (_, i) => `${i + 1}`),
+    )
+    if (char === 'い') {
+      // A wrong first try, then tracing it again.
+      await drawOnPad(page, [
+        [
+          [20, 20],
+          [90, 90],
+        ],
+      ])
+      await page.getByRole('button', { name: /Check/ }).click()
+      await expect(page.locator('.verdict')).not.toHaveText('Correct!')
+      await expect(page.getByLabel('How closely you followed the guide')).toHaveText(
+        /^\d%|^[1-5]\d%/,
+      )
+      await page.getByRole('button', { name: /Trace again/ }).click()
+    }
+    await drawOnPad(page, referenceStrokes(strokesFor(char)))
+    await page.getByRole('button', { name: /Check/ }).click()
+    await expect(page.locator('.verdict')).toHaveText('Correct!')
+    await expect(page.getByLabel('How closely you followed the guide')).toHaveText(/^(9\d|100)%$/)
+    await page.getByRole('button', { name: /^Next Enter/ }).click()
+  }
+  await expect(page.getByRole('heading', { name: 'Done tracing' })).toBeVisible()
+  await expect(page.locator('.done p')).toHaveText(
+    /^4 of 5 right the first time\.\s+Average score: (9\d|100)%\.$/,
+  )
+  await expect(page.locator('.review li')).toHaveText(['い i'])
+  const data = await savedData(page)
+  expect(data.cards).toEqual({})
+  expect(data.log).toHaveLength(6)
+  expect(data.log.every((e: { mode: string }) => e.mode === 'trace')).toBe(true)
 })

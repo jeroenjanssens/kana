@@ -50,7 +50,7 @@ export interface CardRecord {
 }
 
 export type Mode =
-  'srs' | 'order' | 'confusable' | 'listen' | 'reading' | 'intro' | 'write' | 'sprint'
+  'srs' | 'order' | 'confusable' | 'listen' | 'reading' | 'intro' | 'write' | 'sprint' | 'trace'
 
 export interface ReviewEntry {
   /** Epoch ms. */

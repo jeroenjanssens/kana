@@ -149,3 +149,9 @@ describe('confusions', () => {
 test('totalAnswers', () => {
   expect(totalAnswers([entry(0), entry(0, { correct: false })])).toEqual({ total: 2, correct: 1 })
 })
+
+test('tracing over a guide is activity, not an answer', () => {
+  const traced = entry(0, { mode: 'trace', deck: 'write-hiragana' })
+  expect(totalAnswers([entry(0, { correct: false }), traced])).toEqual({ total: 1, correct: 0 })
+  expect(dailyCounts([traced]).size).toBe(1)
+})

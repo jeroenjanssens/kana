@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { StrokeGlyph } from '../lib/data/strokes'
+  import { strokeStart, type StrokeGlyph } from '../lib/data/strokes'
   import type { Point, WritingResult } from '../lib/study/handwriting'
   import Icon from './Icon.svelte'
   import { t } from '../state/i18n.svelte'
@@ -7,6 +7,8 @@
   /**
    * A paper square to draw kana on, in the same 109-unit grid as the KanjiVG strokes. After a
    * check, the correct strokes are shown in red with their numbers, and wrong strokes are marked.
+   * With `guide`, the strokes are shown faintly beforehand, numbered and with a dot where each
+   * starts, to trace over.
    */
   let {
     strokes = $bindable([]),
@@ -15,6 +17,7 @@
     reference,
     result,
     disabled = false,
+    guide = false,
   }: {
     strokes?: Point[][]
     /** Number of characters side by side (2 for yōon). */
@@ -23,6 +26,7 @@
     reference?: StrokeGlyph[]
     result?: WritingResult
     disabled?: boolean
+    guide?: boolean
   } = $props()
 
   const GRID = 109
@@ -103,6 +107,24 @@
         <line x1="4" y1={GRID / 2} x2={GRID - 4} y2={GRID / 2} />
       </g>
     {/each}
+    {#if guide && !result && reference}
+      <g class="guide" aria-hidden="true">
+        {#each reference as g (g.x)}
+          <g transform="translate({g.x} 0)">
+            {#each g.strokes as d, i (i)}
+              <path {d} />
+            {/each}
+            {#each g.strokes as d, i (i)}
+              {@const [x, y] = strokeStart(d)}
+              <circle cx={x} cy={y} r="2.4" />
+            {/each}
+            {#each g.numbers as [x, y], i (i)}
+              <text {x} {y}>{i + 1}</text>
+            {/each}
+          </g>
+        {/each}
+      </g>
+    {/if}
     {#if result && reference}
       <g class="reference">
         {#each reference as g (g.x)}
@@ -189,6 +211,25 @@
     stroke-width: 7;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  .guide path {
+    fill: none;
+    stroke: color-mix(in srgb, var(--ink) 22%, transparent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .guide circle {
+    fill: color-mix(in srgb, var(--shu) 70%, transparent);
+  }
+
+  .guide text {
+    font-family: var(--font-ui);
+    font-size: 7px;
+    font-weight: 700;
+    fill: color-mix(in srgb, var(--shu) 80%, transparent);
   }
 
   .numbers text {

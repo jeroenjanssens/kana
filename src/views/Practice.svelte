@@ -41,6 +41,11 @@
     <h2>{t('practice.writeHeading')}</h2>
     <p>{t('practice.writeDesc')}</p>
   </a>
+  <a class="card panel" href="#/trace">
+    <span class="art" lang="ja">なぞる</span>
+    <h2>{t('practice.traceHeading')}</h2>
+    <p>{t('practice.traceDesc')}</p>
+  </a>
   <a class="card panel" href="#/sprint">
     <span class="art" lang="ja">60</span>
     <h2>{t('practice.sprintHeading')}</h2>

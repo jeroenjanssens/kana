@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { parseKanjiVg, characters } from '../../scripts/fetch-kanjivg'
 import { KANA } from '../../src/lib/data/kana'
-import { GRID, hasStrokes, strokeCount, strokesFor } from '../../src/lib/data/strokes'
+import { GRID, hasStrokes, strokeCount, strokeStart, strokesFor } from '../../src/lib/data/strokes'
 
 describe('KanjiVG parsing', () => {
   test('extracts paths and stroke numbers in order', () => {
@@ -58,5 +58,23 @@ describe('stroke data', () => {
 
   test('unknown characters are skipped', () => {
     expect(strokesFor('x')).toEqual([])
+  })
+})
+
+describe('strokeStart', () => {
+  test('is the first point of the path', () => {
+    expect(strokeStart('M31.01,33c0.88,0.88,2.75,1.82')).toEqual([31.01, 33])
+    expect(strokeStart('M 5 -6.5 L 1,2')).toEqual([5, -6.5])
+  })
+
+  test('every stroke of every kana starts inside the grid', () => {
+    for (const k of KANA) {
+      for (const g of strokesFor(k.hiragana + k.katakana)) {
+        for (const d of g.strokes) {
+          const [x, y] = strokeStart(d)
+          expect(x > 0 && x < GRID && y > 0 && y < GRID, `${g.char}: ${d.slice(0, 20)}`).toBe(true)
+        }
+      }
+    }
   })
 })

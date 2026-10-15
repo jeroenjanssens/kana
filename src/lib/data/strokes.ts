@@ -32,6 +32,12 @@ export function strokesFor(text: string): StrokeGlyph[] {
   })
 }
 
+/** Where a stroke starts: the first point of its SVG path ("M31.01,33c…" → [31.01, 33]). */
+export function strokeStart(d: string): [number, number] {
+  const m = /^M\s*(-?[\d.]+)[\s,]*(-?[\d.]+)/.exec(d)
+  return m ? [Number(m[1]), Number(m[2])] : [0, 0]
+}
+
 export function strokeCount(text: string): number {
   return strokesFor(text).reduce((n, g) => n + g.strokes.length, 0)
 }

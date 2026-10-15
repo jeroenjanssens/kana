@@ -13,6 +13,9 @@ export default {
   'practice.allDoneToday': 'All done for today.',
   'practice.writeHeading': 'Writing',
   'practice.writeDesc': 'See the romaji, write the kana — stroke order and direction are checked.',
+  'practice.traceHeading': 'Tracing',
+  'practice.traceDesc':
+    'Trace kana over a faint guide, stroke by stroke, to get the shapes into your fingers.',
   'practice.sprintHeading': 'One-minute sprint',
   'practice.sprintDesc': 'Read as many kana as you can in 60 seconds, and beat your best.',
   'practice.readingHeading': 'Reading practice',
@@ -123,6 +126,23 @@ export default {
   'reading.inputPlaceholder': 'Type how it reads…',
   'reading.inputLabel': 'Reading in romaji',
   'reading.sessionTitle': 'Reading',
+
+  'write.traceLink': 'Or trace them first →',
+
+  // ── Trace view ───────────────────────────────────────────────────────────────
+  'trace.eyebrow': 'なぞり書き · Tracing',
+  'trace.heading': 'Tracing',
+  'trace.lead':
+    'Write each kana over a faint guide. The numbers show the stroke order and the dots where each stroke starts. Tracing never changes your writing schedule.',
+  'trace.script': 'Script',
+  'trace.start': 'Start · {count} kana',
+  'trace.title': 'Tracing · {script}',
+  'trace.again': 'Trace again',
+  'trace.doneTitle': 'Done tracing',
+  'trace.doneSummary': '{correct} of {total} right the first time.',
+  'trace.scoreLabel': 'How closely you followed the guide',
+  'trace.doneAverage': 'Average score: {score}%.',
+  'trace.otherRows': 'Other rows',
 
   // ── Sprint view ──────────────────────────────────────────────────────────────
   'sprint.eyebrow': '早読み · Sprint',

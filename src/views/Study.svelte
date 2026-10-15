@@ -6,12 +6,13 @@
   import KanaIntro from '../components/KanaIntro.svelte'
   import Icon from '../components/Icon.svelte'
   import MissedKana from '../components/MissedKana.svelte'
+  import RowPicker from '../components/RowPicker.svelte'
   import Modal from '../components/Modal.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import type { VoiceId } from '../lib/audio/voices'
   import { hasDrawing, toggleDrawing } from '../lib/data/drawings'
   import { FONTS, nextCardFont } from '../lib/data/fonts'
-  import { BASIC_ROWS, kanaById, rowsOf, type Kana, type KanaGroup } from '../lib/data/kana'
+  import { BASIC_ROWS, kanaById, type Kana } from '../lib/data/kana'
   import { Session, deckKana, formatInterval, startOfNextDay } from '../lib/srs/queue'
   import { previewIntervals } from '../lib/srs/scheduler'
   import { STUDY_DECKS, type Grade, type StudyDeckId } from '../lib/storage/schema'
@@ -25,6 +26,7 @@
   import { DECK_INFO, queueFor } from '../lib/study/summary'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { shuffle } from '../lib/ui/random'
+  import { kanaInRows, rowOptions as rowOptionsFor } from '../lib/study/rows'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { navigate, route } from '../state/router.svelte'
   import { cardDone } from '../state/photos.svelte'
@@ -93,15 +95,7 @@
   let review = $state<MissedKana>()
   let loop = $state(route.query.loop === '1')
   let shuffled = $state(route.query.shuffle === '1')
-  const groupsWithRows: KanaGroup[] = (
-    ['basic', 'dakuten', 'yoon', 'extended'] as KanaGroup[]
-  ).filter((g) => s.groups.includes(g))
-  const rowOptions = groupsWithRows.flatMap((g) =>
-    rowsOf(g)
-      .map((r) => ({ ...r, kana: r.kana.filter((k) => pool.includes(k)) }))
-      .filter((r) => r.kana.length > 0)
-      .map((r) => ({ key: `${g}:${r.row}`, group: g, row: r.row, kana: r.kana })),
-  )
+  const rowOptions = rowOptionsFor(pool)
   let selectedRows = $state<string[]>(
     route.query.rows
       ? route.query.rows.split(',')
@@ -155,9 +149,7 @@
   }
 
   function startOrderFromRows() {
-    const keys = new Set(selectedRows)
-    const list = rowOptions.filter((r) => keys.has(r.key)).flatMap((r) => r.kana)
-    startOrder(list)
+    startOrder(kanaInRows(rowOptions, selectedRows))
   }
 
   async function show(kana: Kana, isNew: boolean) {
@@ -506,24 +498,7 @@
     <section class="setup panel" in:fly={{ y: 12 }}>
       <h2>{t('study.setup.title')}</h2>
       <p class="muted">{t('study.setup.desc')}</p>
-      <div class="rows">
-        {#each rowOptions as r (r.key)}
-          <label class="row-chip" class:on={selectedRows.includes(r.key)}>
-            <input
-              type="checkbox"
-              checked={selectedRows.includes(r.key)}
-              onchange={(e) => {
-                const on = (e.currentTarget as HTMLInputElement).checked
-                selectedRows = on
-                  ? [...selectedRows, r.key]
-                  : selectedRows.filter((k) => k !== r.key)
-              }}
-            />
-            <span lang="ja">{deck === 'katakana' ? r.kana[0].katakana : r.kana[0].hiragana}</span>
-            <small>{r.kana[0].romaji}…</small>
-          </label>
-        {/each}
-      </div>
+      <RowPicker rows={rowOptions} katakana={deck === 'katakana'} bind:selected={selectedRows} />
       <div class="setup-actions">
         <button
           class="btn small ghost"
@@ -908,60 +883,6 @@
   .done {
     width: min(100%, 720px);
     padding: 1.5rem;
-  }
-
-  .rows {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 1rem 0;
-  }
-
-  .row-chip {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0.4rem 0.7rem;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-    cursor: pointer;
-    min-width: 56px;
-    background: color-mix(in srgb, var(--paper) 50%, transparent);
-    transition:
-      background 0.15s,
-      border-color 0.15s;
-  }
-
-  .row-chip input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .row-chip span {
-    font-family: var(--font-kana);
-    font-size: 1.4rem;
-    line-height: 1.2;
-  }
-
-  .row-chip small {
-    font-size: 0.7rem;
-    color: var(--ink-faint);
-  }
-
-  .row-chip.on {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
-  }
-
-  .row-chip.on small {
-    color: color-mix(in srgb, var(--paper) 70%, transparent);
-  }
-
-  .row-chip:focus-within {
-    outline: 2px solid var(--ai);
-    outline-offset: 2px;
   }
 
   .setup-actions,

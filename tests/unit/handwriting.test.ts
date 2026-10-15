@@ -10,6 +10,7 @@ import {
   referenceStrokes,
   resample,
   samplePath,
+  traceScore,
   writingGrade,
   type Point,
 } from '../../src/lib/study/handwriting'
@@ -187,5 +188,48 @@ describe('writingGrade', () => {
     expect(writingGrade(good, 5000)).toBe(4)
     expect(writingGrade(good, 12_000)).toBe(3)
     expect(writingGrade(good, 30_000)).toBe(2)
+  })
+})
+
+describe('traceScore', () => {
+  const shift = (strokes: Point[][], dx: number, dy = 0) =>
+    strokes.map((st) => st.map(([x, y]) => [x + dx, y + dy] as Point))
+
+  test('a careful trace scores (almost) full marks', () => {
+    expect(traceScore(ref('あ'), ref('あ'))).toBe(100)
+    expect(traceScore(draw(ref('あ')), ref('あ'))).toBeGreaterThanOrEqual(95)
+  })
+
+  test('drifting away from the guide costs points, gradually', () => {
+    const near = traceScore(shift(ref('あ'), 5), ref('あ'))
+    const far = traceScore(shift(ref('あ'), 10), ref('あ'))
+    expect(near).toBeGreaterThan(70)
+    expect(near).toBeLessThan(90)
+    expect(far).toBeLessThan(near)
+    expect(traceScore(shift(ref('あ'), 30), ref('あ'))).toBe(0)
+  })
+
+  test('unlike checkWriting, the right shape in the wrong place scores low', () => {
+    const small = ref('い').map((st) => st.map(([x, y]) => [x / 2, y / 2] as Point))
+    expect(checkWriting(small, ref('い')).correct).toBe(true)
+    expect(traceScore(small, ref('い'))).toBeLessThan(30)
+  })
+
+  test('a stroke the wrong way round scores low', () => {
+    const backwards = ref('い').map((st, i) => (i === 0 ? [...st].reverse() : st))
+    expect(traceScore(backwards, ref('い'))).toBeLessThan(70)
+  })
+
+  test('missing and extra strokes count as zero', () => {
+    const [first, second, third] = ref('あ')
+    const lengthOf = (st: Point[]) => length(st)
+    const expected = Math.round(
+      ((lengthOf(first) + lengthOf(second)) /
+        (lengthOf(first) + lengthOf(second) + lengthOf(third))) *
+        100,
+    )
+    expect(traceScore([first, second], ref('あ'))).toBe(expected)
+    expect(traceScore([...ref('い'), ref('い')[0]], ref('い'))).toBeLessThan(70)
+    expect(traceScore([], ref('あ'))).toBe(0)
   })
 })

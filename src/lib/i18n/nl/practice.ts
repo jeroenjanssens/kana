@@ -15,6 +15,9 @@ export default {
   'practice.writeHeading': 'Schrijven',
   'practice.writeDesc':
     'Zie de romaji, schrijf de kana — volgorde en richting worden gecontroleerd.',
+  'practice.traceHeading': 'Overtrekken',
+  'practice.traceDesc':
+    'Trek kana streek voor streek over een vage hulplijn, zodat je de vormen in je vingers krijgt.',
   'practice.sprintHeading': 'Sprint van een minuut',
   'practice.sprintDesc': 'Lees in 60 seconden zoveel kana als je kunt, en verbeter je beste score.',
   'practice.readingHeading': 'Leesoefening',
@@ -125,6 +128,23 @@ export default {
   'reading.inputPlaceholder': 'Typ hoe het klinkt…',
   'reading.inputLabel': 'Uitspraak in romaji',
   'reading.sessionTitle': 'Lezen',
+
+  'write.traceLink': 'Of trek ze eerst over →',
+
+  // ── Trace view ───────────────────────────────────────────────────────────────
+  'trace.eyebrow': 'なぞり書き · Overtrekken',
+  'trace.heading': 'Overtrekken',
+  'trace.lead':
+    'Schrijf elke kana over een vage hulplijn. De cijfers geven de streekvolgorde aan en de stippen waar elke streek begint. Overtrekken verandert nooit je schrijfschema.',
+  'trace.script': 'Schrift',
+  'trace.start': 'Start · {count} kana',
+  'trace.title': 'Overtrekken · {script}',
+  'trace.again': 'Nog een keer',
+  'trace.doneTitle': 'Klaar met overtrekken',
+  'trace.doneSummary': '{correct} van de {total} in één keer goed.',
+  'trace.scoreLabel': 'Hoe nauwkeurig je de hulplijn volgde',
+  'trace.doneAverage': 'Gemiddelde score: {score}%.',
+  'trace.otherRows': 'Andere rijen',
 
   // ── Sprint view ──────────────────────────────────────────────────────────────
   'sprint.eyebrow': '早読み · Sprint',
