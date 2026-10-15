@@ -274,7 +274,7 @@
                 <span class="answers">
                   <span class="typed"
                     ><span class="label muted">{t('sprint.typed')}</span>
-                    <s>{m.typed || '—'}</s></span
+                    <span class="wrong">{m.typed || '—'}</span></span
                   >
                   <span class="expected"
                     ><span class="label muted">{t('sprint.expected')}</span>
@@ -519,7 +519,7 @@
     font-size: 0.75rem;
   }
 
-  .typed s {
+  .wrong {
     font-weight: 650;
     color: var(--shu);
   }
