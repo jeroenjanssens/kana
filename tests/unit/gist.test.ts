@@ -18,10 +18,12 @@ function fakeGitHub(options: { token?: string; offline?: boolean } = {}) {
     { id: string; description: string; files: Record<string, { content: string }> }
   >()
   const calls: string[] = []
+  const caches: (RequestCache | undefined)[] = []
   const fetcher = (async (url: string, init: RequestInit = {}) => {
     if (options.offline) throw new TypeError('Failed to fetch')
     const method = init.method ?? 'GET'
     calls.push(`${method} ${url.replace('https://api.github.com', '')}`)
+    caches.push(init.cache)
     const auth = (init.headers as Record<string, string>)?.Authorization
     if (auth !== `Bearer ${options.token ?? 'good'}`) return new Response('', { status: 401 })
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status })
@@ -40,7 +42,7 @@ function fakeGitHub(options: { token?: string; offline?: boolean } = {}) {
     }
     return json(gist)
   }) as unknown as typeof fetch
-  return { fetcher, gists, calls }
+  return { fetcher, gists, calls, caches }
 }
 
 describe('Gist sync', () => {
@@ -81,6 +83,15 @@ describe('Gist sync', () => {
     await expect(
       syncWithGist(emptySave(), new GistClient('good', offline.fetcher)),
     ).rejects.toThrow(SyncError)
+  })
+
+  test('never uses a cached copy of the gist', async () => {
+    // GitHub allows caching for 60 s; a stale read would undo another device's sync.
+    const gh = fakeGitHub()
+    const first = await syncWithGist(emptySave(1), new GistClient('good', gh.fetcher))
+    await syncWithGist(emptySave(2), new GistClient('good', gh.fetcher), first.gistId)
+    expect(gh.caches.length).toBeGreaterThan(2)
+    expect(gh.caches.every((c) => c === 'no-store')).toBe(true)
   })
 
   test('a deleted gist is replaced by a new one', async () => {

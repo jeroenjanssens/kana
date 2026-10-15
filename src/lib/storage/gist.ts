@@ -45,6 +45,9 @@ export class GistClient {
     try {
       res = await this.fetcher(`${API}${path}`, {
         ...init,
+        // GitHub lets browsers reuse a gist for 60 seconds. A stale copy would be merged and
+        // written back, undoing what another device just synced.
+        cache: 'no-store',
         headers: {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${this.token}`,
@@ -75,7 +78,7 @@ export class GistClient {
     if (!file) return undefined
     let content = file.content ?? ''
     if (file.truncated && file.raw_url) {
-      const res = await this.fetcher(file.raw_url)
+      const res = await this.fetcher(file.raw_url, { cache: 'no-store' })
       content = await res.text()
     }
     return content ? migrate(JSON.parse(content)) : undefined

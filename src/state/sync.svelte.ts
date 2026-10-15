@@ -59,7 +59,10 @@ export function disconnect(clearError = true): void {
   if (clearError) sync.error = ''
 }
 
-/** Sync on start, after each study session and when the app goes to the background. */
+/**
+ * Sync on start, after each study session, when the app goes to the background (to share what
+ * was done here) and when it comes back (to pick up what was done elsewhere in the meantime).
+ */
 export function startSync(sessionActive: () => boolean): () => void {
   if (sync.connected) void syncNow()
   let wasActive = false
@@ -70,12 +73,14 @@ export function startSync(sessionActive: () => boolean): () => void {
       wasActive = active
     })
   })
-  const onHide = () => {
-    if (document.visibilityState === 'hidden' && sync.connected) void syncNow()
+  const onVisibility = () => {
+    if (!sync.connected) return
+    // Coming back mid-session, wait: the session's end syncs anyway.
+    if (document.visibilityState === 'hidden' || !sessionActive()) void syncNow()
   }
-  document.addEventListener('visibilitychange', onHide)
+  document.addEventListener('visibilitychange', onVisibility)
   return () => {
     stop()
-    document.removeEventListener('visibilitychange', onHide)
+    document.removeEventListener('visibilitychange', onVisibility)
   }
 }
