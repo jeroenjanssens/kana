@@ -37,10 +37,12 @@
     }}
   >
     <div class="face front washi turn" style={washiStyle(paper)}>
-      {@render front()}
+      <div class="content">{@render front()}</div>
     </div>
     <div class="face back washi turn" style={washiStyle(paper + 1)} aria-hidden={!flipped}>
-      {#if back}{@render back()}{/if}
+      <div class="content">
+        {#if back}{@render back()}{/if}
+      </div>
     </div>
   </div>
 </div>
@@ -71,18 +73,14 @@
     transform: rotateY(180deg);
   }
 
+  /* The face clips its paper (an oversized, rotated layer: see .washi.turn); the content scrolls
+     on its own when it's taller than the card, so the paper never makes a scrollbar. */
   .face {
     grid-area: 1 / 1;
     position: relative;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: safe center;
     max-height: max(calc(var(--width) * 1.2), calc(100dvh - 17rem));
-    overflow: hidden auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    padding: 1.5rem;
     border-radius: 18px;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -104,6 +102,24 @@
     box-shadow:
       inset 0 0 0 1px rgb(120 95 60 / 0.12),
       inset 0 0 24px rgb(120 95 60 / 0.1);
+  }
+
+  .content {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: safe center;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
+    /* Content taller than the card (a small window) still scrolls, but without a bar on the paper. */
+    scrollbar-width: none;
+    padding: 1.5rem;
+  }
+
+  .content::-webkit-scrollbar {
+    display: none;
   }
 
   .back {
