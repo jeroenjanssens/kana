@@ -4,6 +4,7 @@
   import Header from './components/Header.svelte'
   import InkDefs from './components/InkDefs.svelte'
   import Shortcuts from './components/Shortcuts.svelte'
+  import SyncNotice from './components/SyncNotice.svelte'
   import Toasts from './components/Toasts.svelte'
   import { HEADING_FONT_ID } from './lib/data/fonts'
   import { loadFont } from './lib/ui/fontLoader'
@@ -149,6 +150,7 @@
 </div>
 
 <Toasts />
+<SyncNotice />
 <Shortcuts bind:open={shortcutsOpen} />
 
 <style>

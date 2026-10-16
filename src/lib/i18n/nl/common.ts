@@ -42,4 +42,6 @@ export default {
   'missed.typed': 'Jij typte',
   'missed.expected': 'Moet zijn',
   'missed.showCard': 'Toon de kaart van {kana} ({romaji})',
+  // SyncNotice.svelte
+  'sync.done': 'Voortgang gesynchroniseerd',
 } satisfies Record<keyof typeof en, string>

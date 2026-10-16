@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 import { quizOnly, savedData, seed } from './helpers'
 
 const DAY = 86_400_000
@@ -168,7 +168,8 @@ test('intervals can be personalised with the FSRS optimiser', async ({ page }) =
   expect((await savedData(page)).settings.fsrsWeights).toEqual([])
 })
 
-test('progress syncs through a GitHub gist', async ({ page }) => {
+/** A fake of the GitHub gist API that accepts the token ghp_test. */
+async function fakeGitHub(page: Page) {
   const gists = new Map<
     string,
     { id: string; description: string; files: Record<string, { content: string }> }
@@ -192,6 +193,11 @@ test('progress syncs through a GitHub gist', async ({ page }) => {
     if (req.method() === 'PATCH') gist.files = { ...gist.files, ...req.postDataJSON().files }
     return route.fulfill({ json: gist })
   })
+  return gists
+}
+
+test('progress syncs through a GitHub gist', async ({ page }) => {
+  const gists = await fakeGitHub(page)
   await quizOnly(page)
   await page.goto('./#/study/hiragana?mode=srs')
   await page.getByRole('button', { name: /Show answer/ }).click()
@@ -206,10 +212,34 @@ test('progress syncs through a GitHub gist', async ({ page }) => {
   const synced = JSON.parse(gists.get('g1')!.files['kana-progress.json'].content)
   expect(Object.keys(synced.cards.hiragana)).toEqual(['a'])
   expect(await page.evaluate(() => localStorage.getItem('kana:gist-token'))).toBe('ghp_test')
-  await page.getByRole('button', { name: 'Sync now' }).click()
-  await expect(page.getByRole('button', { name: 'Sync now' })).toBeEnabled()
+  const settingsSync = page.getByRole('main').getByRole('button', { name: 'Sync now' })
+  await settingsSync.click()
+  await expect(settingsSync).toBeEnabled()
   await page.getByRole('button', { name: 'Disconnect' }).click()
   expect(await page.evaluate(() => localStorage.getItem('kana:gist-token'))).toBeNull()
+})
+
+test('the sync button in the header syncs and says so', async ({ page }) => {
+  const gists = await fakeGitHub(page)
+  await page.goto('./#/')
+  // Without a connected gist there's nothing to sync.
+  const header = page.getByRole('banner')
+  await expect(header.getByRole('button', { name: 'Sync now' })).toHaveCount(0)
+  await page.evaluate(() => localStorage.setItem('kana:gist-token', 'ghp_test'))
+  await page.reload()
+  // Syncing on start already shows the message.
+  await expect(page.getByRole('status').filter({ hasText: 'Progress synced' })).toBeVisible()
+  await expect(page.getByRole('status').filter({ hasText: 'Progress synced' })).toBeHidden({
+    timeout: 5000,
+  })
+  await header.getByRole('button', { name: 'Sync now' }).click()
+  await expect(page.getByRole('status').filter({ hasText: 'Progress synced' })).toBeVisible()
+  expect(gists.size).toBe(1)
+  // A failed manual sync says what went wrong.
+  await page.unroute('https://api.github.com/**')
+  await page.route('https://api.github.com/**', (route) => route.abort())
+  await header.getByRole('button', { name: 'Sync now' }).click()
+  await expect(page.getByRole('alert')).toBeVisible()
 })
 
 test('the interface can be switched to Dutch', async ({ page }) => {

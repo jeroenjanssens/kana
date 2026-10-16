@@ -4,6 +4,7 @@
   import type { MessageKey } from '../lib/i18n/messages'
   import Icon, { type IconName } from './Icon.svelte'
   import SoundToggle from './SoundToggle.svelte'
+  import SyncButton from './SyncButton.svelte'
 
   const NAV: { href: string; labelKey: MessageKey; icon: IconName; match: string[] }[] = [
     { href: '#/', labelKey: 'nav.learn', icon: 'cards', match: ['', 'study'] },
@@ -12,7 +13,7 @@
       href: '#/practice',
       labelKey: 'nav.practice',
       icon: 'pairs',
-      match: ['practice', 'drills', 'listen', 'reading', 'write', 'sprint'],
+      match: ['practice', 'drills', 'listen', 'reading', 'write', 'sprint', 'trace', 'speech'],
     },
     { href: '#/stats', labelKey: 'nav.stats', icon: 'chart', match: ['stats'] },
   ]
@@ -35,6 +36,7 @@
   </nav>
   <div class="tools">
     <SoundToggle />
+    <SyncButton />
     <a
       class="btn icon ghost"
       href="#/settings"

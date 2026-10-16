@@ -41,4 +41,6 @@ export default {
   'missed.typed': 'You typed',
   'missed.expected': 'Should be',
   'missed.showCard': 'Show the card for {kana} ({romaji})',
+  // SyncNotice.svelte
+  'sync.done': 'Progress synced',
 } as const

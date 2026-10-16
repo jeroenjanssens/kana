@@ -13,9 +13,17 @@ export const sync = $state({
   syncing: false,
   lastSync: Number(typeof localStorage !== 'undefined' ? (localStorage.getItem(LAST_KEY) ?? 0) : 0),
   error: '',
+  /** The latest message to show (bottom right): a finished sync, or a failed manual one. */
+  notice: undefined as { id: number; ok: boolean; error?: string } | undefined,
 })
 
-export async function syncNow(): Promise<boolean> {
+let noticeId = 0
+
+/**
+ * Sync with the gist. `manual` (the sync button): a failure is shown as a message too; failures
+ * of automatic syncs (often just being offline) only show in Settings.
+ */
+export async function syncNow(manual = false): Promise<boolean> {
   const token = localStorage.getItem(TOKEN_KEY)
   if (!token || sync.syncing) return false
   sync.syncing = true
@@ -32,10 +40,12 @@ export async function syncNow(): Promise<boolean> {
     localStorage.setItem(GIST_KEY, result.gistId)
     sync.lastSync = Date.now()
     localStorage.setItem(LAST_KEY, String(sync.lastSync))
+    sync.notice = { id: ++noticeId, ok: true }
     return true
   } catch (err) {
     // A code the interface translates (see the 'sync.error.*' messages).
     sync.error = err instanceof SyncError ? err.code : 'http'
+    if (manual) sync.notice = { id: ++noticeId, ok: false, error: sync.error }
     return false
   } finally {
     sync.syncing = false
