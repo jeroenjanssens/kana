@@ -1,9 +1,11 @@
 import { describe, expect, test } from 'vitest'
 import { kanaById } from '../../src/lib/data/kana'
+import { kanaForAnswer } from '../../src/lib/study/answer'
 import { grade } from '../../src/lib/srs/scheduler'
 import { migrate } from '../../src/lib/storage/persistence'
 import { emptySave } from '../../src/lib/storage/schema'
 import {
+  answerPool,
   bestSprint,
   judge,
   nextSprintKana,
@@ -16,6 +18,20 @@ describe('judge', () => {
     ['ka', 'k', 'pending'],
     ['ka', 'ka', 'correct'],
     ['ka', 'ki', 'wrong'],
+    ['ka', 's', 'pending'],
+    ['ka', 'sa', 'wrong'],
+    ['ka', 'n', 'pending'],
+    ['ka', 'a', 'wrong'],
+    ['ka', 'x', 'pending'],
+    ['ka', 'xy', 'wrong'],
+    ['ka', 'nn', 'wrong'],
+    ['ka', 'nk', 'wrong'],
+    ['ka', 'ky', 'pending'],
+    ['ka', 'kyo', 'wrong'],
+    ['shi', 'ts', 'pending'],
+    ['shi', 'tsu', 'wrong'],
+    ['shi', 'ch', 'pending'],
+    ['shi', 'chi', 'wrong'],
     ['shi', 'si', 'correct'],
     ['shi', 'sh', 'pending'],
     ['shi', 'sa', 'wrong'],
@@ -27,6 +43,15 @@ describe('judge', () => {
     ['ka', ' KA ', 'correct'],
   ])('%s: typing "%s" is %s', (id, input, expected) => {
     expect(judge(input, kanaById(id))).toBe(expected)
+  })
+})
+
+describe('answerPool', () => {
+  test('names kana outside the sprint pool, but only ones that exist in the script', () => {
+    expect(kanaForAnswer('kyo', answerPool('hiragana'))?.id).toBe('kyo')
+    expect(kanaForAnswer('fa', answerPool('hiragana'))).toBeUndefined()
+    expect(kanaForAnswer('fa', answerPool('katakana'))?.id).toBe('x-fa')
+    expect(kanaForAnswer('ji', answerPool('hiragana'))?.id).toBe('ji')
   })
 })
 

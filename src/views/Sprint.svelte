@@ -13,6 +13,7 @@
   import {
     PENALTY_MS,
     SPRINT_MS,
+    answerPool,
     bestSprint,
     judge,
     nextSprintKana,
@@ -34,6 +35,7 @@
 
   let phase = $state<'ready' | 'running' | 'done'>('ready')
   let pool: Kana[] = []
+  const answerable = script ? answerPool(script) : []
   let current = $state<Kana | undefined>()
   let font = $state(settings().font)
   let options = $state<Kana[]>([])
@@ -121,7 +123,7 @@
     if (!current || reveal) return
     const verdict = judge(input, current)
     if (verdict === 'correct') answer(true)
-    else if (verdict === 'wrong') answer(false, kanaForAnswer(input, pool), input.trim())
+    else if (verdict === 'wrong') answer(false, kanaForAnswer(input, answerable), input.trim())
   }
 
   function finish() {

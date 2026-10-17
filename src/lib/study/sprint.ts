@@ -1,4 +1,4 @@
-import { acceptedAnswers, kanaInGroups, type Kana, type Script } from '../data/kana'
+import { KANA, acceptedAnswers, kanaInGroups, type Kana, type Script } from '../data/kana'
 import type { SaveFile } from '../storage/schema'
 import { normalize } from './answer'
 
@@ -10,16 +10,25 @@ const KEEP = 50
 
 export type Judgement = 'correct' | 'wrong' | 'pending'
 
+/** Every accepted spelling of every kana, for telling what a wrong answer is turning into. */
+const ALL_ANSWERS = [...new Set(KANA.flatMap((k) => acceptedAnswers(k).map(normalize)))]
+
 /**
- * Judge romaji while it's being typed: correct as soon as it matches an accepted spelling, wrong
- * as soon as it can't become one any more, pending otherwise. No Enter needed.
+ * Judge romaji while it's being typed: correct as soon as it matches an accepted spelling, pending
+ * while it can still become one. A wrong answer waits until it's another whole kana nothing longer
+ * starts with ("tsu", "a") or can't become any kana ("nk"), so a mistake records what was meant.
+ * A wrong first letter always waits for a second one. No Enter needed.
  */
 export function judge(input: string, kana: Kana): Judgement {
   const typed = normalize(input)
   if (!typed) return 'pending'
   const answers = acceptedAnswers(kana).map(normalize)
   if (answers.includes(typed)) return 'correct'
-  return answers.some((a) => a.startsWith(typed)) ? 'pending' : 'wrong'
+  if (answers.some((a) => a.startsWith(typed))) return 'pending'
+  const complete = ALL_ANSWERS.includes(typed)
+  const longer = ALL_ANSWERS.some((a) => a.length > typed.length && a.startsWith(typed))
+  if (complete && !longer) return 'wrong'
+  return typed.length < 2 || longer ? 'pending' : 'wrong'
 }
 
 /** Kana for a sprint: the ones studied in this script (or the basic kana if that's too few). */
@@ -34,6 +43,11 @@ export function sprintPool(save: SaveFile, script: Script): Kana[] {
   const candidates = kanaInGroups(['basic', 'dakuten', 'yoon'], script)
   const known = candidates.filter((k) => studied.has(k.id))
   return known.length >= MIN_POOL ? known : candidates.filter((k) => k.group === 'basic')
+}
+
+/** Every kana a wrong answer can name in this script, so a mix-up is logged even outside the pool. */
+export function answerPool(script: Script): Kana[] {
+  return kanaInGroups(['basic', 'dakuten', 'yoon', 'extended'], script)
 }
 
 /** A random kana from the pool, never the same one twice in a row. */
