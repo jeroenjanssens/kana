@@ -88,11 +88,16 @@ export interface KanaStyle {
   /** Fade-in (seconds) at the start of kana that begin with s or sh, so the hiss doesn't start
    * as abruptly as the t in ts. */
   hissFadeIn?: number
+  /**
+   * Minimum length (seconds) of b, p and w (ば, ぱ, わ…). Some voices barely open the lips before
+   * the vowel, so ば sounds like あ.
+   */
+  minLips?: number
 }
 
 /**
- * Natural speed and length, with the weak u/i held long enough to be heard, and a longer, softly
- * starting s so す doesn't sound like つ (chosen by ear).
+ * Natural speed and length, with the weak u/i held long enough to be heard, a longer, softly
+ * starting s so す doesn't sound like つ, and b, p and w long enough to be heard (chosen by ear).
  */
 export const KANA_STYLE: KanaStyle = {
   speed: 1,
@@ -100,6 +105,7 @@ export const KANA_STYLE: KanaStyle = {
   minWeakVowel: 0.28,
   minHiss: 0.18,
   hissFadeIn: 0.08,
+  minLips: 0.06,
 }
 
 /** Whether a kana starts with the s or sh hiss. */
@@ -108,6 +114,7 @@ export function startsWithHiss(kana: Kana): boolean {
 }
 
 const VOICELESS = new Set(['s', 'sh', 'k', 'ts', 'ch', 'h', 'f', 'p', 't'])
+const LIPS = new Set(['b', 'p', 'w'])
 
 /** Synthesize `text` with a voice. `kana` text uses the phonetic notation instead of reading. */
 export async function synthesize(
@@ -129,6 +136,9 @@ export async function synthesize(
       if (weak) mora.vowel_length = Math.max(mora.vowel_length, style.minWeakVowel)
       if (mora.consonant === 's' || mora.consonant === 'sh') {
         mora.consonant_length = Math.max(mora.consonant_length, style.minHiss ?? 0)
+      }
+      if (LIPS.has(mora.consonant ?? '')) {
+        mora.consonant_length = Math.max(mora.consonant_length, style.minLips ?? 0)
       }
     }
     query.accent_phrases = phrases
@@ -325,7 +335,11 @@ const STYLES: { name: string; style: KanaStyle }[] = [
     name: 'F · C with a longer s (≥ 0.18 s)',
     style: { speed: 1, stretch: 1, minWeakVowel: 0.28, minHiss: 0.18 },
   },
-  { name: 'G · F with a soft start to the s (80 ms fade-in) (current)', style: KANA_STYLE },
+  {
+    name: 'G · F with a soft start to the s (80 ms fade-in)',
+    style: { ...KANA_STYLE, minLips: undefined },
+  },
+  { name: 'H · G with longer b, p and w (≥ 0.06 s) (current)', style: KANA_STYLE },
   {
     name: 'D · slightly held (×1.2), clear weak u/i',
     style: { speed: 1, stretch: 1.2, minWeakVowel: 0.3 },
@@ -353,6 +367,12 @@ const STYLE_KANA = [
   'kya',
   'ra',
   'ma',
+  'ba',
+  'pa',
+  'bi',
+  'bo',
+  'po',
+  'wa',
 ]
 
 /** Build voice-preview/styles.html: the same kana in each style, for both voices. */
