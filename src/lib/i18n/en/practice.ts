@@ -1,4 +1,4 @@
-/** Interface text: practice hub, drills, listen, reading, write, sprint, writing pad. */
+/** Interface text: practice hub, drills, listen, reading, write, sprint, race, writing pad. */
 export default {
   // ── Practice hub ────────────────────────────────────────────────────────────
   'practice.eyebrow': '練習 · Practice',
@@ -22,6 +22,8 @@ export default {
   'practice.sprintHeading': 'Sprint',
   'practice.sprintDesc':
     'Read as many kana as you can before the time runs out, and beat your best.',
+  'practice.raceHeading': 'Race',
+  'practice.raceDesc': 'Go through a set of kana, each once, as fast as you can.',
   'practice.readingHeading': 'Reading practice',
   'practice.readingDesc': 'Real words made of kana you know.',
   'practice.readingUnlocked': '{count} words unlocked.',
@@ -156,7 +158,6 @@ export default {
   'sprint.lengthLabel': 'Length',
   'sprint.minutes': '{n} min',
   'sprint.bestScore': 'Best: {score}',
-  'sprint.title': 'Sprint · {script}',
   'sprint.timeLeft': 'Time left',
   'sprint.scoreLabel': 'Score',
   'sprint.doneEyebrow': '結果 · Result',
@@ -168,6 +169,32 @@ export default {
   'sprint.newRecord': 'New record! (was {previous})',
   'sprint.newRecordTitle': 'New record',
   'sprint.whichRomaji': 'Which romaji?',
+
+  // ── Race view ────────────────────────────────────────────────────────────────
+  'race.eyebrow': '競走 · Race',
+  'race.heading': 'Race',
+  'race.lead':
+    'Go through every kana you choose, each exactly once, as fast as you can. Type the romaji — no Enter needed. A mistake adds two seconds.',
+  'race.kanaLabel': 'Which kana',
+  'race.kana.seen': 'Seen so far',
+  'race.kana.mastered': 'Mastered',
+  'race.kana.all': 'All',
+  'race.kana.rows': 'Choose rows',
+  'race.shuffle': 'Random order',
+  'race.start': 'Race {count} kana',
+  'race.emptySeen': "You haven't studied any of these kana yet.",
+  'race.emptyMastered':
+    'You haven\'t mastered any of these kana yet: a kana counts once it\'s at least "young".',
+  'race.emptyRows': 'Choose at least one row.',
+  'race.timeLabel': 'Time',
+  'race.progressLabel': 'Progress',
+  'race.doneEyebrow': '結果 · Result',
+  'race.doneTime': '{count} kana in {time}',
+  'race.perKana': '{seconds} s per kana',
+  'race.best': 'Best: {time}',
+  'race.newRecord': 'New record! (was {previous})',
+  'race.firstTime': 'Your first race with these kana',
+  'race.missedAgain': 'Race the missed ones',
 
   // ── WritingPad component ─────────────────────────────────────────────────────
   'writingpad.areaLabel': 'Drawing area: {count} {count|stroke|strokes} drawn',

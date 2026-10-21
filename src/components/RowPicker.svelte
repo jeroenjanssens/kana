@@ -5,8 +5,21 @@
   let {
     rows,
     katakana = false,
+    both = false,
     selected = $bindable([]),
-  }: { rows: RowOption[]; katakana?: boolean; selected?: string[] } = $props()
+  }: {
+    rows: RowOption[]
+    katakana?: boolean
+    /** Label each row in both scripts (か カ); rows without hiragana show only katakana. */
+    both?: boolean
+    selected?: string[]
+  } = $props()
+
+  function label(r: RowOption): string {
+    const { hiragana, katakana: kata } = r.kana[0]
+    if (both && hiragana) return `${hiragana} ${kata}`
+    return katakana || !hiragana ? kata : hiragana
+  }
 </script>
 
 <div class="rows">
@@ -20,7 +33,7 @@
           selected = on ? [...selected, r.key] : selected.filter((k) => k !== r.key)
         }}
       />
-      <span lang="ja">{katakana ? r.kana[0].katakana : r.kana[0].hiragana}</span>
+      <span lang="ja">{label(r)}</span>
       <small>{r.kana[0].romaji}…</small>
     </label>
   {/each}

@@ -21,5 +21,5 @@ export function questionKey(q: Question): string {
 
 /** The kana in a list of questions, each once (for answer buttons). */
 export function kanaOf(questions: readonly Question[]): Kana[] {
-  return [...new Set(questions.map((q) => q.kana))]
+  return [...new Map(questions.map((q) => [q.kana.id, q.kana])).values()]
 }

@@ -145,7 +145,7 @@ test('a two-minute sprint in both scripts', async ({ page, isMobile }) => {
   await page.getByRole('group', { name: 'Length' }).getByRole('button', { name: '2 min' }).click()
   await page.getByRole('button', { name: /Start/ }).click()
   await expect(page.getByLabel('Time left')).toHaveText('2:00')
-  await expect(page.getByText('Sprint · Hiragana + Katakana')).toBeVisible()
+  await expect(page.locator('.topbar strong')).toHaveText('Sprint · Hiragana + Katakana')
   const input = page.getByRole('textbox', { name: 'Romaji' })
   for (let i = 0; i < 6; i++) {
     const kana = (await page.locator('.question .glyph').textContent())!.trim()

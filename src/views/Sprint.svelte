@@ -201,7 +201,9 @@
       <button class="btn icon ghost" onclick={leave} aria-label={t('common.leave')}>
         <Icon name="close" />
       </button>
-      <strong>{t('sprint.title', { script: scriptLabel(choice) })}</strong>
+      <strong
+        >{t('sprint.heading')}<span class="title-script"> · {scriptLabel(choice)}</span></strong
+      >
       <span class="bar" style:--p={left / (minutes * 60_000)}></span>
       <span class="time" aria-label={t('sprint.timeLeft')}
         >{formatClock(Math.ceil(left / 1000))}</span
@@ -406,5 +408,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
+  }
+
+  /* On phones the script would push the title onto two lines. */
+  @media (max-width: 520px) {
+    .title-script {
+      display: none;
+    }
   }
 </style>

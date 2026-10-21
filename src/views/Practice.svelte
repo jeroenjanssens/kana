@@ -51,6 +51,11 @@
     <h2>{t('practice.sprintHeading')}</h2>
     <p>{t('practice.sprintDesc')}</p>
   </a>
+  <a class="card panel" href="#/race">
+    <span class="art"><Icon name="flag" size={40} /></span>
+    <h2>{t('practice.raceHeading')}</h2>
+    <p>{t('practice.raceDesc')}</p>
+  </a>
   <a class="card panel" href="#/reading">
     <span class="art" lang="ja">ねこ</span>
     <h2>{t('practice.readingHeading')}</h2>

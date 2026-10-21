@@ -2,6 +2,7 @@ import type { KanaGroup } from '../data/kana'
 import type { VoiceSetting } from '../audio/voices'
 import type { PhotoMode } from '../ui/photos'
 import { SCRIPT_CHOICES, type ScriptChoice } from '../study/scripts'
+import { RACE_KANA, type RaceKana } from '../study/race'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1
@@ -51,7 +52,16 @@ export interface CardRecord {
 }
 
 export type Mode =
-  'srs' | 'order' | 'confusable' | 'listen' | 'reading' | 'intro' | 'write' | 'sprint' | 'trace'
+  | 'srs'
+  | 'order'
+  | 'confusable'
+  | 'listen'
+  | 'reading'
+  | 'intro'
+  | 'write'
+  | 'sprint'
+  | 'race'
+  | 'trace'
 
 export interface ReviewEntry {
   /** Epoch ms. */
@@ -136,6 +146,11 @@ export interface Settings {
   /** The script(s) and length (in minutes: 1, 2, 3 or 5) of the last sprint. */
   sprintScript: ScriptChoice
   sprintMinutes: number
+  /** The last race setup: script(s), which kana, the rows for 'rows', and random order. */
+  raceScript: ScriptChoice
+  raceKana: RaceKana
+  raceRows: string[]
+  raceShuffle: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -184,12 +199,18 @@ export const DEFAULT_SETTINGS: Settings = {
   reducedMotion: 'system',
   sprintScript: 'hiragana',
   sprintMinutes: 1,
+  raceScript: 'hiragana',
+  raceKana: 'seen',
+  raceRows: ['basic:a', 'basic:k'],
+  raceShuffle: true,
 }
 
 /** Settings that only take one of a few values; anything else falls back to the default. */
 export const SETTING_CHOICES: Partial<Record<keyof Settings, readonly string[]>> = {
   drawings: DRAWING_MODES,
   sprintScript: SCRIPT_CHOICES,
+  raceScript: SCRIPT_CHOICES,
+  raceKana: RACE_KANA,
 }
 
 /** A finished sprint. Sprints saved before lengths could be chosen have no `minutes`: they're 1. */
@@ -197,6 +218,13 @@ export interface SprintResult {
   score: number
   at: number
   minutes?: number
+}
+
+/** The fastest race through a set of kana: time including penalties. */
+export interface RaceResult {
+  ms: number
+  mistakes: number
+  at: number
 }
 
 export interface WordProgress {
@@ -221,6 +249,8 @@ export interface SaveFile {
   goalDay: string
   /** Sprint results per script choice (most recent last). */
   sprints: Partial<Record<ScriptChoice, SprintResult[]>>
+  /** The fastest race per set of kana (see `raceKey`). */
+  races: Record<string, RaceResult>
   /** Kana ids whose "mature" seal has been celebrated, per deck. */
   celebrated: Partial<Record<DeckId, string[]>>
   createdAt: number
@@ -236,6 +266,7 @@ export function emptySave(now = Date.now()): SaveFile {
     daily: { day: '', newShown: {} },
     seenNotes: [],
     sprints: {},
+    races: {},
     goalDay: '',
     settingsUpdatedAt: 0,
     celebrated: {},

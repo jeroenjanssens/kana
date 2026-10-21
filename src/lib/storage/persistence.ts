@@ -134,6 +134,14 @@ export function migrate(raw: unknown): SaveFile {
     }
   }
 
+  if (isObject(raw.races)) {
+    for (const [key, r] of Object.entries(raw.races)) {
+      if (isObject(r) && [r.ms, r.mistakes, r.at].every((n) => typeof n === 'number')) {
+        save.races[key] = { ms: r.ms as number, mistakes: r.mistakes as number, at: r.at as number }
+      }
+    }
+  }
+
   if (isObject(raw.celebrated)) {
     for (const deck of DECK_IDS) {
       const ids = raw.celebrated[deck]

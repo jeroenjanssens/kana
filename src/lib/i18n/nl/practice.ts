@@ -24,6 +24,8 @@ export default {
   'practice.sprintHeading': 'Sprint',
   'practice.sprintDesc':
     'Lees zoveel kana als je kunt voordat de tijd om is, en verbeter je beste score.',
+  'practice.raceHeading': 'Race',
+  'practice.raceDesc': 'Ga zo snel als je kunt door een reeks kana, elk één keer.',
   'practice.readingHeading': 'Leesoefening',
   'practice.readingDesc': 'Echte woorden van kana die je al kent.',
   'practice.readingUnlocked': '{count} woorden vrijgespeeld.',
@@ -158,7 +160,6 @@ export default {
   'sprint.lengthLabel': 'Duur',
   'sprint.minutes': '{n} min',
   'sprint.bestScore': 'Beste: {score}',
-  'sprint.title': 'Sprint · {script}',
   'sprint.timeLeft': 'Tijd over',
   'sprint.scoreLabel': 'Score',
   'sprint.doneEyebrow': '結果 · Resultaat',
@@ -170,6 +171,32 @@ export default {
   'sprint.newRecord': 'Nieuw record! (was {previous})',
   'sprint.newRecordTitle': 'Nieuw record',
   'sprint.whichRomaji': 'Welke romaji?',
+
+  // ── Race view ────────────────────────────────────────────────────────────────
+  'race.eyebrow': '競走 · Race',
+  'race.heading': 'Race',
+  'race.lead':
+    'Ga zo snel als je kunt door alle kana die je kiest, elk precies één keer. Typ de romaji — geen Enter nodig. Een fout kost twee seconden extra.',
+  'race.kanaLabel': 'Welke kana',
+  'race.kana.seen': 'Tot nu toe gezien',
+  'race.kana.mastered': 'Beheerst',
+  'race.kana.all': 'Alle',
+  'race.kana.rows': 'Rijen kiezen',
+  'race.shuffle': 'Willekeurige volgorde',
+  'race.start': 'Race met {count} kana',
+  'race.emptySeen': 'Je hebt nog geen van deze kana gestudeerd.',
+  'race.emptyMastered':
+    'Je beheerst nog geen van deze kana: een kana telt mee zodra hij minstens "jong" is.',
+  'race.emptyRows': 'Kies minstens één rij.',
+  'race.timeLabel': 'Tijd',
+  'race.progressLabel': 'Voortgang',
+  'race.doneEyebrow': '結果 · Resultaat',
+  'race.doneTime': '{count} kana in {time}',
+  'race.perKana': '{seconds} s per kana',
+  'race.best': 'Beste: {time}',
+  'race.newRecord': 'Nieuw record! (was {previous})',
+  'race.firstTime': 'Je eerste race met deze kana',
+  'race.missedAgain': 'Race met de gemiste',
 
   // ── WritingPad component ─────────────────────────────────────────────────────
   'writingpad.areaLabel': 'Tekengebied: {count} {count|streek|streken} getekend',

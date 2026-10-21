@@ -1,4 +1,5 @@
 import { SCRIPT_CHOICES } from '../study/scripts'
+import { fasterRace } from '../study/race'
 import { sprintMinutes, trimSprints } from '../study/sprint'
 import { DECK_IDS, type CardRecord, type ReviewEntry, type SaveFile } from './schema'
 
@@ -60,6 +61,11 @@ export function mergeSaves(a: SaveFile, b: SaveFile): SaveFile {
       ...new Map(all.map((s) => [`${s.at}:${s.score}:${sprintMinutes(s)}`, s])).values(),
     ]
     if (unique.length) out.sprints[script] = trimSprints(unique.sort((p, q) => p.at - q.at))
+  }
+
+  out.races = { ...x.races }
+  for (const [key, r] of Object.entries(y.races)) {
+    out.races[key] = out.races[key] ? fasterRace(out.races[key], r) : r
   }
 
   // Daily counters: the later day wins; on the same day, the higher count per deck.

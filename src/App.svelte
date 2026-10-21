@@ -27,6 +27,7 @@
     listen: () => import('./views/Listen.svelte'),
     write: () => import('./views/Write.svelte'),
     sprint: () => import('./views/Sprint.svelte'),
+    race: () => import('./views/Race.svelte'),
     trace: () => import('./views/Trace.svelte'),
     speech: () => import('./views/Speech.svelte'),
     reading: () => import('./views/Reading.svelte'),
