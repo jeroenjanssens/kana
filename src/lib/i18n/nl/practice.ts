@@ -21,8 +21,9 @@ export default {
   'practice.speechHeading': 'Spreken (test)',
   'practice.speechDesc':
     'Spreek kana en woorden hardop uit: zie wat spraakherkenning hoort, of neem jezelf op en vergelijk.',
-  'practice.sprintHeading': 'Sprint van een minuut',
-  'practice.sprintDesc': 'Lees in 60 seconden zoveel kana als je kunt, en verbeter je beste score.',
+  'practice.sprintHeading': 'Sprint',
+  'practice.sprintDesc':
+    'Lees zoveel kana als je kunt voordat de tijd om is, en verbeter je beste score.',
   'practice.readingHeading': 'Leesoefening',
   'practice.readingDesc': 'Echte woorden van kana die je al kent.',
   'practice.readingUnlocked': '{count} woorden vrijgespeeld.',
@@ -151,17 +152,20 @@ export default {
 
   // ── Sprint view ──────────────────────────────────────────────────────────────
   'sprint.eyebrow': '早読み · Sprint',
-  'sprint.heading': 'Sprint van een minuut',
+  'sprint.heading': 'Sprint',
   'sprint.lead':
-    'Lees in 60 seconden zoveel kana als je kunt. Typ de romaji — geen Enter nodig. Een fout kost twee seconden.',
+    'Lees zoveel kana als je kunt voordat de tijd om is. Typ de romaji — geen Enter nodig. Een fout kost twee seconden.',
+  'sprint.lengthLabel': 'Duur',
+  'sprint.minutes': '{n} min',
   'sprint.bestScore': 'Beste: {score}',
   'sprint.title': 'Sprint · {script}',
-  'sprint.secondsLeft': 'Seconden over',
+  'sprint.timeLeft': 'Tijd over',
   'sprint.scoreLabel': 'Score',
-  'sprint.ready': 'Klaar?',
-  'sprint.bestSoFar': 'Beste tot nu toe: {score}',
   'sprint.doneEyebrow': '結果 · Resultaat',
-  'sprint.doneKana': '{score} kana in één minuut',
+  'sprint.doneKanaOne': '{score} kana in één minuut',
+  'sprint.doneKana': '{score} kana in {minutes} minuten',
+  'sprint.perMinute': '{rate} per minuut',
+  'sprint.change': 'Wijzigen',
   'sprint.mistakes': '{mistakes} {mistakes|fout|fouten}',
   'sprint.newRecord': 'Nieuw record! (was {previous})',
   'sprint.newRecordTitle': 'Nieuw record',

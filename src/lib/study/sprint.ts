@@ -1,8 +1,10 @@
 import { KANA, acceptedAnswers, kanaInGroups, type Kana, type Script } from '../data/kana'
-import type { SaveFile } from '../storage/schema'
+import type { SaveFile, SprintResult } from '../storage/schema'
 import { normalize } from './answer'
+import { questionKey, scriptsOf, type Question, type ScriptChoice } from './scripts'
 
-export const SPRINT_MS = 60_000
+/** The lengths a sprint can have, in minutes. */
+export const SPRINT_MINUTES = [1, 2, 3, 5] as const
 /** A wrong answer costs this much time. */
 export const PENALTY_MS = 2000
 const MIN_POOL = 10
@@ -31,6 +33,11 @@ export function judge(input: string, kana: Kana): Judgement {
   return typed.length < 2 || longer ? 'pending' : 'wrong'
 }
 
+/** A valid sprint length in minutes (anything else is 1). */
+export function sprintLength(minutes: number): number {
+  return (SPRINT_MINUTES as readonly number[]).includes(minutes) ? minutes : 1
+}
+
 /** Kana for a sprint: the ones studied in this script (or the basic kana if that's too few). */
 export function sprintPool(save: SaveFile, script: Script): Kana[] {
   const studied = new Set(
@@ -45,32 +52,68 @@ export function sprintPool(save: SaveFile, script: Script): Kana[] {
   return known.length >= MIN_POOL ? known : candidates.filter((k) => k.group === 'basic')
 }
 
+/** Questions for a sprint: each script's pool, in that script. */
+export function sprintQuestions(save: SaveFile, choice: ScriptChoice): Question[] {
+  return scriptsOf(choice).flatMap((script) =>
+    sprintPool(save, script).map((kana) => ({ kana, script })),
+  )
+}
+
 /** Every kana a wrong answer can name in this script, so a mix-up is logged even outside the pool. */
 export function answerPool(script: Script): Kana[] {
   return kanaInGroups(['basic', 'dakuten', 'yoon', 'extended'], script)
 }
 
-/** A random kana from the pool, never the same one twice in a row. */
-export function nextSprintKana(pool: readonly Kana[], previous?: Kana, rand = Math.random): Kana {
-  const choices = pool.length > 1 ? pool.filter((k) => k.id !== previous?.id) : pool
+/** A random question from the pool, never the same one twice in a row. */
+export function nextQuestion(
+  pool: readonly Question[],
+  previous?: Question,
+  rand = Math.random,
+): Question {
+  const last = previous && questionKey(previous)
+  const choices = pool.length > 1 ? pool.filter((q) => questionKey(q) !== last) : pool
   return choices[Math.floor(rand() * choices.length)]
 }
 
-export function bestSprint(save: SaveFile, script: Script): number {
-  return Math.max(0, ...(save.sprints[script] ?? []).map((s) => s.score))
+export function sprintMinutes(result: SprintResult): number {
+  return result.minutes ?? 1
 }
 
-/** Save a sprint result. Returns true when it's a new record. */
+export function bestSprint(save: SaveFile, choice: ScriptChoice, minutes: number): number {
+  const results = (save.sprints[choice] ?? []).filter((s) => sprintMinutes(s) === minutes)
+  return Math.max(0, ...results.map((s) => s.score))
+}
+
+/** Keep the most recent results of each length, so a rarely run length keeps its record. */
+export function trimSprints(list: readonly SprintResult[]): SprintResult[] {
+  const kept = new Map<number, number>()
+  const out: SprintResult[] = []
+  for (let i = list.length - 1; i >= 0; i--) {
+    const minutes = sprintMinutes(list[i])
+    const n = kept.get(minutes) ?? 0
+    if (n >= KEEP) continue
+    kept.set(minutes, n + 1)
+    out.push(list[i])
+  }
+  return out.reverse()
+}
+
+/** Save a sprint result. Returns true when it's a new record for this script choice and length. */
 export function recordSprint(
   save: SaveFile,
-  script: Script,
+  choice: ScriptChoice,
+  minutes: number,
   score: number,
   now = Date.now(),
 ): boolean {
-  const best = bestSprint(save, script)
-  save.sprints[script] ??= []
-  const list = save.sprints[script]!
-  list.push({ score, at: now })
-  if (list.length > KEEP) list.splice(0, list.length - KEEP)
+  const best = bestSprint(save, choice, minutes)
+  const result: SprintResult = minutes === 1 ? { score, at: now } : { score, at: now, minutes }
+  save.sprints[choice] = trimSprints([...(save.sprints[choice] ?? []), result])
   return score > best
+}
+
+/** A whole number of seconds as `m:ss`. */
+export function formatClock(seconds: number): string {
+  const s = Math.max(0, Math.floor(seconds))
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }

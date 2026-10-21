@@ -1,3 +1,5 @@
+import { SCRIPT_CHOICES } from '../study/scripts'
+import { sprintMinutes, trimSprints } from '../study/sprint'
 import { DECK_IDS, type CardRecord, type ReviewEntry, type SaveFile } from './schema'
 
 /**
@@ -52,10 +54,12 @@ export function mergeSaves(a: SaveFile, b: SaveFile): SaveFile {
   }
 
   out.sprints = {}
-  for (const script of ['hiragana', 'katakana'] as const) {
+  for (const script of SCRIPT_CHOICES) {
     const all = [...(x.sprints[script] ?? []), ...(y.sprints[script] ?? [])]
-    const unique = [...new Map(all.map((s) => [`${s.at}:${s.score}`, s])).values()]
-    if (unique.length) out.sprints[script] = unique.sort((p, q) => p.at - q.at).slice(-50)
+    const unique = [
+      ...new Map(all.map((s) => [`${s.at}:${s.score}:${sprintMinutes(s)}`, s])).values(),
+    ]
+    if (unique.length) out.sprints[script] = trimSprints(unique.sort((p, q) => p.at - q.at))
   }
 
   // Daily counters: the later day wins; on the same day, the higher count per deck.

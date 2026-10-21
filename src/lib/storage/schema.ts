@@ -1,6 +1,7 @@
 import type { KanaGroup } from '../data/kana'
 import type { VoiceSetting } from '../audio/voices'
 import type { PhotoMode } from '../ui/photos'
+import { SCRIPT_CHOICES, type ScriptChoice } from '../study/scripts'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1
@@ -132,6 +133,9 @@ export interface Settings {
   haptics: boolean
   silent: boolean
   reducedMotion: 'system' | 'on' | 'off'
+  /** The script(s) and length (in minutes: 1, 2, 3 or 5) of the last sprint. */
+  sprintScript: ScriptChoice
+  sprintMinutes: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -178,11 +182,21 @@ export const DEFAULT_SETTINGS: Settings = {
   haptics: true,
   silent: false,
   reducedMotion: 'system',
+  sprintScript: 'hiragana',
+  sprintMinutes: 1,
 }
 
 /** Settings that only take one of a few values; anything else falls back to the default. */
 export const SETTING_CHOICES: Partial<Record<keyof Settings, readonly string[]>> = {
   drawings: DRAWING_MODES,
+  sprintScript: SCRIPT_CHOICES,
+}
+
+/** A finished sprint. Sprints saved before lengths could be chosen have no `minutes`: they're 1. */
+export interface SprintResult {
+  score: number
+  at: number
+  minutes?: number
 }
 
 export interface WordProgress {
@@ -205,8 +219,8 @@ export interface SaveFile {
   settingsUpdatedAt: number
   /** Day the daily goal was last celebrated. */
   goalDay: string
-  /** One-minute sprint results per script (most recent last). */
-  sprints: Partial<Record<'hiragana' | 'katakana', { score: number; at: number }[]>>
+  /** Sprint results per script choice (most recent last). */
+  sprints: Partial<Record<ScriptChoice, SprintResult[]>>
   /** Kana ids whose "mature" seal has been celebrated, per deck. */
   celebrated: Partial<Record<DeckId, string[]>>
   createdAt: number

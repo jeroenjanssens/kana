@@ -103,7 +103,7 @@ test('a one-minute sprint counts correct answers and keeps the best score', asyn
 }) => {
   test.skip(isMobile, 'typing version')
   await page.clock.install()
-  await page.goto('./#/sprint/hiragana')
+  await page.goto('./#/sprint')
   await page.getByRole('button', { name: /Start/ }).click()
   const input = page.getByRole('textbox', { name: 'Romaji' })
   for (let i = 0; i < 3; i++) {
@@ -129,10 +129,38 @@ test('a one-minute sprint counts correct answers and keeps the best score', asyn
   expect(data.log.filter((e: { mode: string }) => e.mode === 'sprint')).toHaveLength(4)
 })
 
-/** Romaji of the basic hiragana, for the sprint test (the pool is the basic kana). */
+/** Romaji of the basic kana in both scripts, for the sprint tests (the pool is the basic kana). */
 const ROMAJI: Record<string, string> = Object.fromEntries(
-  KANA.filter((k) => k.group === 'basic').map((k) => [k.hiragana, k.romaji]),
+  KANA.filter((k) => k.group === 'basic').flatMap((k) => [
+    [k.hiragana, k.romaji],
+    [k.katakana, k.romaji],
+  ]),
 )
+
+test('a two-minute sprint in both scripts', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'typing version')
+  await page.clock.install()
+  await page.goto('./#/sprint')
+  await page.getByRole('group', { name: 'Script' }).getByRole('button', { name: 'Both' }).click()
+  await page.getByRole('group', { name: 'Length' }).getByRole('button', { name: '2 min' }).click()
+  await page.getByRole('button', { name: /Start/ }).click()
+  await expect(page.getByLabel('Time left')).toHaveText('2:00')
+  await expect(page.getByText('Sprint · Hiragana + Katakana')).toBeVisible()
+  const input = page.getByRole('textbox', { name: 'Romaji' })
+  for (let i = 0; i < 6; i++) {
+    const kana = (await page.locator('.question .glyph').textContent())!.trim()
+    await input.pressSequentially(ROMAJI[kana])
+    await expect(page.getByLabel('Score')).toHaveText(String(i + 1))
+  }
+  await page.clock.runFor(121_000)
+  await expect(page.getByRole('heading', { name: '6 kana in 2 minutes' })).toBeVisible()
+  await expect(page.getByText('3 per minute')).toBeVisible()
+  const data = await savedData(page)
+  expect(data.sprints.both[0]).toMatchObject({ score: 6, minutes: 2 })
+  expect(data.settings).toMatchObject({ sprintScript: 'both', sprintMinutes: 2 })
+  for (const e of data.log.filter((e: { mode: string }) => e.mode === 'sprint'))
+    expect(['hiragana', 'katakana']).toContain(e.deck)
+})
 
 test('a sprint shows each kana in a font from the random rotation', async ({ page, isMobile }) => {
   test.skip(isMobile, 'typing version')

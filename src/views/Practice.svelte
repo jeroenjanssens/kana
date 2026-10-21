@@ -47,7 +47,7 @@
     <p>{t('practice.traceDesc')}</p>
   </a>
   <a class="card panel" href="#/sprint">
-    <span class="art" lang="ja">60</span>
+    <span class="art"><Icon name="stopwatch" size={40} /></span>
     <h2>{t('practice.sprintHeading')}</h2>
     <p>{t('practice.sprintDesc')}</p>
   </a>

@@ -1,5 +1,6 @@
+import { SCRIPT_CHOICES } from '../study/scripts'
 import { DECK_IDS, DEFAULT_SETTINGS, SCHEMA_VERSION, SETTING_CHOICES, emptySave } from './schema'
-import type { CardRecord, ReviewEntry, SaveFile, Settings } from './schema'
+import type { CardRecord, ReviewEntry, SaveFile, Settings, SprintResult } from './schema'
 
 export const STORAGE_KEY = 'kana:save'
 
@@ -119,13 +120,16 @@ export function migrate(raw: unknown): SaveFile {
   if (typeof raw.settingsUpdatedAt === 'number') save.settingsUpdatedAt = raw.settingsUpdatedAt
 
   if (isObject(raw.sprints)) {
-    for (const script of ['hiragana', 'katakana'] as const) {
+    for (const script of SCRIPT_CHOICES) {
       const list = raw.sprints[script]
       if (Array.isArray(list)) {
-        save.sprints[script] = list.filter(
-          (s): s is { score: number; at: number } =>
-            isObject(s) && typeof s.score === 'number' && typeof s.at === 'number',
-        )
+        save.sprints[script] = list
+          .filter((s) => isObject(s) && typeof s.score === 'number' && typeof s.at === 'number')
+          .map((s) => ({
+            score: s.score,
+            at: s.at,
+            ...(typeof s.minutes === 'number' ? { minutes: s.minutes } : {}),
+          })) as SprintResult[]
       }
     }
   }

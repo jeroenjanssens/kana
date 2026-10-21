@@ -19,8 +19,9 @@ export default {
   'practice.speechHeading': 'Speaking (test)',
   'practice.speechDesc':
     'Say kana and words out loud: see what speech recognition hears, or record yourself and compare.',
-  'practice.sprintHeading': 'One-minute sprint',
-  'practice.sprintDesc': 'Read as many kana as you can in 60 seconds, and beat your best.',
+  'practice.sprintHeading': 'Sprint',
+  'practice.sprintDesc':
+    'Read as many kana as you can before the time runs out, and beat your best.',
   'practice.readingHeading': 'Reading practice',
   'practice.readingDesc': 'Real words made of kana you know.',
   'practice.readingUnlocked': '{count} words unlocked.',
@@ -149,17 +150,20 @@ export default {
 
   // ── Sprint view ──────────────────────────────────────────────────────────────
   'sprint.eyebrow': '早読み · Sprint',
-  'sprint.heading': 'One-minute sprint',
+  'sprint.heading': 'Sprint',
   'sprint.lead':
-    'Read as many kana as you can in 60 seconds. Type the romaji — no Enter needed. A mistake costs two seconds.',
+    'Read as many kana as you can before the time runs out. Type the romaji — no Enter needed. A mistake costs two seconds.',
+  'sprint.lengthLabel': 'Length',
+  'sprint.minutes': '{n} min',
   'sprint.bestScore': 'Best: {score}',
   'sprint.title': 'Sprint · {script}',
-  'sprint.secondsLeft': 'Seconds left',
+  'sprint.timeLeft': 'Time left',
   'sprint.scoreLabel': 'Score',
-  'sprint.ready': 'Ready?',
-  'sprint.bestSoFar': 'Best so far: {score}',
   'sprint.doneEyebrow': '結果 · Result',
-  'sprint.doneKana': '{score} kana in one minute',
+  'sprint.doneKanaOne': '{score} kana in one minute',
+  'sprint.doneKana': '{score} kana in {minutes} minutes',
+  'sprint.perMinute': '{rate} per minute',
+  'sprint.change': 'Change',
   'sprint.mistakes': '{mistakes} {mistakes|mistake|mistakes}',
   'sprint.newRecord': 'New record! (was {previous})',
   'sprint.newRecordTitle': 'New record',
