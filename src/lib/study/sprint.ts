@@ -1,6 +1,7 @@
 import { KANA, acceptedAnswers, kanaInGroups, type Kana, type Script } from '../data/kana'
 import type { SaveFile, SprintResult } from '../storage/schema'
 import { normalize } from './answer'
+import { sprintMinutes, trimSprints } from './records'
 import { questionKey, scriptsOf, type Question, type ScriptChoice } from './scripts'
 
 /** The lengths a sprint can have, in minutes. */
@@ -8,7 +9,6 @@ export const SPRINT_MINUTES = [1, 2, 3, 5] as const
 /** A wrong answer costs this much time. */
 export const PENALTY_MS = 2000
 const MIN_POOL = 10
-const KEEP = 50
 
 export type Judgement = 'correct' | 'wrong' | 'pending'
 
@@ -75,27 +75,9 @@ export function nextQuestion(
   return choices[Math.floor(rand() * choices.length)]
 }
 
-export function sprintMinutes(result: SprintResult): number {
-  return result.minutes ?? 1
-}
-
 export function bestSprint(save: SaveFile, choice: ScriptChoice, minutes: number): number {
   const results = (save.sprints[choice] ?? []).filter((s) => sprintMinutes(s) === minutes)
   return Math.max(0, ...results.map((s) => s.score))
-}
-
-/** Keep the most recent results of each length, so a rarely run length keeps its record. */
-export function trimSprints(list: readonly SprintResult[]): SprintResult[] {
-  const kept = new Map<number, number>()
-  const out: SprintResult[] = []
-  for (let i = list.length - 1; i >= 0; i--) {
-    const minutes = sprintMinutes(list[i])
-    const n = kept.get(minutes) ?? 0
-    if (n >= KEEP) continue
-    kept.set(minutes, n + 1)
-    out.push(list[i])
-  }
-  return out.reverse()
 }
 
 /** Save a sprint result. Returns true when it's a new record for this script choice and length. */

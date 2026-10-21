@@ -3,11 +3,8 @@ import { atLeast, deckKana, masteryLevel, type MasteryLevel } from '../srs/queue
 import type { RaceResult, SaveFile } from '../storage/schema'
 import { shuffle } from '../ui/random'
 import { kanaInRows, rowOptions } from './rows'
-import { questionKey, scriptsOf, type Question, type ScriptChoice } from './scripts'
-
-/** Which kana a race goes through. */
-export type RaceKana = 'seen' | 'mastered' | 'all' | 'rows'
-export const RACE_KANA: readonly RaceKana[] = ['seen', 'mastered', 'all', 'rows']
+import { questionKey, scriptsOf, type Question, type RaceKana, type ScriptChoice } from './scripts'
+export { RACE_KANA, type RaceKana } from './scripts'
 
 export interface RaceSetup {
   script: ScriptChoice
@@ -80,11 +77,6 @@ export function recordRace(
   const record = !previous || ms < previous.ms
   if (record) save.races[key] = { ms: Math.round(ms), mistakes, at: now }
   return { previous, record: record && !!previous }
-}
-
-/** The faster of two results (the earlier one on a tie). */
-export function fasterRace(a: RaceResult, b: RaceResult): RaceResult {
-  return a.ms !== b.ms ? (a.ms < b.ms ? a : b) : a.at <= b.at ? a : b
 }
 
 /** A time as `m:ss.t`, e.g. 83 400 ms → `1:23.4`. */

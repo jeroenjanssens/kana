@@ -1,8 +1,7 @@
 import type { KanaGroup } from '../data/kana'
 import type { VoiceSetting } from '../audio/voices'
 import type { PhotoMode } from '../ui/photos'
-import { SCRIPT_CHOICES, type ScriptChoice } from '../study/scripts'
-import { RACE_KANA, type RaceKana } from '../study/race'
+import { RACE_KANA, SCRIPT_CHOICES, type RaceKana, type ScriptChoice } from '../study/scripts'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1

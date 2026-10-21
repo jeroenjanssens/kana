@@ -202,7 +202,8 @@
         <Icon name="close" />
       </button>
       <strong
-        >{t('sprint.heading')}<span class="title-script"> · {scriptLabel(choice)}</span></strong
+        >{t('sprint.heading')}<span class="title-script">{` · ${scriptLabel(choice)}`}</span
+        ></strong
       >
       <span class="bar" style:--p={left / (minutes * 60_000)}></span>
       <span class="time" aria-label={t('sprint.timeLeft')}

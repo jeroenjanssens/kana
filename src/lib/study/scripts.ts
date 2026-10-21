@@ -8,6 +8,10 @@ export function scriptsOf(choice: ScriptChoice): Script[] {
   return choice === 'both' ? ['hiragana', 'katakana'] : [choice]
 }
 
+/** Which kana a race goes through. */
+export type RaceKana = 'seen' | 'mastered' | 'all' | 'rows'
+export const RACE_KANA: readonly RaceKana[] = ['seen', 'mastered', 'all', 'rows']
+
 /** A kana as it's asked: in one script. */
 export interface Question {
   kana: Kana

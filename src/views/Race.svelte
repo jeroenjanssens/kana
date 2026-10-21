@@ -268,7 +268,9 @@
       <button class="btn icon ghost" onclick={leave} aria-label={t('common.leave')}>
         <Icon name="close" />
       </button>
-      <strong>{t('race.heading')}<span class="title-script"> · {scriptLabel(choice)}</span></strong>
+      <strong
+        >{t('race.heading')}<span class="title-script">{` · ${scriptLabel(choice)}`}</span></strong
+      >
       <span class="bar" style:--p={(phase === 'done' ? questions.length : index) / questions.length}
       ></span>
       <span class="progress" aria-label={t('race.progressLabel')}

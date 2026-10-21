@@ -1,6 +1,5 @@
 import { SCRIPT_CHOICES } from '../study/scripts'
-import { fasterRace } from '../study/race'
-import { sprintMinutes, trimSprints } from '../study/sprint'
+import { fasterRace, sprintMinutes, trimSprints } from '../study/records'
 import { DECK_IDS, type CardRecord, type ReviewEntry, type SaveFile } from './schema'
 
 /**
