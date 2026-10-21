@@ -15,6 +15,12 @@ interface Trim {
   duration: number
 }
 
+/** Strike the sound a second time, `delay` seconds later and at `gain` times the volume. */
+interface Repeat {
+  delay: number
+  gain: number
+}
+
 interface SfxEntry {
   id: string
   event: string
@@ -24,6 +30,7 @@ interface SfxEntry {
   downloadUrl?: string
   license: string
   trim?: Trim
+  repeat?: Repeat
   gainDb?: number
   rootHz?: number
   generate?: string
@@ -95,13 +102,22 @@ async function buildRawWav(e: SfxEntry, rawWav: string): Promise<void> {
   const durArgs: string[] = []
   if (e.trim?.duration) durArgs.push('-t', String(e.trim.duration))
 
+  const silence = 'silenceremove=start_periods=1:start_threshold=-50dB'
+  const filterArgs = e.repeat
+    ? [
+        '-filter_complex',
+        `${silence},asplit[a][b];` +
+          `[b]adelay=${Math.round(e.repeat.delay * 1000)},volume=${e.repeat.gain}[c];` +
+          '[a][c]amix=inputs=2:normalize=0:duration=longest',
+      ]
+    : ['-af', silence]
+
   ff([
     ...seekArgs,
     '-i',
     srcMp3,
     ...durArgs,
-    '-af',
-    'silenceremove=start_periods=1:start_threshold=-50dB',
+    ...filterArgs,
     '-ar',
     '44100',
     '-ac',

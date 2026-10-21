@@ -159,14 +159,18 @@
   {
     "id": "complete-1",
     "event": "complete",
-    "title": "Small bell (long decay)",
+    "title": "Small bell (long decay), struck twice",
     "author": "Throndronis",
     "sourceUrl": "https://freesound.org/people/Throndronis/sounds/799520/",
     "downloadUrl": "https://cdn.freesound.org/previews/799/799520_14610131-hq.mp3",
     "license": "CC0",
     "trim": {
       "start": 0.0,
-      "duration": 4.0
+      "duration": 2.5
+    },
+    "repeat": {
+      "delay": 0.17,
+      "gain": 0.7
     },
     "gainDb": 0
   },
