@@ -4,8 +4,9 @@ Recognise which kana you said with a small model of our own that runs in the bro
 practice works offline, privately, in every browser (including Vivaldi), and for single kana —
 where general speech recognition (Safari, Chrome, Whisper) is at its weakest.
 
-Status: **plan**, not started. The speech test page (`#/speech`) and record & compare exist and
-are the starting point.
+Status: **plan**, not started. Record & compare (in the kana details) exists and is the starting
+point. The speech test page (`#/speech`), which showed what the browser's speech recognition heard,
+was removed on 2026-10-21; the pages below that build on it would have to bring it back.
 
 ## Decisions
 

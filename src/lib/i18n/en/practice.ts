@@ -16,9 +16,6 @@ export default {
   'practice.traceHeading': 'Tracing',
   'practice.traceDesc':
     'Trace kana over a faint guide, stroke by stroke, to get the shapes into your fingers.',
-  'practice.speechHeading': 'Speaking (test)',
-  'practice.speechDesc':
-    'Say kana and words out loud: see what speech recognition hears, or record yourself and compare.',
   'practice.sprintHeading': 'Sprint',
   'practice.sprintDesc':
     'Read as many kana as you can before the time runs out, and beat your best.',
@@ -203,40 +200,7 @@ export default {
   'writingpad.clear': 'Clear',
   'writingpad.clearLabel': 'Clear drawing',
 
-  // ── Speech view and record & compare ────────────────────────────────────────────
-  'speech.eyebrow': '話す · Speaking',
-  'speech.heading': 'Speaking (test)',
-  'speech.lead':
-    "Say a kana or word and see exactly what your browser's speech recognition heard. This is a test, to find out how well it works on your device. You can also record yourself and compare with the app's voice.",
-  'speech.statusHeading': 'On this device',
-  'speech.recognitionYes': 'Speech recognition is available',
-  'speech.recognitionNo':
-    "Speech recognition isn't available in this browser. Try Safari or Chrome.",
-  'speech.recordingYes': 'Recording is available',
-  'speech.recordingNo': "Recording isn't available in this browser",
-  'speech.privacy':
-    'To recognise speech, your browser sends your voice to Apple (Safari) or Google (Chrome). Recordings for comparing stay on this device and are never saved.',
-  'speech.tryHeading': 'Try saying',
-  'speech.kanaLabel': 'Kana to try',
-  'speech.wordsLabel': 'Words to try',
-  'speech.otherWords': 'Other words',
-  'speech.say': 'Say {text}',
-  'speech.listening': 'Listening… tap to stop',
-  'speech.recordHint': 'Or record yourself:',
-  'speech.resultsHeading': 'What was heard',
-  'speech.match': '✓ recognised',
-  'speech.noMatch': '✗ heard something else',
-  'speech.nothingHeard': 'Nothing was heard.',
-  'speech.error.notAllowed':
-    'Microphone or speech recognition access was blocked. Allow it in your browser settings (on iPhone: Settings → Safari → Microphone).',
-  'speech.error.serviceNotAllowed':
-    'Speech recognition is turned off. On iPhone, turn on Dictation (Settings → General → Keyboard) and try again.',
-  'speech.error.network':
-    "Speech recognition couldn't reach its service. Browsers built on Chrome such as Vivaldi and Brave can't use it: try Safari or Chrome. Otherwise, check your connection.",
-  'speech.error.noSpeech': 'Nothing was heard. Speak a little louder or closer to the microphone.',
-  'speech.error.audioCapture': 'No microphone was found.',
-  'speech.error.language': "This browser can't recognise Japanese.",
-  'speech.error.other': 'Speech recognition stopped unexpectedly. Try again.',
+  // ── Record & compare ─────────────────────────────────────────────────────────
   'record.label': 'Record and compare',
   'record.start': 'Record yourself',
   'record.stop': 'Stop',

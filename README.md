@@ -29,8 +29,8 @@ stroke-order animations and flashcards that look like ink on washi paper.
   one per card), generated with VOICEVOX.
 - **Fonts**: pick one of 15 Japanese fonts, or let every card use a random one, plus a font gallery.
 - **Practice modes**: confusable pairs (シ/ツ, ぬ/め, …, also built from your own mistakes),
-  listening with its own schedule, reading practice with ~400 real words, and a **one-minute
-  sprint**.
+  listening with its own schedule, reading practice with ~400 real words, a **sprint** of one to
+  five minutes, and a **race** through a set of kana you choose.
 - **Help with tricky kana**: cards you keep forgetting are flagged, with a hint and a drill.
 - **Stats**: activity heatmap, streaks, a **daily goal**, due forecast, mastery per deck, weakest,
   tricky and most-confused kana. A daily reminder can be added to your calendar.

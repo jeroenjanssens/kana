@@ -1,6 +1,10 @@
 # Sprint and Race: plan
 
-> **Status (2026-10-21): plan.**
+> **Status (2026-10-21): implemented.** Where the build differs from this plan:
+> - **Top bars:** on phones they show only "Sprint" or "Race", without the script, so the title fits on one line.
+> - **Race records:** the first race through a set isn't a "new record"; the result says "Your first race with these kana" instead.
+> - **Race heading:** 競走 (*kyōsō*, race). Its two kanji were added to the font subsets; 話 from the Speaking page was dropped.
+> - **First load:** the record helpers live in `src/lib/study/records.ts`, so loading and merging saves doesn't pull in the Sprint and Race pages. The first visit still loads 61.7 KB of JavaScript, just over the 60 KB budget in `tests/e2e/budget.spec.ts` (open).
 
 Three changes to Practice:
 

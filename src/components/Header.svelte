@@ -13,17 +13,7 @@
       href: '#/practice',
       labelKey: 'nav.practice',
       icon: 'pairs',
-      match: [
-        'practice',
-        'drills',
-        'listen',
-        'reading',
-        'write',
-        'sprint',
-        'race',
-        'trace',
-        'speech',
-      ],
+      match: ['practice', 'drills', 'listen', 'reading', 'write', 'sprint', 'race', 'trace'],
     },
     { href: '#/stats', labelKey: 'nav.stats', icon: 'chart', match: ['stats'] },
   ]
