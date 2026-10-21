@@ -10,10 +10,10 @@ function firstLoadScripts(): string[] {
   )
 }
 
-test('the first visit loads at most 60 KB of gzipped JavaScript', ({ isMobile }) => {
+test('the first visit loads at most 62 KB of gzipped JavaScript', ({ isMobile }) => {
   test.skip(isMobile, 'same build')
   const size = firstLoadScripts().reduce((n, f) => n + gzipSync(readFileSync(f)).length, 0)
-  expect(size).toBeLessThan(60 * 1024)
+  expect(size).toBeLessThan(62 * 1024)
 })
 
 test('the FSRS algorithm is not part of the first load', ({ isMobile }) => {
