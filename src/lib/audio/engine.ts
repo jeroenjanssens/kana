@@ -80,10 +80,14 @@ export class AudioEngine {
     return this.ensure() !== undefined
   }
 
-  /** Create (or resume) the audio context. Call from a user gesture to satisfy autoplay rules. */
+  /**
+   * Create (or resume) the audio context. Call from a user gesture to satisfy autoplay rules.
+   * Phones suspend the context when the screen locks or the app goes to the background (iOS
+   * calls this state "interrupted"), so this is needed again after every such pause.
+   */
   unlock(): void {
     const ctx = this.ensure()
-    if (ctx && ctx.state === 'suspended') void ctx.resume()
+    if (ctx && ctx.state !== 'running') void ctx.resume().catch(() => {})
   }
 
   configure(settings: AudioSettings): void {
@@ -222,7 +226,9 @@ export class AudioEngine {
   }
 
   private ensure(): AudioContext | undefined {
-    if (this.ctx) return this.ctx
+    if (this.ctx && this.ctx.state !== 'closed') return this.ctx
+    // A closed context can't be resumed: start over with a new one and its own buffers.
+    if (this.ctx) this.buffers.clear()
     const ctx = this.createContext()
     if (!ctx) return undefined
     this.ctx = ctx

@@ -47,7 +47,7 @@ function fakeAudio() {
     state: 'running',
     currentTime: 0,
     destination: {},
-    resume: vi.fn(),
+    resume: vi.fn(async () => {}),
     createGain() {
       const g = { ...node(), gain: new Param() }
       gains.push(g)
@@ -225,6 +225,24 @@ describe('AudioEngine', () => {
     const { engine, audio } = makeEngine()
     await engine.playSfx('milestone')
     expect(audio.played).toHaveLength(0)
+  })
+
+  test('resumes an interrupted context on unlock', () => {
+    const { engine, audio } = makeEngine()
+    engine.unlock()
+    ;(audio.ctx as unknown as { state: string }).state = 'interrupted'
+    engine.unlock()
+    expect(audio.ctx.resume).toHaveBeenCalledTimes(1)
+  })
+
+  test('starts a new context when the old one was closed', () => {
+    const contexts = [fakeAudio(), fakeAudio()]
+    let made = 0
+    const engine = new AudioEngine('/', () => contexts[made++].ctx)
+    engine.unlock()
+    ;(contexts[0].ctx as unknown as { state: string }).state = 'closed'
+    engine.unlock()
+    expect(made).toBe(2)
   })
 
   test('applies volumes to the buses', () => {

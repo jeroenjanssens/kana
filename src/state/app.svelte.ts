@@ -79,20 +79,26 @@ export function startPersistence(): () => void {
     if (document.visibilityState === 'hidden') flush()
   })
 
-  // Unlock audio on the first interaction (autoplay policy) and preload the effects.
+  // Unlock audio on every interaction (autoplay policy), not just the first: phones suspend audio
+  // when the screen locks or the app goes to the background, and voices that play on a timer
+  // can't resume it themselves. On touch screens only pointerup/touchend/click count as a gesture.
+  let preloaded = false
   const unlock = () => {
     audio.unlock()
-    void audio.preloadSfx()
-    window.removeEventListener('pointerdown', unlock)
-    window.removeEventListener('keydown', unlock)
+    if (!preloaded) {
+      preloaded = true
+      void audio.preloadSfx()
+    }
   }
-  window.addEventListener('pointerdown', unlock)
-  window.addEventListener('keydown', unlock)
+  const gestures = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'] as const
+  for (const type of gestures)
+    window.addEventListener(type, unlock, { capture: true, passive: true })
 
   void requestPersistence()
 
   return () => {
     stop()
     window.removeEventListener('pagehide', onHide)
+    for (const type of gestures) window.removeEventListener(type, unlock, { capture: true })
   }
 }
