@@ -77,4 +77,12 @@ export default {
   'misc.newVersionAvailable': 'Een nieuwe versie van kana is beschikbaar',
   'misc.offlineReady': 'kana werkt nu offline',
   'misc.reload': 'Herladen',
+
+  // Version number (bottom-left corner and Settings)
+  'misc.versionShort': 'v{version}',
+  'misc.version': 'Versie {version}',
+  'misc.checkForUpdates': 'Zoek naar updates',
+  'misc.updating': 'Bijwerken naar versie {version}…',
+  'misc.latestVersion': 'Je hebt de nieuwste versie ({version})',
+  'misc.updateCheckFailed': 'Kon niet zoeken naar updates',
 } satisfies Record<keyof typeof en, string>

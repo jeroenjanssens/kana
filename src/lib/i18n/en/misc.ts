@@ -75,4 +75,12 @@ export default {
   'misc.newVersionAvailable': 'A new version of kana is available',
   'misc.offlineReady': 'kana is ready to work offline',
   'misc.reload': 'Reload',
+
+  // Version number (bottom-left corner and Settings)
+  'misc.versionShort': 'v{version}',
+  'misc.version': 'Version {version}',
+  'misc.checkForUpdates': 'Check for updates',
+  'misc.updating': 'Updating to version {version}…',
+  'misc.latestVersion': 'You have the latest version ({version})',
+  'misc.updateCheckFailed': "Couldn't check for updates",
 } as const

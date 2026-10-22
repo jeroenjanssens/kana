@@ -20,6 +20,8 @@
   import { toast } from '../state/ui.svelte'
   import { t, lang } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { APP_VERSION } from '../lib/ui/version'
+  import { checkForUpdates } from '../state/update'
 
   const DRAWING_LABEL: Record<DrawingMode, MessageKey> = {
     off: 'settings.drawingsOff',
@@ -671,6 +673,10 @@
         >{t('settings.githubLink')}</a
       >
     </p>
+    <p class="small">
+      {t('misc.version', { version: APP_VERSION })} ·
+      <button class="link" onclick={checkForUpdates}>{t('misc.checkForUpdates')}</button>
+    </p>
   </section>
 </div>
 
@@ -854,5 +860,15 @@
 
   .danger {
     color: var(--shu);
+  }
+
+  .link {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
   }
 </style>

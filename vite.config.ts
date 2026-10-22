@@ -1,15 +1,35 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import type { Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
 const BASE = '/kana/'
+/** The GitHub Actions run number that built this version (set in CI), or "dev". */
+const VERSION = process.env.KANA_VERSION || 'dev'
+
+/** Write version.json, which the app fetches to see whether a newer version is out. */
+function versionFile(): Plugin {
+  return {
+    name: 'kana-version',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'version.json',
+        source: JSON.stringify({ version: VERSION }),
+      })
+    },
+  }
+}
 
 export default defineConfig({
   base: BASE,
   // The FSRS optimizer runs in a module worker.
   worker: { format: 'es' },
+  define: { __APP_VERSION__: JSON.stringify(VERSION) },
   plugins: [
     svelte(),
+    versionFile(),
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,

@@ -52,7 +52,7 @@ test('writing あ stroke by stroke is accepted', async ({ page }) => {
   await expect(page.locator('.romaji')).toHaveText('a')
   await drawOnPad(page, referenceStrokes(strokesFor('あ')))
   await expect(page.getByRole('img', { name: 'Drawing area: 3 strokes drawn' })).toBeVisible()
-  await page.getByRole('button', { name: /Check/ }).click()
+  await page.getByRole('button', { name: /^Check/ }).click()
   await expect(page.locator('.verdict')).toHaveText('Correct!')
   await expect(page.locator('.grade.suggested')).toBeVisible()
   await page.getByRole('button', { name: /Good/ }).click()
@@ -71,7 +71,7 @@ test('a stroke drawn the wrong way round is explained', async ({ page }) => {
   const strokes = referenceStrokes(strokesFor('ア'))
   strokes[1] = [...strokes[1]].reverse()
   await drawOnPad(page, strokes)
-  await page.getByRole('button', { name: /Check/ }).click()
+  await page.getByRole('button', { name: /^Check/ }).click()
   await expect(page.locator('.verdict')).toHaveText('Stroke 2 goes the other way.')
   await expect(page.locator('.grade.suggested')).toHaveText(/Again/)
 })
@@ -217,7 +217,7 @@ test('tracing over a faint guide, without touching the schedule', async ({ page 
           [90, 90],
         ],
       ])
-      await page.getByRole('button', { name: /Check/ }).click()
+      await page.getByRole('button', { name: /^Check/ }).click()
       await expect(page.locator('.verdict')).not.toHaveText('Correct!')
       await expect(page.getByLabel('How closely you followed the guide')).toHaveText(
         /^\d%|^[1-5]\d%/,
@@ -225,7 +225,7 @@ test('tracing over a faint guide, without touching the schedule', async ({ page 
       await page.getByRole('button', { name: /Trace again/ }).click()
     }
     await drawOnPad(page, referenceStrokes(strokesFor(char)))
-    await page.getByRole('button', { name: /Check/ }).click()
+    await page.getByRole('button', { name: /^Check/ }).click()
     await expect(page.locator('.verdict')).toHaveText('Correct!')
     await expect(page.getByLabel('How closely you followed the guide')).toHaveText(/^(9\d|100)%$/)
     await page.getByRole('button', { name: /^Next Enter/ }).click()

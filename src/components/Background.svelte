@@ -6,6 +6,8 @@
   import { route } from '../state/router.svelte'
   import { ui } from '../state/ui.svelte'
   import { t } from '../state/i18n.svelte'
+  import { checkForUpdates } from '../state/update'
+  import { APP_VERSION } from '../lib/ui/version'
   import Icon from './Icon.svelte'
 
   const base = import.meta.env.BASE_URL
@@ -70,6 +72,15 @@
     <div class="veil"></div>
   {/if}
 </div>
+
+<button
+  class="version"
+  class:on-photo={show && photo}
+  onclick={checkForUpdates}
+  title={t('misc.checkForUpdates')}
+  aria-label="{t('misc.version', { version: APP_VERSION })} · {t('misc.checkForUpdates')}"
+  >{t('misc.versionShort', { version: APP_VERSION })}</button
+>
 
 {#if show && photo}
   <div class="corner" class:quiet={quietPage}>
@@ -177,6 +188,31 @@
     flex-direction: column;
   }
 
+  /* The version, bottom-left, in the same small type as the photo credit. */
+  .version {
+    position: fixed;
+    left: 14px;
+    bottom: 10px;
+    z-index: 1;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.72rem;
+    line-height: 1.35;
+    color: var(--ink-faint);
+  }
+
+  .version.on-photo {
+    color: rgb(255 255 255 / 0.82);
+    text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+  }
+
+  .version:hover {
+    text-decoration: underline;
+  }
+
   .credit .title {
     font-weight: 600;
     opacity: 0;
@@ -218,7 +254,8 @@
   /* On phones the credit would cover content (photographers are listed on the credits page);
      the arrows stay, small, on Home and the Table only. */
   @media (max-width: 720px) {
-    .credit {
+    .credit,
+    .version {
       display: none;
     }
 
