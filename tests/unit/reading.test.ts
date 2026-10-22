@@ -4,11 +4,9 @@ import { macronVariants, romajiVariants } from '../../src/lib/data/romaji'
 import { words, type Word } from '../../src/lib/data/words'
 import { normalize } from '../../src/lib/study/answer'
 import {
-  NOTES,
   isUnlocked,
   knownLevel,
   missingKana,
-  notesFor,
   practiceOrder,
   unlockedWords,
   wordKana,
@@ -139,14 +137,7 @@ describe('unlocking', () => {
   })
 })
 
-describe('notes and order', () => {
-  test('notes are shown for special spellings', () => {
-    expect(
-      notesFor(word('がっこう', 'hiragana', ['sokuon', 'long-vowel', 'dakuten'])).map((n) => n.id),
-    ).toEqual(['sokuon', 'long-vowel'])
-    expect(Object.keys(NOTES)).toEqual(['sokuon', 'choon', 'long-vowel', 'yoon'])
-  })
-
+describe('order', () => {
   test('practiceOrder puts unpractised words first', () => {
     const save = emptySave()
     save.words['あい'] = { seen: 10, correct: 10, last: 1 }

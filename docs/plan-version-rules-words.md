@@ -1,6 +1,11 @@
 # Version number, pronunciation rules and more words: plan
 
-> **Status (2026-10-22): plan.**
+> **Status (2026-10-22): implemented.** Where the build differs from this plan:
+> - **Rule order:** with 507 words, the order within the levels follows the new counts: long vowels (73 words) now come before small ゃゅょ (56), rendaku before ぢ/づ, and the soft g (24) leads level 3. Each rule shows how many practice words use it.
+> - **Silent vowels** are detected from the spelling, using the conditions from Wikipedia's *Japanese phonology*, instead of being marked by hand; all 59 words were checked by hand. Rendaku and particles are marked by hand.
+> - **Pitch accent:** VOICEVOX's own pitch was too subtle, especially in the male voice, so the pitch examples set the melody explicitly (about five semitones) with a larger intonation scale. Measured in all eight recordings: high-low and low-high as intended.
+> - **Rules on the back of a card** sit below the answer buttons, so answering never needs scrolling. The old reading notes are replaced by the rules; rules you'd already seen as notes count as seen.
+> - **Rule examples** that became practice words (ビル, きって, とうきょう…) use the word's recording; 15 examples keep their own.
 
 Four parts, each in its own commit, pushed only when asked:
 

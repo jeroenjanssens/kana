@@ -3,21 +3,18 @@
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
+  import Modal from '../components/Modal.svelte'
   import PaperCard from '../components/PaperCard.svelte'
+  import RuleList from '../components/RuleList.svelte'
+  import WordCard from '../components/WordCard.svelte'
   import type { VoiceId } from '../lib/audio/voices'
   import { nextCardFont } from '../lib/data/fonts'
-  import { segment } from '../lib/data/kana'
+  import { segment, type Kana } from '../lib/data/kana'
+  import type { RuleId } from '../lib/data/rules'
   import { words, type Word } from '../lib/data/words'
   import { logPractice, markNoteSeen, recordWord } from '../lib/study/actions'
   import { checkWord } from '../lib/study/answer'
-  import {
-    missingKana,
-    notesFor,
-    practiceOrder,
-    unlockedWords,
-    wordMeaning,
-    type ReadingNote,
-  } from '../lib/study/reading'
+  import { missingKana, practiceOrder, unlockedWords, wordMeaning } from '../lib/study/reading'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
@@ -41,7 +38,11 @@
   let flipped = $state(false)
   let input = $state('')
   let verdict = $state<boolean | undefined>()
-  let notes = $state<ReadingNote[]>([])
+  /** Rules met for the first time on this card: their explanation is shown open. */
+  let newRules = $state<RuleId[]>([])
+  /** The word whose card is open from the overview. */
+  let opened = $state<{ word: Word; missing: Kana[] } | undefined>()
+  let wordOpen = $state(false)
   let font = $state(settings().font)
   /** One voice per word card (matters for the "random" setting). */
   let voice: VoiceId = audio.pickVoice()
@@ -74,7 +75,7 @@
     flipped = false
     verdict = undefined
     input = ''
-    notes = []
+    newRules = []
     tilt = (Math.random() - 0.5) * 1.2
     paper = Math.floor(Math.random() * 2 ** 31)
     phase = 'card'
@@ -88,7 +89,7 @@
     void audio.playSfx('flip')
     const word = current
     if (s.autoplay) setTimeout(() => current === word && audio.playWord(word.index, voice), 280)
-    notes = notesFor(current, lang()).filter((n) => markNoteSeen(store.data, n.id))
+    newRules = current.rules.filter((r) => markNoteSeen(store.data, r))
   }
 
   function submit() {
@@ -143,6 +144,11 @@
   }
 
   const parts = $derived(current ? segment(current.kana) : [])
+
+  function openWord(word: Word, missing: Kana[] = []) {
+    opened = { word, missing }
+    wordOpen = true
+  }
 </script>
 
 <svelte:window onkeydown={onKeydown} />
@@ -174,8 +180,16 @@
       <ul class="chips">
         {#each unlocked as w (w.kana)}
           {@const p = store.data.words[w.kana]}
-          <li title="{w.romaji} — {wordMeaning(w, lang())}" class:practised={p && p.correct > 0}>
-            <span lang="ja">{w.kana}</span>
+          <li class:practised={p && p.correct > 0}>
+            <button
+              title="{w.romaji} — {wordMeaning(w, lang())}"
+              aria-label={t('reading.openWord', {
+                kana: w.kana,
+                romaji: w.romaji,
+                meaning: wordMeaning(w, lang()),
+              })}
+              onclick={() => openWord(w)}><span lang="ja">{w.kana}</span></button
+            >
           </li>
         {/each}
       </ul>
@@ -188,7 +202,7 @@
       <ul class="next">
         {#each locked.slice(0, 8) as { w, missing } (w.kana)}
           <li>
-            <span class="word" lang="ja">{w.kana}</span>
+            <button class="word" lang="ja" onclick={() => openWord(w, missing)}>{w.kana}</button>
             <span class="muted">{t('reading.needs')}</span>
             <span lang="ja" class="missing">
               {missing.map((k) => (w.script === 'katakana' ? k.katakana : k.hiragana)).join(' ')}
@@ -266,9 +280,9 @@
                   <span class="part mark"
                     ><span lang="ja">{p.text}</span><small
                       >{p.text === 'ー'
-                        ? 'long'
+                        ? t('word.long')
                         : p.text === 'っ' || p.text === 'ッ'
-                          ? 'pause'
+                          ? t('word.pause')
                           : ''}</small
                     ></span
                   >
@@ -279,15 +293,6 @@
         </PaperCard>
       </div>
     {/key}
-
-    {#each notes as n (n.id)}
-      <aside class="note panel" in:fly={{ y: 8 }}>
-        <p class="eyebrow">{t('reading.newRule')}</p>
-        <h3>{n.title}</h3>
-        <p>{n.body}</p>
-        <p class="example" lang="ja">{n.example}</p>
-      </aside>
-    {/each}
 
     <div class="controls">
       {#if typed && !flipped}
@@ -329,6 +334,13 @@
         </div>
       {/if}
     </div>
+
+    {#if flipped && current.rules.length}
+      <aside class="note panel" in:fly={{ y: 8 }}>
+        <h3>{t('reading.rulesHeading')}</h3>
+        <RuleList rules={current.rules} open={newRules} />
+      </aside>
+    {/if}
   </div>
 {:else if phase === 'done'}
   <section class="panel block done">
@@ -339,6 +351,12 @@
       <button class="btn" onclick={() => (phase = 'overview')}>{t('reading.overview')}</button>
     </div>
   </section>
+{/if}
+
+{#if opened}
+  <Modal bind:open={wordOpen} title={opened.word.kana}>
+    <WordCard word={opened.word} missing={opened.missing} />
+  </Modal>
 {/if}
 
 <style>
@@ -386,11 +404,29 @@
   }
 
   .chips li {
-    padding: 0.25rem 0.7rem;
     border-radius: 999px;
     border: 1px solid var(--line);
+  }
+
+  .chips button,
+  button.word {
+    padding: 0.25rem 0.7rem;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: inherit;
+    cursor: pointer;
     font-family: var(--font-kana);
     font-size: 1.05rem;
+  }
+
+  .chips button:hover,
+  button.word:hover {
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+
+  button.word {
+    padding: 0.1rem 0.4rem;
   }
 
   .chips li.practised {
@@ -523,16 +559,6 @@
 
   .note h3 {
     margin: 0.2rem 0 0.4rem;
-  }
-
-  .note p {
-    margin: 0 0 0.4rem;
-    font-size: 0.9rem;
-  }
-
-  .example {
-    font-family: var(--font-kana);
-    color: var(--ink-soft);
   }
 
   .controls {

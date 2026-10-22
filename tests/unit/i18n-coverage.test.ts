@@ -6,10 +6,9 @@ import { KANA } from '../../src/lib/data/kana'
 import { KANA_NOTES, mnemonicFor } from '../../src/lib/data/mnemonics'
 import { hintsNl } from '../../src/lib/data/nl/confusables'
 import { mnemonicsNl } from '../../src/lib/data/nl/mnemonics'
-import { kanaNotesNl, readingNotesNl } from '../../src/lib/data/nl/notes'
+import { kanaNotesNl } from '../../src/lib/data/nl/notes'
 import { meaningsNl } from '../../src/lib/data/nl/words'
 import { words } from '../../src/lib/data/words'
-import { NOTES } from '../../src/lib/study/reading'
 
 function svelteFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -123,7 +122,5 @@ describe('Dutch learning content', () => {
   test('every note is translated', () => {
     for (const id of Object.keys(KANA_NOTES))
       expect(kanaNotesNl[id as keyof typeof kanaNotesNl], id).toBeDefined()
-    for (const id of Object.keys(NOTES))
-      expect(readingNotesNl[id as keyof typeof readingNotesNl], id).toBeDefined()
   })
 })

@@ -121,7 +121,17 @@ export default {
   'reading.check': 'Check',
   'reading.couldntRead': "Couldn't read it",
   'reading.readIt': 'Read it',
-  'reading.newRule': 'New rule',
+  'reading.rulesHeading': 'Rules in this word',
+  'reading.openWord': '{kana}: {romaji}, {meaning}',
+
+  // ── Word card (Reading overview and the rules page) ─────────────────────────
+  'word.needs': 'To unlock this word, learn:',
+  'word.parts': 'Made of',
+  'word.pause': 'pause',
+  'word.long': 'long',
+  'word.progress': 'Seen {seen} {seen|time|times}, read correctly {correct} {correct|time|times}.',
+  'word.notPractised': 'Not practised yet.',
+  'word.greenHint': 'Words you’ve read correctly at least once are green in the list.',
   'reading.doneEyebrow': 'よくできました · Well read',
   'reading.doneScore': '{score} / {total} words read correctly',
   'reading.anotherRound': 'Another round',

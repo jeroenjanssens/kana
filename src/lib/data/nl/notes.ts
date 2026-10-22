@@ -24,27 +24,3 @@ export const kanaNotesNl: Partial<Record<'dakuten' | 'handakuten' | 'yoon' | 'sm
       example: 'フ fu + ァ → ファ fa, テ te + ィ → ティ ti',
     },
   }
-
-/** Dutch versions of the reading-practice notes (っ, ー, long vowels, yōon). */
-export const readingNotesNl: Partial<Record<'sokuon' | 'choon' | 'long-vowel' | 'yoon', Note>> = {
-  sokuon: {
-    title: 'Klein っ verdubbelt de volgende medeklinker',
-    body: 'Een kleine っ (ッ in katakana) wordt niet uitgesproken als "tsu". Het maakt een korte pauze en verdubbelt de medeklinker die volgt.',
-    example: 'がっこう → gakkō, ねっこ → nekko',
-  },
-  choon: {
-    title: 'ー maakt een klinker lang',
-    body: 'In katakana rekt het lange streepje ー de klinker ervóór uit tot ongeveer het dubbele.',
-    example: 'コーヒー → kōhī, ケーキ → kēki',
-  },
-  'long-vowel': {
-    title: 'Lange klinkers in hiragana',
-    body: 'In hiragana wordt een klinker verlengd door een extra klinker toe te voegen: あ, い of う na dezelfde klinker, い na e, en meestal う na o.',
-    example: 'おかあさん → okāsan, せんせい → sensē, がっこう → gakkō',
-  },
-  yoon: {
-    title: 'Klein ゃ ゅ ょ smelt samen tot één klank',
-    body: 'Een kleine ゃ, ゅ of ょ na een i-rij-kana smelt ermee samen tot één lettergreep.',
-    example: 'き + ゃ → きゃ (kya), し + ょ → しょ (sho)',
-  },
-}

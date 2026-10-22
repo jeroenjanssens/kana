@@ -1,15 +1,21 @@
 <script lang="ts">
   import { tick } from 'svelte'
+  import Modal from '../components/Modal.svelte'
   import VoiceButtons from '../components/VoiceButtons.svelte'
+  import WordCard from '../components/WordCard.svelte'
+  import type { Word } from '../lib/data/words'
   import { RULES, RULE_SOURCES, localRule, type RuleLevel } from '../lib/data/rules'
   import type { MessageKey } from '../lib/i18n/messages'
-  import { playExample, wordsWithRule } from '../lib/study/examples'
+  import { exampleWord, playExample, wordsWithRule } from '../lib/study/examples'
   import { audio } from '../state/app.svelte'
   import { route } from '../state/router.svelte'
   import { lang, t } from '../state/i18n.svelte'
 
   const LEVELS: RuleLevel[] = [1, 2, 3]
   const rules = $derived(RULES.map((r) => localRule(r, lang())))
+  /** The practice word whose card is open. */
+  let opened = $state<Word | undefined>()
+  let wordOpen = $state(false)
 
   // #/rules?rule=sokuon opens the page at that rule.
   $effect(() => {
@@ -64,7 +70,17 @@
         <ul class="examples">
           {#each rule.examples as example, i (i)}
             <li>
-              <span class="kana" lang="ja">{example.kana}</span>
+              {#if exampleWord(example)}
+                {@const word = exampleWord(example)!}
+                <button
+                  class="kana word"
+                  lang="ja"
+                  title={t('rules.openWord')}
+                  onclick={() => ((opened = word), (wordOpen = true))}>{example.kana}</button
+                >
+              {:else}
+                <span class="kana" lang="ja">{example.kana}</span>
+              {/if}
               <span class="romaji">{example.romaji}</span>
               <span class="note">{example.note}</span>
               <VoiceButtons
@@ -88,6 +104,12 @@
     {/each}
   </ul>
 </section>
+
+{#if opened}
+  <Modal bind:open={wordOpen} title={opened.kana}>
+    <WordCard word={opened} />
+  </Modal>
+{/if}
 
 <style>
   .page-head {
@@ -205,6 +227,16 @@
   .kana {
     font-family: var(--font-kana);
     font-size: 1.35rem;
+  }
+
+  button.word {
+    justify-self: start;
+    padding: 0 0.2rem;
+    border: 0;
+    border-bottom: 1px dashed var(--ink-faint);
+    background: none;
+    color: inherit;
+    cursor: pointer;
   }
 
   .romaji {

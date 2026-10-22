@@ -123,7 +123,17 @@ export default {
   'reading.check': 'Controleer',
   'reading.couldntRead': 'Niet kunnen lezen',
   'reading.readIt': 'Gelezen',
-  'reading.newRule': 'Nieuwe regel',
+  'reading.rulesHeading': 'Regels in dit woord',
+  'reading.openWord': '{kana}: {romaji}, {meaning}',
+
+  // ── Word card (Reading overview and the rules page) ─────────────────────────
+  'word.needs': 'Om dit woord vrij te spelen, leer:',
+  'word.parts': 'Gemaakt van',
+  'word.pause': 'pauze',
+  'word.long': 'lang',
+  'word.progress': '{seen} {seen|keer|keer} gezien, {correct} {correct|keer|keer} goed gelezen.',
+  'word.notPractised': 'Nog niet geoefend.',
+  'word.greenHint': 'Woorden die je minstens één keer goed gelezen hebt, zijn groen in de lijst.',
   'reading.doneEyebrow': 'よくできました · Goed gelezen',
   'reading.doneScore': '{score} / {total} woorden goed gelezen',
   'reading.anotherRound': 'Nog een ronde',
