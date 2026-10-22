@@ -183,7 +183,7 @@ export default {
   'race.start': 'Race met {count} kana',
   'race.emptySeen': 'Je hebt nog geen van deze kana gestudeerd.',
   'race.emptyMastered':
-    'Je beheerst nog geen van deze kana: een kana telt mee zodra hij minstens "jong" is.',
+    'Je beheerst nog geen van deze kana: een kana telt mee zodra de volgende herhaling minstens drie weken weg is.',
   'race.emptyRows': 'Kies minstens één rij.',
   'race.timeLabel': 'Tijd',
   'race.progressLabel': 'Voortgang',

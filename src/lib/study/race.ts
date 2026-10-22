@@ -21,7 +21,7 @@ function level(save: SaveFile, script: 'hiragana' | 'katakana', id: string): Mas
 
 /**
  * The questions of a race, in table order: all hiragana first, then all katakana. Only kana in the
- * groups enabled in Settings; "mastered" means at least young.
+ * groups enabled in Settings; "mastered" means mature (next review at least 21 days away).
  */
 export function raceQuestions(
   save: SaveFile,
@@ -36,7 +36,7 @@ export function raceQuestions(
         : setup.kana === 'all'
           ? pool
           : pool.filter((k) =>
-              atLeast(level(save, script, k.id), setup.kana === 'seen' ? 'learning' : 'young'),
+              atLeast(level(save, script, k.id), setup.kana === 'seen' ? 'learning' : 'mature'),
             )
     return kana.map((k) => ({ kana: k, script }))
   })

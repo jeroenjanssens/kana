@@ -181,7 +181,7 @@ export default {
   'race.start': 'Race {count} kana',
   'race.emptySeen': "You haven't studied any of these kana yet.",
   'race.emptyMastered':
-    'You haven\'t mastered any of these kana yet: a kana counts once it\'s at least "young".',
+    "You haven't mastered any of these kana yet: a kana counts once its next review is at least three weeks away.",
   'race.emptyRows': 'Choose at least one row.',
   'race.timeLabel': 'Time',
   'race.progressLabel': 'Progress',

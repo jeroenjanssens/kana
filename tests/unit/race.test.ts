@@ -44,11 +44,16 @@ describe('which kana', () => {
     ])
   })
 
-  test('mastered: at least young', () => {
+  test('mastered: mature, in its own deck or the combined deck', () => {
     const s = emptySave()
-    s.cards.katakana = { a: card(1), i: card(2, 3), u: card(2, 60) }
+    s.cards.katakana = { a: card(1), i: card(2, 3), u: card(2, 21), e: card(2, 60) }
+    s.cards.combined = { o: card(2, 30) }
     const setup = { script: 'katakana' as const, kana: 'mastered' as const, rows: [] }
-    expect(keys(raceQuestions(s, setup, GROUPS))).toEqual(['katakana:i', 'katakana:u'])
+    expect(keys(raceQuestions(s, setup, GROUPS))).toEqual([
+      'katakana:u',
+      'katakana:e',
+      'katakana:o',
+    ])
     expect(raceQuestions(emptySave(), setup, GROUPS)).toEqual([])
   })
 

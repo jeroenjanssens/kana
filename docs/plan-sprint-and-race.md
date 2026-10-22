@@ -85,7 +85,7 @@ A segmented control for the choice (`ScriptPicker.svelte`), used by both pages a
 - Script: Hiragana · Katakana · Both
 - Which kana: Seen so far · Mastered · All · Choose rows
   - **Seen so far**: kana you've studied at least once in that script (its own deck or the combined deck).
-  - **Mastered**: kana that are at least "young" in that script's deck or the combined deck.
+  - **Mastered**: kana that are "mature" (next review at least 21 days away) in that script's deck or the combined deck. At first this was "at least young", but kana only stay in learning for minutes, so that was nearly always the same as "Seen so far".
   - **All**: every kana in the groups enabled in Settings.
   - **Choose rows**: the row chips from Study in order, with Select all and Clear. With Both, a chip shows both scripts (か カ) and a row counts in both. Extended rows only exist in katakana.
 - Random order (switch)
