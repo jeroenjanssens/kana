@@ -1,5 +1,5 @@
 import type { VoiceId } from '../audio/voices'
-import { RULES, exampleAudio, type RuleExample } from '../data/rules'
+import { RULES, exampleAudio, type RuleExample, type RuleId } from '../data/rules'
 import { words, type Word } from '../data/words'
 
 const WORDS_BY_KANA = new Map(words.map((w) => [w.kana, w]))
@@ -7,6 +7,11 @@ const WORDS_BY_KANA = new Map(words.map((w) => [w.kana, w]))
 /** The practice word an example is, if any (pitch examples never are: they need their melody). */
 export function exampleWord(example: RuleExample): Word | undefined {
   return example.accent ? undefined : WORDS_BY_KANA.get(example.kana)
+}
+
+/** The practice words that use a rule. */
+export function wordsWithRule(rule: RuleId): Word[] {
+  return words.filter((w) => w.rules.includes(rule))
 }
 
 /** A playable recording: a practice word's, or the example's own. */

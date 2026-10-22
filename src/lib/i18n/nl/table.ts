@@ -71,4 +71,5 @@ export default {
   'rules.sources': 'Bronnen',
   'rules.sourcesBody': 'De regels zijn gecontroleerd met deze artikelen (Engels).',
   'rules.forKana': 'Uitspraakregels',
+  'rules.wordCount': 'Komt voor in {count} {count|oefenwoord|oefenwoorden}',
 } satisfies Record<keyof typeof en, string>

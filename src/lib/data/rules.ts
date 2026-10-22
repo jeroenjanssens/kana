@@ -4,7 +4,7 @@ import { rulesNl } from './nl/rules'
 
 /**
  * Pronunciation and spelling rules for reading kana, from the first ones you need to the rare
- * ones. Checked against Wikipedia's articles on Japanese phonology, rendaku, sokuon and pitch
+ * ones; within a level, the rules most practice words use come first. Checked against Wikipedia's articles on Japanese phonology, rendaku, sokuon and pitch
  * accent (see RULE_SOURCES).
  */
 
@@ -114,6 +114,24 @@ export const RULES: readonly Rule[] = [
     ],
   },
   {
+    id: 'long-vowel',
+    level: 1,
+    title: 'Long vowels in hiragana',
+    body: [
+      'Hiragana has no long-vowel mark: a vowel is made long by writing a second one. ああ is ā, いい is ī and うう is ū.',
+      'For a long e you usually write い: えい is said ē (せんせい sounds like “sensē”), though the romaji here writes ei. For a long o you usually write う: おう is said ō. A few words use ええ or おお instead (see “おお instead of おう”).',
+      'A long vowel takes two beats, and length changes the meaning: おばさん is aunt, おばあさん grandmother. When the two vowels belong to different parts of a word, each keeps its sound, as in おもう o-mo-u (to think).',
+    ],
+    examples: [
+      { kana: 'おかあさん', romaji: 'okāsan', note: 'mother: ああ → ā' },
+      { kana: 'いいえ', romaji: 'iie', note: 'no: いい → ī' },
+      { kana: 'せんせい', romaji: 'sensei', note: 'teacher: えい → ē' },
+      { kana: 'がっこう', romaji: 'gakkō', note: 'school: おう → ō' },
+      { kana: 'おばさん', romaji: 'obasan', note: 'aunt: short a' },
+      { kana: 'おばあさん', romaji: 'obāsan', note: 'grandmother: long ā' },
+    ],
+  },
+  {
     id: 'yoon',
     level: 1,
     title: 'Small ゃ ゅ ょ blend into one sound',
@@ -143,24 +161,6 @@ export const RULES: readonly Rule[] = [
       { kana: 'ラーメン', romaji: 'rāmen', note: 'ramen' },
       { kana: 'ビル', romaji: 'biru', note: 'building: short i' },
       { kana: 'ビール', romaji: 'bīru', note: 'beer: long ī' },
-    ],
-  },
-  {
-    id: 'long-vowel',
-    level: 1,
-    title: 'Long vowels in hiragana',
-    body: [
-      'Hiragana has no long-vowel mark: a vowel is made long by writing a second one. ああ is ā, いい is ī and うう is ū.',
-      'For a long e you usually write い: えい is said ē (せんせい sounds like “sensē”). For a long o you usually write う: おう is said ō. A few words use ええ or おお instead (see “おお instead of おう”).',
-      'A long vowel takes two beats, and length changes the meaning: おばさん is aunt, おばあさん grandmother. When the two vowels belong to different parts of a word, each keeps its sound, as in おもう o-mo-u (to think).',
-    ],
-    examples: [
-      { kana: 'おかあさん', romaji: 'okāsan', note: 'mother: ああ → ā' },
-      { kana: 'いいえ', romaji: 'iie', note: 'no: いい → ī' },
-      { kana: 'せんせい', romaji: 'sensē', note: 'teacher: えい → ē' },
-      { kana: 'がっこう', romaji: 'gakkō', note: 'school: おう → ō' },
-      { kana: 'おばさん', romaji: 'obasan', note: 'aunt: short a' },
-      { kana: 'おばあさん', romaji: 'obāsan', note: 'grandmother: long ā' },
     ],
   },
   {
@@ -259,21 +259,6 @@ export const RULES: readonly Rule[] = [
     ],
   },
   {
-    id: 'ji-zu',
-    level: 2,
-    title: 'ぢ and づ',
-    body: [
-      'ぢ sounds just like じ (ji), and づ like ず (zu). They’re mostly written when a ち or つ becomes voiced in a compound (see “Sounds that change in compounds”), or when ち or つ is repeated: ちぢむ, つづく.',
-      'To type them, use di and du.',
-    ],
-    examples: [
-      { kana: 'つづく', romaji: 'tsuzuku', note: 'to continue: つ + づ' },
-      { kana: 'はなぢ', romaji: 'hanaji', note: 'nosebleed: はな (nose) + ち (blood)' },
-      { kana: 'みかづき', romaji: 'mikazuki', note: 'crescent moon: みか + つき (moon)' },
-      { kana: 'ちぢむ', romaji: 'chijimu', note: 'to shrink' },
-    ],
-  },
-  {
     id: 'rendaku',
     level: 2,
     title: 'Sounds that change in compounds (rendaku)',
@@ -288,20 +273,34 @@ export const RULES: readonly Rule[] = [
       { kana: 'ひとびと', romaji: 'hitobito', note: 'people: ひと + ひと' },
     ],
   },
+  {
+    id: 'ji-zu',
+    level: 2,
+    title: 'ぢ and づ',
+    body: [
+      'ぢ sounds just like じ (ji), and づ like ず (zu). They’re mostly written when a ち or つ becomes voiced in a compound (see “Sounds that change in compounds”), or when ち or つ is repeated: ちぢむ, つづく.',
+      'To type them, use di and du.',
+    ],
+    examples: [
+      { kana: 'つづく', romaji: 'tsuzuku', note: 'to continue: つ + づ' },
+      { kana: 'はなぢ', romaji: 'hanaji', note: 'nosebleed: はな (nose) + ち (blood)' },
+      { kana: 'みかづき', romaji: 'mikazuki', note: 'crescent moon: みか + つき (moon)' },
+      { kana: 'ちぢむ', romaji: 'chijimu', note: 'to shrink' },
+    ],
+  },
 
   // ── Level 3 ─────────────────────────────────────────────────────────────────
   {
-    id: 'n-apostrophe',
+    id: 'nasal-g',
     level: 3,
-    title: 'ん before a vowel or y',
+    title: 'A soft g in the middle of words',
     body: [
-      'When ん comes before a vowel or y, romaji writes n’ to show where the beats split: きんえん kin’en (no smoking) is four beats, きねん kinen (anniversary) only three. In the same way ほんや hon’ya (bookshop) isn’t ほにゃ.',
-      'To type ん before a vowel, type nn.',
+      'Traditionally, standard Japanese says a g inside a word, and the particle が, through the nose, like the ng in “singer”: かがみ ka-nga-mi.',
+      'Only a minority of speakers still do this consistently, it has been fading for decades, and younger speakers mostly say a plain g. Both are correct; the app’s voices say a plain g.',
     ],
     examples: [
-      { kana: 'きんえん', romaji: 'kin’en', note: 'no smoking: き-ん-え-ん' },
-      { kana: 'きねん', romaji: 'kinen', note: 'anniversary: き-ね-ん' },
-      { kana: 'ほんや', romaji: 'hon’ya', note: 'bookshop: ほ-ん-や' },
+      { kana: 'かぎ', romaji: 'kagi', note: 'key: also said “kangi”' },
+      { kana: 'たまご', romaji: 'tamago', note: 'egg: also said “tamango”' },
     ],
   },
   {
@@ -317,6 +316,20 @@ export const RULES: readonly Rule[] = [
       { kana: 'とおい', romaji: 'tōi', note: 'far' },
       { kana: 'こおり', romaji: 'kōri', note: 'ice' },
       { kana: 'おねえさん', romaji: 'onēsan', note: 'older sister: ええ → ē' },
+    ],
+  },
+  {
+    id: 'n-apostrophe',
+    level: 3,
+    title: 'ん before a vowel or y',
+    body: [
+      'When ん comes before a vowel or y, romaji writes n’ to show where the beats split: きんえん kin’en (no smoking) is four beats, きねん kinen (anniversary) only three. In the same way ほんや hon’ya (bookshop) isn’t ほにゃ.',
+      'To type ん before a vowel, type nn.',
+    ],
+    examples: [
+      { kana: 'きんえん', romaji: 'kin’en', note: 'no smoking: き-ん-え-ん' },
+      { kana: 'きねん', romaji: 'kinen', note: 'anniversary: き-ね-ん' },
+      { kana: 'ほんや', romaji: 'hon’ya', note: 'bookshop: ほ-ん-や' },
     ],
   },
   {
@@ -372,19 +385,6 @@ export const RULES: readonly Rule[] = [
         say: "アメ'",
         accent: true,
       },
-    ],
-  },
-  {
-    id: 'nasal-g',
-    level: 3,
-    title: 'A soft g in the middle of words',
-    body: [
-      'Traditionally, standard Japanese says a g inside a word, and the particle が, through the nose, like the ng in “singer”: かがみ ka-nga-mi.',
-      'Only a minority of speakers still do this consistently, it has been fading for decades, and younger speakers mostly say a plain g. Both are correct; the app’s voices say a plain g.',
-    ],
-    examples: [
-      { kana: 'かぎ', romaji: 'kagi', note: 'key: also said “kangi”' },
-      { kana: 'たまご', romaji: 'tamago', note: 'egg: also said “tamango”' },
     ],
   },
   {

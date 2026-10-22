@@ -18,10 +18,10 @@ test('the rules page opens from the menu, and examples play in both voices', asy
   await row.getByRole('button', { name: 'きっぷ · Male' }).click()
   await request
   // …and other examples have one of their own.
-  request = page.waitForRequest(/audio\/male\/rules\/kitte\.mp3$/)
+  request = page.waitForRequest(/audio\/male\/rules\/kite\.mp3$/)
   await sokuon
     .getByRole('listitem')
-    .filter({ hasText: 'kitte' })
+    .filter({ hasText: /^きて/ })
     .getByRole('button', { name: /Male/ })
     .click()
   await request

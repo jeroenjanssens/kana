@@ -3,7 +3,7 @@
   import VoiceButtons from '../components/VoiceButtons.svelte'
   import { RULES, RULE_SOURCES, localRule, type RuleLevel } from '../lib/data/rules'
   import type { MessageKey } from '../lib/i18n/messages'
-  import { playExample } from '../lib/study/examples'
+  import { playExample, wordsWithRule } from '../lib/study/examples'
   import { audio } from '../state/app.svelte'
   import { route } from '../state/router.svelte'
   import { lang, t } from '../state/i18n.svelte'
@@ -57,6 +57,9 @@
           <span class="number">{rules.indexOf(rule) + 1}</span>
           {rule.title}
         </h3>
+        {#if wordsWithRule(rule.id).length}
+          <p class="count">{t('rules.wordCount', { count: wordsWithRule(rule.id).length })}</p>
+        {/if}
         {#each rule.body as paragraph, i (i)}<p>{paragraph}</p>{/each}
         <ul class="examples">
           {#each rule.examples as example, i (i)}
@@ -168,6 +171,12 @@
   .number {
     font-family: var(--font-heading);
     color: var(--shu);
+  }
+
+  .rule .count {
+    margin: -0.3rem 0 0.6rem;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
   }
 
   .rule p {

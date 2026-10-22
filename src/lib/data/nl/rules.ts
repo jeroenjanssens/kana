@@ -64,7 +64,7 @@ export const rulesNl: Record<RuleId, { title: string; body: string[]; notes: str
     title: 'Lange klinkers in hiragana',
     body: [
       'Hiragana heeft geen teken voor een lange klinker: je maakt een klinker lang door er nog een te schrijven. ああ is ā, いい is ī en うう is ū.',
-      'Voor een lange e schrijf je meestal い: えい zeg je als ē (せんせい klinkt als “sensē”). Voor een lange o schrijf je meestal う: おう zeg je als ō. Een paar woorden gebruiken ええ of おお (zie “おお in plaats van おう”).',
+      'Voor een lange e schrijf je meestal い: えい zeg je als ē (せんせい klinkt als “sensē”), al schrijft de romaji hier ei. Voor een lange o schrijf je meestal う: おう zeg je als ō. Een paar woorden gebruiken ええ of おお (zie “おお in plaats van おう”).',
       'Een lange klinker duurt twee tellen, en de lengte verandert de betekenis: おばさん is tante, おばあさん oma. Horen de twee klinkers bij verschillende delen van een woord, dan houdt elk zijn eigen klank, zoals in おもう o-mo-u (denken).',
     ],
     notes: [

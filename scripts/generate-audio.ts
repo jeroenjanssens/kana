@@ -9,10 +9,11 @@
  *   npx tsx scripts/generate-audio.ts            # generate public/audio/{voice}/…
  *   npx tsx scripts/generate-audio.ts --voice=male  # regenerate one voice only
  *   npx tsx scripts/generate-audio.ts --rules    # only the pronunciation-rule examples
+ *   npx tsx scripts/generate-audio.ts --new-words  # only words that have no recording yet
  *   npx tsx scripts/generate-audio.ts --preview  # build voice-preview/index.html to compare voices
  */
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { KANA, type Kana } from '../src/lib/data/kana.ts'
@@ -278,26 +279,15 @@ async function synthesizeAccent(notation: string, speaker: number): Promise<Buff
 }
 
 /**
- * Readings in kanji for rule examples whose kana alone could be read differently (美容院 is
- * bi-yō-in, not byōin), by recording name. Kept here so the kanji don't end up in the fonts.
+ * Readings in kanji for rule examples that aren't practice words, so VOICEVOX reads them as
+ * meant (a particle は as wa), by recording name. Kept here so the kanji don't end up in the fonts.
  */
 const RULE_READINGS: Record<string, string> = {
-  biyooin: '美容院',
-  obasan: '叔母さん',
   kite: '来て',
-  kitte: '切手',
   'watashi-wa': '私は',
   'gakkoo-e': '学校へ',
   'mizu-o': '水を',
-  tookyoo: '東京',
-  hanaji: '鼻血',
-  mikazuki: '三日月',
-  chijimu: '縮む',
-  hitobito: '人々',
   kinen: '記念',
-  tooi: '遠い',
-  koori: '氷',
-  oneesan: 'お姉さん',
 }
 
 /** Record the pronunciation-rule examples that aren't practice words, in every voice. */
@@ -313,6 +303,21 @@ async function generateRules(only?: string) {
       encodeMp3(wav, join('public', ruleAudioPath(voice.id, r.name)))
     }
     console.log(`${voice.id}: ${recordings.length} rule examples (${voice.character})`)
+  }
+}
+
+/** Record the words that don't have a recording yet (new words go at the end of the list). */
+async function generateNewWords(only?: string) {
+  for (const voice of loadVoices().filter((v) => !only || v.id === only)) {
+    mkdirSync(join(OUT_DIR, voice.id, 'words'), { recursive: true })
+    let made = 0
+    for (const [i, word] of words.entries()) {
+      const file = join('public', wordAudioPath(voice.id, i))
+      if (existsSync(file)) continue
+      encodeMp3(await synthesize(word.kana, voice.speaker, false), file)
+      made++
+    }
+    console.log(`${voice.id}: ${made} new words (${voice.character})`)
   }
 }
 
@@ -504,7 +509,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
       ? preview()
       : process.argv.includes('--rules')
         ? generateRules(only)
-        : generate(only).then(() => generateRules(only))
+        : process.argv.includes('--new-words')
+          ? generateNewWords(only)
+          : generate(only).then(() => generateRules(only))
   run.catch((err) => {
     console.error(err)
     process.exit(1)

@@ -70,4 +70,5 @@ export default {
   'rules.sources': 'Sources',
   'rules.sourcesBody': 'The rules were checked against these articles.',
   'rules.forKana': 'Pronunciation rules',
+  'rules.wordCount': 'Used in {count} practice {count|word|words}',
 } as const

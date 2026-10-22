@@ -31,7 +31,7 @@ const young = (days = 4): CardRecord => ({
 const word = (
   kana: string,
   script: Word['script'] = 'hiragana',
-  tags: Word['tags'] = [],
+  rules: Word['rules'] = [],
 ): Word => ({
   kana,
   romaji: '',
@@ -39,7 +39,7 @@ const word = (
   meaning: '',
   index: 0,
   script,
-  tags,
+  rules,
 })
 
 describe('word list', () => {
@@ -62,10 +62,9 @@ describe('word list', () => {
     expect(w.meaning).toBeTruthy()
     expect(w.accept.length).toBeGreaterThan(0)
     for (const a of w.accept) expect(a).toMatch(/^[a-z]+$/)
-    expect(w.tags.includes('sokuon')).toBe(/[っッ]/.test(w.kana))
-    expect(w.tags.includes('choon')).toBe(w.kana.includes('ー'))
-    expect(w.tags.includes('loanword')).toBe(w.script === 'katakana')
-    expect(w.tags.includes('yoon')).toBe(/[ゃゅょャュョ]/.test(w.kana))
+    expect(w.rules.includes('sokuon')).toBe(/[っッ]./.test(w.kana))
+    expect(w.rules.includes('choon')).toBe(w.kana.includes('ー'))
+    expect(w.rules.includes('yoon')).toBe(/[ゃゅょャュョ]/.test(w.kana))
     // Every word is made of kana we can teach.
     expect(wordKana(w).length).toBeGreaterThan(0)
     // The plain spelling of the romaji is accepted.
@@ -73,7 +72,9 @@ describe('word list', () => {
   })
 
   test.each(words.map((w) => [w.kana, w] as const))('%s: romaji matches the kana', (_, w) => {
-    const fromKana = romajiVariants(w.kana)
+    // A particle は at the end (こんにちは) is said wa.
+    const spoken = w.rules.includes('particles') ? w.kana.replace(/は$/, 'わ') : w.kana
+    const fromKana = romajiVariants(spoken)
     expect(
       macronVariants(w.romaji).some((v) => fromKana.includes(v)),
       `${w.kana} ≠ ${w.romaji}`,

@@ -1,6 +1,6 @@
+import { segment } from './kana'
 import { macronVariants, romajiVariants } from './romaji'
-
-export type WordTag = 'sokuon' | 'choon' | 'long-vowel' | 'loanword' | 'yoon' | 'dakuten'
+import { RULES, type RuleId } from './rules'
 
 export interface Word {
   /** The word as normally written in kana: hiragana for native words, katakana for loanwords. */
@@ -11,13 +11,17 @@ export interface Word {
   accept: string[]
   meaning: string
   script: 'hiragana' | 'katakana'
-  tags: WordTag[]
+  /** The pronunciation rules this word uses (see rules.ts), in the order of the rules page. */
+  rules: RuleId[]
   /** Position in the word list; also names the word's audio file. */
   index: number
 }
 
-/** [kana, Hepburn romaji, meaning], roughly from easiest to hardest. */
-type Entry = [kana: string, romaji: string, meaning: string]
+/**
+ * [kana, Hepburn romaji, meaning, rules that can't be detected from the spelling], roughly from
+ * easiest to hardest. New words go at the end: a word's place names its recording.
+ */
+type Entry = [kana: string, romaji: string, meaning: string, rules?: RuleId[]]
 
 const ENTRIES: Entry[] = [
   // First words: only the あ か さ た な rows.
@@ -421,23 +425,189 @@ const ENTRIES: Entry[] = [
   ['ティッシュ', 'tisshu', 'tissue'],
   ['ディズニー', 'dizunī', 'Disney'],
   ['フィンランド', 'finrando', 'Finland'],
+
+  // Added for the pronunciation rules: words for the rules with few examples, then everyday words.
+  ['れんあい', "ren'ai", 'romantic love'],
+  ['げんいん', "gen'in", 'cause'],
+  ['ぜんいん', "zen'in", 'everyone (in a group)'],
+  ['こんや', "kon'ya", 'tonight'],
+  ['きんようび', "kin'yōbi", 'Friday'],
+  ['しんゆう', "shin'yū", 'best friend'],
+  ['ほんやく', "hon'yaku", 'translation'],
+  ['せんえん', "sen'en", 'a thousand yen'],
+  ['ふんいき', "fun'iki", 'atmosphere, mood'],
+  ['はなぢ', 'hanaji', 'nosebleed', ['rendaku']],
+  ['みかづき', 'mikazuki', 'crescent moon', ['rendaku']],
+  ['ちぢむ', 'chijimu', 'to shrink'],
+  ['こづつみ', 'kozutsumi', 'parcel', ['rendaku']],
+  ['つづき', 'tsuzuki', 'continuation'],
+  ['かなづち', 'kanazuchi', 'hammer', ['rendaku']],
+  ['てづくり', 'tezukuri', 'handmade', ['rendaku']],
+  ['ちかづく', 'chikazuku', 'to come closer', ['rendaku']],
+  ['きづく', 'kizuku', 'to notice', ['rendaku']],
+  ['つづける', 'tsuzukeru', 'to keep doing, to continue'],
+  ['とおい', 'tōi', 'far'],
+  ['おおい', 'ōi', 'many, a lot'],
+  ['こおり', 'kōri', 'ice'],
+  ['とおり', 'tōri', 'street, avenue'],
+  ['おおかみ', 'ōkami', 'wolf'],
+  ['ほのお', 'honō', 'flame'],
+  ['とお', 'tō', 'ten (things)'],
+  ['こおろぎ', 'kōrogi', 'cricket (insect)'],
+  ['おおぜい', 'ōzei', 'a crowd, many people'],
+  ['ええ', 'ē', 'yes'],
+  ['えいが', 'eiga', 'film, movie'],
+  ['きれい', 'kirei', 'pretty; clean'],
+  ['ていねい', 'teinei', 'polite; careful'],
+  ['れいぞうこ', 'reizōko', 'fridge'],
+  ['けいさつ', 'keisatsu', 'police'],
+  ['めいし', 'meishi', 'business card'],
+  ['へいわ', 'heiwa', 'peace'],
+  ['せいと', 'seito', 'pupil, student'],
+  ['くうき', 'kūki', 'air'],
+  ['すうがく', 'sūgaku', 'mathematics'],
+  ['ゆうき', 'yūki', 'courage'],
+  ['ふうとう', 'fūtō', 'envelope'],
+  ['かんぱい', 'kanpai', 'cheers!'],
+  ['せんぱい', 'senpai', 'senior (at school or work)'],
+  ['しんぱい', 'shinpai', 'worry'],
+  ['こんぶ', 'konbu', 'kelp'],
+  ['さんま', 'sanma', 'Pacific saury (fish)'],
+  ['がんばって', 'ganbatte', 'good luck!, do your best'],
+  ['ぶんぽう', 'bunpō', 'grammar'],
+  ['けんぶつ', 'kenbutsu', 'sightseeing'],
+  ['こんにちは', 'konnichiwa', 'hello, good afternoon', ['particles']],
+  ['こんばんは', 'konbanwa', 'good evening', ['particles']],
+  ['きって', 'kitte', 'stamp'],
+  ['いっぱい', 'ippai', 'full; a lot'],
+  ['はっぱ', 'happa', 'leaf'],
+  ['しっぽ', 'shippo', 'tail'],
+  ['みっか', 'mikka', 'three days; the third (of the month)'],
+  ['けっこん', 'kekkon', 'marriage'],
+  ['せっけん', 'sekken', 'soap'],
+  ['きっさてん', 'kissaten', 'coffee shop'],
+  ['マッチ', 'matchi', 'match (to light a fire)'],
+  ['ポケット', 'poketto', 'pocket'],
+  ['ふじさん', 'fujisan', 'Mount Fuji'],
+  ['ふく', 'fuku', 'clothes'],
+  ['さいふ', 'saifu', 'wallet'],
+  ['ふつう', 'futsū', 'normal, usual'],
+  ['ふたご', 'futago', 'twins'],
+  ['ヴァイオリン', 'vaiorin', 'violin'],
+  ['ファン', 'fan', 'fan (supporter)'],
+  ['フィルム', 'firumu', 'film (for a camera)'],
+  ['ディスク', 'disuku', 'disc'],
+  ['チェス', 'chesu', 'chess'],
+  ['シェア', 'shea', 'share (of a market)'],
+  ['ウィーン', 'wīn', 'Vienna'],
+  ['ファイル', 'fairu', 'file'],
+  ['ウォッカ', 'wokka', 'vodka'],
+  ['ヴィーナス', 'vīnasu', 'Venus'],
+  ['フィギュア', 'figyua', 'figurine'],
+  ['すこし', 'sukoshi', 'a little'],
+  ['ちから', 'chikara', 'strength'],
+  ['ふくろ', 'fukuro', 'bag'],
+  ['しつもん', 'shitsumon', 'question'],
+  ['たくさん', 'takusan', 'a lot, many'],
+  ['おりがみ', 'origami', 'origami (paper folding)', ['rendaku']],
+  ['いけばな', 'ikebana', 'flower arranging', ['rendaku']],
+  ['ほんだな', 'hondana', 'bookshelf', ['rendaku']],
+  ['ふでばこ', 'fudebako', 'pencil case', ['rendaku']],
+  ['てぶくろ', 'tebukuro', 'gloves', ['rendaku']],
+  ['はなび', 'hanabi', 'fireworks', ['rendaku']],
+  ['ひとびと', 'hitobito', 'people', ['rendaku']],
+  ['ゆきだるま', 'yukidaruma', 'snowman', ['rendaku']],
+  ['みずぎ', 'mizugi', 'swimsuit', ['rendaku']],
+  ['とうきょう', 'tōkyō', 'Tokyo'],
+  ['きょうと', 'kyōto', 'Kyoto'],
+  ['びよういん', 'biyōin', 'beauty salon'],
+  ['ビル', 'biru', 'building'],
+  ['おばさん', 'obasan', 'aunt'],
+  ['しゅっぱつ', 'shuppatsu', 'departure'],
+  ['きゅうり', 'kyūri', 'cucumber'],
+  ['じょうず', 'jōzu', 'skilful, good at'],
+  ['メニュー', 'menyū', 'menu'],
+  ['ジャケット', 'jaketto', 'jacket'],
+  ['アイスクリーム', 'aisukurīmu', 'ice cream'],
+  ['たんい', "tan'i", 'unit; (study) credit'],
+  ['みぢか', 'mijika', 'close to home, familiar', ['rendaku']],
+  ['おおあめ', 'ōame', 'heavy rain'],
+  ['こおる', 'kōru', 'to freeze'],
+  ['しかく', 'shikaku', 'square'],
+  ['ふかい', 'fukai', 'deep'],
+  ['きせつ', 'kisetsu', 'season'],
+  ['あまがさ', 'amagasa', 'umbrella (for rain)', ['rendaku']],
+  ['くちぶえ', 'kuchibue', 'whistling', ['rendaku']],
+  ['フェリー', 'ferī', 'ferry'],
+  ['ずっと', 'zutto', 'all the time; by far'],
+  ['やっぱり', 'yappari', 'as expected, after all'],
+  ['ちゃいろ', 'chairo', 'brown'],
 ]
 
-function tagsFor(kana: string, romaji: string, script: Word['script']): WordTag[] {
-  const tags: WordTag[] = []
-  if (/[っッ]/.test(kana)) tags.push('sokuon')
-  if (kana.includes('ー')) tags.push('choon')
-  if (script === 'hiragana' && /[āīūēō]/.test(romaji)) tags.push('long-vowel')
-  if (script === 'katakana') tags.push('loanword')
-  if (/[ゃゅょャュョ]/.test(kana)) tags.push('yoon')
-  if (/[\u3099\u309a]/.test(kana.normalize('NFD'))) tags.push('dakuten')
-  return tags
+/** An i or u after a voiceless consonant: ki, shi, tsu, fu, pu, kyu… */
+const WEAK = /^(k|ky|s|sh|ch|ts|h|hy|f|p|py)(i|u)$/
+/** Where the next beat starts with a stop or affricate (k, t, p, ch, ts). */
+const STOP_NEXT = /^(k|t|p|ch)/
+/** A voiceless fricative (s, sh): only after a stop (k, p). */
+const HISS_NEXT = /^s/
+
+/**
+ * Whether an i or u in the word goes silent in standard Japanese: between voiceless consonants,
+ * very likely when the next one is a stop or affricate, or when a stop is followed by s or sh
+ * (never before h). At the end of a word, only in です and ます.
+ */
+export function devoices(kana: string): boolean {
+  const beats = segment(kana).map((p) => p.kana?.romaji ?? p.text)
+  for (let i = 0; i < beats.length - 1; i++) {
+    const weak = WEAK.exec(beats[i])
+    if (!weak) continue
+    const next = beats[i + 1]
+    if (STOP_NEXT.test(next) || (/^(k|p)/.test(weak[1]) && HISS_NEXT.test(next))) return true
+  }
+  return /[でま]す$/.test(kana)
 }
 
-function build([kana, romaji, meaning]: Entry, index: number): Word {
+/** The rules a word uses, from its spelling, plus the ones given by hand. */
+export function rulesFor(
+  kana: string,
+  romaji: string,
+  script: Word['script'],
+  extra: readonly RuleId[] = [],
+): RuleId[] {
+  const rules = new Set<RuleId>(extra)
+  const add = (rule: RuleId, when: boolean) => when && rules.add(rule)
+  const hiragana = script === 'hiragana'
+  add('dakuten', /[\u3099\u309a]/.test(kana.normalize('NFD')))
+  add('r', /[らりるれろラリルレロ]/.test(kana))
+  add('n', /[んン]/.test(kana))
+  add('yoon', /[ゃゅょャュョ]/.test(kana))
+  add('choon', kana.includes('ー'))
+  add(
+    'long-vowel',
+    hiragana && (/[āīūēō]/.test(romaji) || /[えけせてねへめれげぜでべぺ]い/.test(kana)),
+  )
+  add('sokuon', /[っッ]./.test(kana))
+  add('devoicing', devoices(kana))
+  add('sounds', /[ふフつツ]/.test(kana))
+  add('small-vowels', /[ァィゥェォヴ]/.test(kana))
+  add('ji-zu', /[ぢづヂヅ]/.test(kana))
+  add('n-apostrophe', /[んン][あいうえおやゆよアイウエオヤユヨ]/.test(kana))
+  add(
+    'oo',
+    hiragana &&
+      /[ōē]/.test(romaji) &&
+      /[おこそとのほもよろごぞどぼぽ]お|[えけせてねへめれげぜでべぺ]え/.test(kana),
+  )
+  add('final-sokuon', /[っッ]$/.test(kana))
+  add('nasal-g', hiragana && /^.+[がぎぐげご]/.test(kana))
+  return RULES.map((r) => r.id).filter((r) => rules.has(r))
+}
+
+function build([kana, romaji, meaning, extra]: Entry, index: number): Word {
   const script = /[\u30a0-\u30ff]/.test(kana) ? 'katakana' : 'hiragana'
   const accept = [...new Set([...romajiVariants(kana), ...macronVariants(romaji)])]
-  return { kana, romaji, accept, meaning, script, tags: tagsFor(kana, romaji, script), index }
+  const rules = rulesFor(kana, romaji, script, extra)
+  return { kana, romaji, accept, meaning, script, rules, index }
 }
 
 export const words: readonly Word[] = ENTRIES.map(build)

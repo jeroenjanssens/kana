@@ -2,7 +2,8 @@ import type { Lang } from '../i18n/format'
 import { kanaByChar, segment, type Kana } from '../data/kana'
 import { meaningsNl } from '../data/nl/words'
 import { readingNotesNl } from '../data/nl/notes'
-import { words, type Word, type WordTag } from '../data/words'
+import type { RuleId } from '../data/rules'
+import { words, type Word } from '../data/words'
 import { atLeast, masteryLevel, type MasteryLevel } from '../srs/queue'
 import type { SaveFile } from '../storage/schema'
 
@@ -45,14 +46,14 @@ export function missingKana(save: SaveFile, word: Word): Kana[] {
 }
 
 export interface ReadingNote {
-  id: WordTag
+  id: RuleId
   title: string
   body: string
   example: string
 }
 
 /** Short explanations of spelling rules, shown the first time a word uses them. */
-export const NOTES: Partial<Record<WordTag, ReadingNote>> = {
+export const NOTES: Partial<Record<RuleId, ReadingNote>> = {
   sokuon: {
     id: 'sokuon',
     title: 'Small っ doubles the next consonant',
@@ -80,7 +81,7 @@ export const NOTES: Partial<Record<WordTag, ReadingNote>> = {
 }
 
 export function notesFor(word: Word, lang: Lang = 'en'): ReadingNote[] {
-  return word.tags.flatMap((t) => {
+  return word.rules.flatMap((t) => {
     const note = NOTES[t]
     if (!note) return []
     const nl = lang === 'nl' ? readingNotesNl[t as keyof typeof readingNotesNl] : undefined
