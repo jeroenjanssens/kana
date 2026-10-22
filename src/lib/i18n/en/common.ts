@@ -3,6 +3,7 @@ export default {
   'nav.main': 'Main',
   'nav.learn': 'Learn',
   'nav.table': 'Table',
+  'nav.rules': 'Rules',
   'nav.practice': 'Practice',
   'nav.stats': 'Stats',
   'nav.settings': 'Settings',

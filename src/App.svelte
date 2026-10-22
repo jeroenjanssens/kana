@@ -22,6 +22,7 @@
   const LAZY = {
     study: () => import('./views/Study.svelte'),
     table: () => import('./views/Table.svelte'),
+    rules: () => import('./views/Rules.svelte'),
     practice: () => import('./views/Practice.svelte'),
     drills: () => import('./views/Drills.svelte'),
     listen: () => import('./views/Listen.svelte'),

@@ -4,7 +4,14 @@
  */
 
 import type { Grade } from '../storage/schema'
-import { kanaAudioPath, pickVoice, wordAudioPath, type VoiceId, type VoiceSetting } from './voices'
+import {
+  kanaAudioPath,
+  pickVoice,
+  ruleAudioPath,
+  wordAudioPath,
+  type VoiceId,
+  type VoiceSetting,
+} from './voices'
 
 export type SfxEvent =
   'flip' | 'hard' | 'good' | 'easy' | 'wrong' | 'stamp' | 'bell' | 'complete' | 'milestone' | 'tick'
@@ -154,6 +161,11 @@ export class AudioEngine {
   /** Play the pronunciation of a reading-practice word (by its index in the word list). */
   playWord(index: number, voice: VoiceId = this.pickVoice()): Promise<void> {
     return this.playClip(wordAudioPath(voice, index))
+  }
+
+  /** Play a pronunciation-rule example that isn't a practice word (by its recording name). */
+  playRuleExample(name: string, voice: VoiceId = this.pickVoice()): Promise<void> {
+    return this.playClip(ruleAudioPath(voice, name))
   }
 
   /** Play a recording (e.g. of yourself) on the voice channel. Resolves when playback ends. */

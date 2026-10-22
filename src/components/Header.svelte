@@ -9,6 +9,7 @@
   const NAV: { href: string; labelKey: MessageKey; icon: IconName; match: string[] }[] = [
     { href: '#/', labelKey: 'nav.learn', icon: 'cards', match: ['', 'study'] },
     { href: '#/table', labelKey: 'nav.table', icon: 'table', match: ['table'] },
+    { href: '#/rules', labelKey: 'nav.rules', icon: 'book', match: ['rules'] },
     {
       href: '#/practice',
       labelKey: 'nav.practice',

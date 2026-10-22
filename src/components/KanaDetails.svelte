@@ -7,6 +7,7 @@
   import type { DeckId } from '../lib/storage/schema'
   import { audio, settings, store } from '../state/app.svelte'
   import { mnemonicFor } from '../lib/data/mnemonics'
+  import { RULES_BY_ID, localRule, rulesForKana } from '../lib/data/rules'
   import type { MessageKey } from '../lib/i18n/messages'
   import { t, lang } from '../state/i18n.svelte'
   import Hanko from './Hanko.svelte'
@@ -122,6 +123,14 @@
       </li>
     {/each}
   </ul>
+  {#if rulesForKana(kana).length}
+    <p class="rules">
+      <span class="script">{t('rules.forKana')}</span>
+      {#each rulesForKana(kana) as id (id)}
+        <a class="chip" href="#/rules?rule={id}">{localRule(RULES_BY_ID.get(id)!, lang()).title}</a>
+      {/each}
+    </p>
+  {/if}
   <ul class="decks">
     {#each decks as d (d.deck)}
       <li>
@@ -303,5 +312,26 @@
 
   .dot.level-mature {
     background: var(--level-mature);
+  }
+
+  .rules {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0.6rem 0 0;
+  }
+
+  .rules .script {
+    width: 100%;
+  }
+
+  .rules .chip {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .rules .chip:hover {
+    border-color: var(--ink-soft);
   }
 </style>

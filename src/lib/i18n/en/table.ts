@@ -1,4 +1,4 @@
-/** Interface text: table view and kana details panel. */
+/** Interface text: table view, kana details panel and pronunciation rules. */
 export default {
   // Table.svelte – page header & controls
   'table.heading': 'Kana table',
@@ -55,4 +55,19 @@ export default {
   'table.dueIn': 'due in {interval}',
   'table.dueNow': 'due now',
   'table.metaRecall': '{pct}% recall',
+  // Rules.svelte – pronunciation rules
+  'rules.eyebrow': '発音 · Pronunciation',
+  'rules.heading': 'Pronunciation rules',
+  'rules.lead':
+    'How kana are really said, from the rules you need from the start to rare exceptions. Every example can be heard in both voices.',
+  'rules.contents': 'Contents',
+  'rules.level1': 'From the start',
+  'rules.level1Desc': 'You’ll need these in your first words.',
+  'rules.level2': 'Good to know soon',
+  'rules.level2Desc': 'Common, and they make you sound more natural.',
+  'rules.level3': 'Rare or advanced',
+  'rules.level3Desc': 'Exceptions, and things you’ll meet later.',
+  'rules.sources': 'Sources',
+  'rules.sourcesBody': 'The rules were checked against these articles.',
+  'rules.forKana': 'Pronunciation rules',
 } as const

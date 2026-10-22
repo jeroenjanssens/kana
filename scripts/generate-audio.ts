@@ -8,6 +8,7 @@
  * Usage:
  *   npx tsx scripts/generate-audio.ts            # generate public/audio/{voice}/…
  *   npx tsx scripts/generate-audio.ts --voice=male  # regenerate one voice only
+ *   npx tsx scripts/generate-audio.ts --rules    # only the pronunciation-rule examples
  *   npx tsx scripts/generate-audio.ts --preview  # build voice-preview/index.html to compare voices
  */
 import { execFileSync } from 'node:child_process'
@@ -16,7 +17,13 @@ import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { KANA, type Kana } from '../src/lib/data/kana.ts'
 import { words } from '../src/lib/data/words.ts'
-import { kanaAudioPath, wordAudioPath, type VoiceId } from '../src/lib/audio/voices.ts'
+import {
+  kanaAudioPath,
+  ruleAudioPath,
+  wordAudioPath,
+  type VoiceId,
+} from '../src/lib/audio/voices.ts'
+import { ruleRecordings } from '../src/lib/study/examples.ts'
 
 const ENGINE = process.env.VOICEVOX_URL ?? 'http://localhost:50021'
 const OUT_DIR = 'public/audio'
@@ -54,6 +61,7 @@ async function post<T>(path: string, body?: unknown, raw = false): Promise<T> {
 
 interface AccentPhrase {
   moras: {
+    pitch: number
     vowel_length: number
     vowel: string
     consonant: string | null
@@ -228,6 +236,84 @@ async function generate(only?: string) {
   }
   const sources = { engine: 'VOICEVOX', voices: Object.fromEntries(voices.map((v) => [v.id, v])) }
   writeFileSync(join(OUT_DIR, 'SOURCES.json'), JSON.stringify(sources, null, 2) + '\n')
+}
+
+/** How far high beats are above low ones, in VOICEVOX pitch (log Hz): about five semitones, like a real accent drop. */
+const PITCH_STEP = 0.3
+
+/**
+ * Make the pitch accent clearly audible: in standard (Tokyo) Japanese the first beat is low and
+ * the second high, unless the accent is on the first beat (high, then low); after the accented
+ * beat the pitch drops. VOICEVOX gets the direction right, but often only just.
+ */
+export function setMelody(phrase: { accent: number; moras: { pitch: number }[] }) {
+  const voiced = phrase.moras.filter((m) => m.pitch > 0)
+  if (!voiced.length) return
+  const mid = voiced.reduce((n, m) => n + m.pitch, 0) / voiced.length
+  phrase.moras.forEach((m, i) => {
+    if (m.pitch <= 0) return
+    const beat = i + 1
+    const high = phrase.accent === 1 ? beat === 1 : beat > 1 && beat <= phrase.accent
+    m.pitch = mid + (high ? PITCH_STEP : -PITCH_STEP) / 2
+  })
+}
+
+/**
+ * Synthesize text written in VOICEVOX's kana notation (' after the accented beat), as running
+ * speech: for examples whose pitch has to be exactly right.
+ */
+async function synthesizeAccent(notation: string, speaker: number): Promise<Buffer> {
+  const q = new URLSearchParams({ text: 'あ', speaker: String(speaker) })
+  const query = await post<AudioQuery>(`/audio_query?${q}`)
+  const p = new URLSearchParams({ text: notation, speaker: String(speaker), is_kana: 'true' })
+  const phrases = await post<(AccentPhrase & { accent: number })[]>(`/accent_phrases?${p}`)
+  for (const phrase of phrases) setMelody(phrase)
+  query.accent_phrases = phrases
+  // The male voice barely follows the beats' pitch otherwise.
+  query.intonationScale = 2
+  query.speedScale = 0.95
+  query.prePhonemeLength = 0.1
+  query.postPhonemeLength = 0.15
+  return post<Buffer>(`/synthesis?speaker=${speaker}`, query, true)
+}
+
+/**
+ * Readings in kanji for rule examples whose kana alone could be read differently (美容院 is
+ * bi-yō-in, not byōin), by recording name. Kept here so the kanji don't end up in the fonts.
+ */
+const RULE_READINGS: Record<string, string> = {
+  biyooin: '美容院',
+  obasan: '叔母さん',
+  kite: '来て',
+  kitte: '切手',
+  'watashi-wa': '私は',
+  'gakkoo-e': '学校へ',
+  'mizu-o': '水を',
+  tookyoo: '東京',
+  hanaji: '鼻血',
+  mikazuki: '三日月',
+  chijimu: '縮む',
+  hitobito: '人々',
+  kinen: '記念',
+  tooi: '遠い',
+  koori: '氷',
+  oneesan: 'お姉さん',
+}
+
+/** Record the pronunciation-rule examples that aren't practice words, in every voice. */
+async function generateRules(only?: string) {
+  for (const voice of loadVoices().filter((v) => !only || v.id === only)) {
+    rmSync(join(OUT_DIR, voice.id, 'rules'), { recursive: true, force: true })
+    mkdirSync(join(OUT_DIR, voice.id, 'rules'), { recursive: true })
+    const recordings = ruleRecordings()
+    for (const r of recordings) {
+      const wav = r.accent
+        ? await synthesizeAccent(r.say, voice.speaker)
+        : await synthesize(RULE_READINGS[r.name] ?? r.say, voice.speaker, false)
+      encodeMp3(wav, join('public', ruleAudioPath(voice.id, r.name)))
+    }
+    console.log(`${voice.id}: ${recordings.length} rule examples (${voice.character})`)
+  }
 }
 
 /** A small HTML page with rows of play buttons. */
@@ -416,7 +502,9 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
     ? previewStyles()
     : process.argv.includes('--preview')
       ? preview()
-      : generate(only)
+      : process.argv.includes('--rules')
+        ? generateRules(only)
+        : generate(only).then(() => generateRules(only))
   run.catch((err) => {
     console.error(err)
     process.exit(1)

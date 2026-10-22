@@ -56,4 +56,19 @@ export default {
   'table.dueIn': 'over {interval}',
   'table.dueNow': 'nu gepland',
   'table.metaRecall': '{pct}% onthouden',
+  // Rules.svelte – pronunciation rules
+  'rules.eyebrow': '発音 · Uitspraak',
+  'rules.heading': 'Uitspraakregels',
+  'rules.lead':
+    'Hoe je kana echt zegt, van de regels die je meteen nodig hebt tot zeldzame uitzonderingen. Elk voorbeeld kun je in beide stemmen horen.',
+  'rules.contents': 'Inhoud',
+  'rules.level1': 'Vanaf het begin',
+  'rules.level1Desc': 'Deze heb je nodig in je eerste woorden.',
+  'rules.level2': 'Goed om snel te weten',
+  'rules.level2Desc': 'Komen veel voor, en je klinkt er natuurlijker door.',
+  'rules.level3': 'Zeldzaam of gevorderd',
+  'rules.level3Desc': 'Uitzonderingen, en dingen die je later tegenkomt.',
+  'rules.sources': 'Bronnen',
+  'rules.sourcesBody': 'De regels zijn gecontroleerd met deze artikelen (Engels).',
+  'rules.forKana': 'Uitspraakregels',
 } satisfies Record<keyof typeof en, string>

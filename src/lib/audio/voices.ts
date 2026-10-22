@@ -18,3 +18,8 @@ export function kanaAudioPath(voice: VoiceId, kanaId: string): string {
 export function wordAudioPath(voice: VoiceId, index: number): string {
   return `audio/${voice}/words/${String(index).padStart(3, '0')}.mp3`
 }
+
+/** A pronunciation-rule example that isn't a practice word, by its recording name. */
+export function ruleAudioPath(voice: VoiceId, name: string): string {
+  return `audio/${voice}/rules/${name}.mp3`
+}

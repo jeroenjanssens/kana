@@ -4,6 +4,7 @@ export default {
   'nav.main': 'Hoofdmenu',
   'nav.learn': 'Leren',
   'nav.table': 'Tabel',
+  'nav.rules': 'Regels',
   'nav.practice': 'Oefenen',
   'nav.stats': 'Statistieken',
   'nav.settings': 'Instellingen',
