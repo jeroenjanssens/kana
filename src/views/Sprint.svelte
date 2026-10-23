@@ -1,24 +1,21 @@
 <script lang="ts">
-  import { onDestroy, tick } from 'svelte'
+  import { onDestroy } from 'svelte'
   import { fly } from 'svelte/transition'
   import Hanko from '../components/Hanko.svelte'
-  import Icon from '../components/Icon.svelte'
-  import KanaGlyph from '../components/KanaGlyph.svelte'
+  import SessionTopbar from '../components/SessionTopbar.svelte'
+  import QuizQuestion from '../components/QuizQuestion.svelte'
   import MissedKana from '../components/MissedKana.svelte'
   import ScriptPicker from '../components/ScriptPicker.svelte'
   import { nextCardFont } from '../lib/data/fonts'
   import { displayRomaji, glyph, type Kana } from '../lib/data/kana'
   import { logPractice } from '../lib/study/actions'
-  import { kanaForAnswer } from '../lib/study/answer'
   import { chooseOptions } from '../lib/study/distractors'
   import { SCRIPT_CHOICES, kanaOf, type Question, type ScriptChoice } from '../lib/study/scripts'
   import {
     PENALTY_MS,
     SPRINT_MINUTES,
-    answerPool,
     bestSprint,
     formatClock,
-    judge,
     nextQuestion,
     recordSprint,
     sprintLength,
@@ -30,6 +27,7 @@
   import { ui } from '../state/ui.svelte'
   import { lang, t } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { timers } from '../lib/ui/timers'
 
   // Old links (#/sprint/katakana) choose the script.
   const param = route.segments[1] as ScriptChoice | undefined
@@ -46,7 +44,6 @@
   let current = $state<Question | undefined>()
   let font = $state(s.font)
   let options = $state<Kana[]>([])
-  let input = $state('')
   let score = $state(0)
   let mistakes = $state(0)
   /** What went wrong this sprint, in order: the kana and the romaji that was typed or chosen. */
@@ -59,13 +56,14 @@
   let previousBest = $state(0)
   let shownAt = 0
   let timer: ReturnType<typeof setInterval> | undefined
-  let inputEl = $state<HTMLInputElement>()
 
   const chosenMinutes = $derived(sprintLength(s.sprintMinutes))
   const best = $derived(bestSprint(store.data, s.sprintScript, chosenMinutes))
 
+  const later = timers()
   onDestroy(() => {
     clearInterval(timer)
+    later.cancel()
     ui.focus = false
   })
 
@@ -94,10 +92,8 @@
   function show(q: Question) {
     current = q
     font = nextCardFont(settings(), font)
-    input = ''
     shownAt = performance.now()
     if (touch) options = chooseOptions(q.kana, kanaOf(pool), 4)
-    void tick().then(() => inputEl?.focus())
   }
 
   function answer(correct: boolean, answered?: Kana, typed = '') {
@@ -120,19 +116,10 @@
       endsAt -= PENALTY_MS
       reveal = displayRomaji(current.kana, settings().romaji)
       const wrong = current
-      setTimeout(() => {
+      later.after(800, () => {
         reveal = undefined
         if (phase === 'running' && current === wrong) show(nextQuestion(pool, wrong))
-      }, 800)
-    }
-  }
-
-  function onInput() {
-    if (!current || reveal) return
-    const verdict = judge(input, current.kana)
-    if (verdict === 'correct') answer(true)
-    else if (verdict === 'wrong') {
-      answer(false, kanaForAnswer(input, answerPool(current.script)), input.trim())
+      })
     }
   }
 
@@ -197,54 +184,29 @@
   </section>
 {:else}
   <div class="sprint">
-    <div class="topbar panel">
-      <button class="btn icon ghost" onclick={leave} aria-label={t('common.leave')}>
-        <Icon name="close" />
-      </button>
-      <strong
-        >{t('sprint.heading')}<span class="title-script">{` · ${scriptLabel(choice)}`}</span
-        ></strong
-      >
-      <span class="bar" style:--p={left / (minutes * 60_000)}></span>
+    <SessionTopbar onleave={leave} progress={left / (minutes * 60_000)}>
+      {#snippet title()}
+        <strong
+          >{t('sprint.heading')}<span class="title-script">{` · ${scriptLabel(choice)}`}</span
+          ></strong
+        >
+      {/snippet}
       <span class="time" aria-label={t('sprint.timeLeft')}
         >{formatClock(Math.ceil(left / 1000))}</span
       >
       <span class="score" aria-label={t('sprint.scoreLabel')}>{score}</span>
-    </div>
+    </SessionTopbar>
 
     {#if phase === 'running' && current}
-      {#key current.script + current.kana.id + score + mistakes}
-        <div class="question washi" in:fly={{ y: 10, duration: 160 }}>
-          <KanaGlyph text={glyph(current.kana, current.script)} {font} size="7rem" />
-          {#if reveal}<span class="reveal">{reveal}</span>{/if}
-        </div>
-      {/key}
-      {#if touch}
-        <div class="options" role="group" aria-label={t('sprint.whichRomaji')}>
-          {#each options as o (o.id)}
-            <button
-              class="btn option"
-              disabled={!!reveal}
-              onclick={() =>
-                answer(o.id === current?.kana.id, o, displayRomaji(o, settings().romaji))}
-              >{displayRomaji(o, settings().romaji)}</button
-            >
-          {/each}
-        </div>
-      {:else}
-        <input
-          bind:this={inputEl}
-          bind:value={input}
-          oninput={onInput}
-          class="answer"
-          type="text"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-          aria-label="Romaji"
-          disabled={!!reveal}
-        />
-      {/if}
+      <QuizQuestion
+        question={current}
+        round={score + mistakes}
+        {font}
+        {reveal}
+        {touch}
+        {options}
+        onanswer={answer}
+      />
     {:else if phase === 'done'}
       <section class="panel card" in:fly={{ y: 12 }}>
         {#if record}<div class="seal">
@@ -275,16 +237,6 @@
 {/if}
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-    margin-bottom: 1rem;
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     max-width: 58ch;
   }
@@ -323,25 +275,6 @@
     gap: 1.25rem;
   }
 
-  .topbar {
-    width: min(100%, 720px);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
-  }
-
-  .bar {
-    flex: 1;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--shu) calc(var(--p) * 100%),
-      color-mix(in srgb, var(--ink) 10%, transparent) 0
-    );
-  }
-
   .time,
   .score {
     font-variant-numeric: tabular-nums;
@@ -353,44 +286,6 @@
     text-align: right;
     font-size: 1.3rem;
     font-family: var(--font-heading);
-  }
-
-  .question {
-    position: relative;
-    width: min(70vw, 260px);
-    aspect-ratio: 1;
-    display: grid;
-    place-items: center;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-  }
-
-  .reveal {
-    position: absolute;
-    bottom: 0.8rem;
-    font-family: var(--font-heading);
-    font-size: 1.6rem;
-    color: var(--shu);
-  }
-
-  .answer {
-    width: min(80vw, 280px);
-    text-align: center;
-    font-size: 1.6rem;
-    border-radius: 999px;
-    box-shadow: var(--shadow-soft);
-  }
-
-  .options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-    width: min(90vw, 360px);
-  }
-
-  .option {
-    min-height: 60px;
-    font-size: 1.3rem;
   }
 
   .card {

@@ -46,8 +46,11 @@ const SOURCE_DIR = 'scripts/tofugu-source'
 const OUT_DIR = 'src/lib/data/tofugu/drawings'
 const PREVIEW_DIR = 'drawings-preview'
 
-/** Upscaling before tracing, for smooth curves from the 150 ppi images. */
-const UPSCALE = 3
+/**
+ * Upscaling before tracing, for smooth curves from the 150 ppi images. 2× looks the same as 3×
+ * (compared with --preview at 3× zoom) and gives a third less path data.
+ */
+const UPSCALE = 2
 /** potrace curve optimisation tolerance: higher gives smaller files with looser curves. */
 const OPTTOLERANCE = '1'
 /** The book's kana size in image pixels (one em), so every drawing gets the same scale. */

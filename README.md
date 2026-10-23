@@ -51,6 +51,7 @@ just dev       # start the dev server at http://localhost:5173/kana/
 just test      # unit tests (Vitest)
 just e2e       # end-to-end tests (Playwright)
 just ci        # lint, type-check, unit tests, build and e2e — what CI runs
+just perf      # profile the Table page on a desktop and a throttled phone
 ```
 
 Run `just` to see all tasks. The asset pipelines (`just audio` with `just voicevox`, `just fonts`,

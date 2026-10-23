@@ -3,6 +3,7 @@
   import { onDestroy, onMount } from 'svelte'
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
+  import SessionTopbar from '../components/SessionTopbar.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import MasteryBar from '../components/MasteryBar.svelte'
   import { confusableSets } from '../lib/data/confusables'
@@ -23,6 +24,7 @@
   import { ui } from '../state/ui.svelte'
   import { t } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { timers, type TimerHandle } from '../lib/ui/timers'
 
   const scriptParam = route.segments[1]
   const script =
@@ -49,7 +51,8 @@
   let startedAt = 0
   /** One voice per card, so replays don't switch speakers ("random" setting). */
   let voice: VoiceId = audio.pickVoice()
-  let advance: ReturnType<typeof setTimeout> | undefined
+  let advance: TimerHandle | undefined
+  const later = timers()
 
   onMount(() => {
     if (!deck) return
@@ -59,7 +62,10 @@
     void next()
   })
 
-  onDestroy(() => (ui.focus = false))
+  onDestroy(() => {
+    later.cancel()
+    ui.focus = false
+  })
 
   function lookAlikes(k: Kana): string[] {
     const char = glyph(k, script ?? 'hiragana')
@@ -72,7 +78,7 @@
 
   async function next() {
     // A manual "next" cancels the automatic one after a correct answer.
-    clearTimeout(advance)
+    later.clear(advance)
     advance = undefined
     if (!session || !deck) return
     const id = session.next()
@@ -121,13 +127,13 @@
     if (correct) {
       correctCount++
     } else {
-      setTimeout(() => current && audio.playVoice(current.id, voice), 450)
+      later.after(450, () => current && audio.playVoice(current.id, voice))
     }
     cardDone()
     if (correct) {
       // Hear it once more, then move on (Enter, Space or Next skip the wait).
-      setTimeout(() => current && picked && audio.playVoice(current.id, voice), 350)
-      advance = setTimeout(next, LISTEN_ADVANCE_MS)
+      later.after(350, () => current && picked && audio.playVoice(current.id, voice))
+      advance = later.after(LISTEN_ADVANCE_MS, next)
     }
   }
 
@@ -204,16 +210,11 @@
   </div>
 {:else}
   <div class="listen">
-    <div class="topbar panel">
-      <button
-        class="btn icon ghost"
-        onclick={() => navigate('/listen')}
-        aria-label={t('common.leave')}
-      >
-        <Icon name="close" />
-      </button>
-      <strong>{t(`deck.${deck}` as MessageKey)}</strong>
-      <span class="bar" style:--p={counts.progress}></span>
+    <SessionTopbar
+      title={t(`deck.${deck}` as MessageKey)}
+      onleave={() => navigate('/listen')}
+      progress={counts.progress}
+    >
       <button
         class="btn icon ghost"
         onclick={undoLast}
@@ -228,7 +229,7 @@
           ? ` · ${t('common.repeating', { count: counts.repeating })}`
           : ''}</span
       >
-    </div>
+    </SessionTopbar>
 
     {#if current}
       {#key current.id + answered}
@@ -291,16 +292,6 @@
 {/if}
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-    margin-bottom: 1rem;
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     max-width: 56ch;
   }
@@ -347,25 +338,6 @@
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
-  }
-
-  .topbar {
-    width: min(100%, 720px);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
-  }
-
-  .bar {
-    flex: 1;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--shu) calc(var(--p) * 100%),
-      color-mix(in srgb, var(--ink) 10%, transparent) 0
-    );
   }
 
   .stage {

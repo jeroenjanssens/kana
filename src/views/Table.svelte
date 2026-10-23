@@ -55,7 +55,7 @@
   }
 </script>
 
-<header class="page-head">
+<header class="table-head">
   <div>
     <p class="eyebrow light">{t('table.eyebrow')}</p>
     <h1>{t('table.heading')}</h1>
@@ -185,7 +185,7 @@
 {/if}
 
 <style>
-  .page-head {
+  .table-head {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -194,14 +194,13 @@
     margin-bottom: 1rem;
   }
 
-  .page-head h1 {
+  .table-head h1 {
     color: #fff;
     text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
     margin: 0;
   }
 
   .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
     text-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
     margin-bottom: 0.2rem;
   }

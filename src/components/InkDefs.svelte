@@ -1,4 +1,4 @@
-<!-- Global SVG filters: slightly irregular, bleeding ink edges for kana on paper. -->
+<!-- Global SVG filters: bleeding ink edges for kana on paper, and the rough edge of a hanko seal. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <defs>
     <filter id="ink" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
@@ -31,6 +31,11 @@
         result="speckle"
       />
       <feComposite in="soft" in2="speckle" operator="in" />
+    </filter>
+    <filter id="hanko-rough" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
+      <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.35" />
+      <feComposite in="SourceGraphic" operator="in" />
     </filter>
   </defs>
 </svg>

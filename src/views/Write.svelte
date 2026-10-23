@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from 'svelte'
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
+  import SessionTopbar from '../components/SessionTopbar.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import MasteryBar from '../components/MasteryBar.svelte'
   import Modal from '../components/Modal.svelte'
@@ -34,6 +35,7 @@
   import { ui } from '../state/ui.svelte'
   import { t } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { timers, type TimerHandle } from '../lib/ui/timers'
 
   const scriptParam = route.segments[1]
   const script =
@@ -63,7 +65,8 @@
   // Choose
   let options = $state<Kana[]>([])
   let picked = $state<Kana | undefined>()
-  let advance: ReturnType<typeof setTimeout> | undefined
+  let advance: TimerHandle | undefined
+  const later = timers()
 
   const text = $derived(current && script ? glyph(current, script) : '')
   const glyphs = $derived(text ? strokesFor(text) : [])
@@ -78,7 +81,7 @@
 
   onDestroy(() => {
     ui.focus = false
-    clearTimeout(advance)
+    later.cancel()
   })
 
   function syncCounts() {
@@ -97,7 +100,7 @@
   }
 
   async function next() {
-    clearTimeout(advance)
+    later.clear(advance)
     if (!session || !deck) return
     const id = session.next()
     syncCounts()
@@ -163,7 +166,7 @@
     picked = k
     const correct = k.id === current.id
     record(listenGrade(correct, performance.now() - startedAt), correct, k.id)
-    if (correct) advance = setTimeout(next, 1200)
+    if (correct) advance = later.after(1200, next)
   }
 
   function undoLast() {
@@ -251,16 +254,11 @@
   </div>
 {:else}
   <div class="writing">
-    <div class="topbar panel">
-      <button
-        class="btn icon ghost"
-        onclick={() => navigate('/write')}
-        aria-label={t('common.leave')}
-      >
-        <Icon name="close" />
-      </button>
-      <strong>{t(`deck.${deck}` as MessageKey)}</strong>
-      <span class="bar" style:--p={counts.progress}></span>
+    <SessionTopbar
+      title={t(`deck.${deck}` as MessageKey)}
+      onleave={() => navigate('/write')}
+      progress={counts.progress}
+    >
       <button
         class="btn icon ghost"
         onclick={undoLast}
@@ -275,7 +273,7 @@
           ? ` · ${t('common.repeating', { count: counts.repeating })}`
           : ''}</span
       >
-    </div>
+    </SessionTopbar>
 
     {#if current}
       {#key current.id + answered}
@@ -378,16 +376,6 @@
 {/if}
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-    margin-bottom: 1rem;
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     max-width: 58ch;
   }
@@ -442,25 +430,6 @@
     flex-direction: column;
     align-items: center;
     gap: 1.25rem;
-  }
-
-  .topbar {
-    width: min(100%, 720px);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
-  }
-
-  .bar {
-    flex: 1;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--shu) calc(var(--p) * 100%),
-      color-mix(in srgb, var(--ink) 10%, transparent) 0
-    );
   }
 
   .stage {

@@ -8,7 +8,7 @@
   import Toasts from './components/Toasts.svelte'
   import { HEADING_FONT_ID } from './lib/data/fonts'
   import { loadFont } from './lib/ui/fontLoader'
-  import { WASHI_VARIANTS, generateWashi } from './lib/ui/washi'
+  import { installWashi } from './lib/ui/washi'
   import { dayKey } from './lib/srs/queue'
   import { goalProgress } from './lib/study/goal'
   import { audio, settings, startPersistence, store } from './state/app.svelte'
@@ -82,20 +82,13 @@
     const root = document.documentElement
     root.dataset.theme = theme
     root.dataset.motion = reduceMotion ? 'reduce' : 'full'
-    // The paper texture is generated when the browser is idle, so it never delays the first paint.
-    const dark = theme === 'dark'
-    const idle = window.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 200))
-    // One sheet per idle callback, so generating all of them never blocks the page.
-    WASHI_VARIANTS.forEach((variant, i) =>
-      idle(() => {
-        const texture = generateWashi({ ...variant, dark })
-        root.style.setProperty(`--washi-${i}`, texture ? `url(${texture})` : 'none')
-      }),
-    )
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', theme === 'dark' ? '#2a2722' : '#f4efe6')
   })
+
+  // The paper texture is generated when the browser is idle, so it never delays the first paint.
+  $effect(() => installWashi(document.documentElement, theme === 'dark'))
 
   function onKeydown(e: KeyboardEvent) {
     const target = e.target as HTMLElement

@@ -164,10 +164,6 @@
     margin-bottom: 0.3em;
   }
 
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     font-size: 1.1rem;
     max-width: 52ch;

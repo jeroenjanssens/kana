@@ -171,9 +171,38 @@ export function load(storage: StorageLike = localStorage): SaveFile {
   }
 }
 
-export function save(data: SaveFile, storage: StorageLike = localStorage): void {
-  if (data.log.length > MAX_LOG_ENTRIES) data.log = data.log.slice(-MAX_LOG_ENTRIES)
-  storage.setItem(STORAGE_KEY, JSON.stringify(data))
+/** Save the progress: the save file, or one already serialised (see SaveWriter). */
+export function save(data: SaveFile | string, storage: StorageLike = localStorage): void {
+  storage.setItem(STORAGE_KEY, typeof data === 'string' ? data : new SaveWriter().serialize(data))
+}
+
+/**
+ * Serialises the save file each time it changes, without redoing the review log: the log only
+ * grows (or is cut back by undo, or replaced as a whole), so every entry is serialised once and
+ * kept. Only the newest MAX_LOG_ENTRIES entries are written.
+ *
+ * In the app the save file is reactive state: reading it here also subscribes to it, to every
+ * value except the old log entries, which never change.
+ */
+export class SaveWriter {
+  private log: readonly ReviewEntry[] | undefined
+  private entries: string[] = []
+  private last: ReviewEntry | undefined
+
+  serialize(data: SaveFile): string {
+    const log = data.log
+    let n = Math.min(this.entries.length, log.length)
+    // A different log, or one changed in place, is serialised again from the start.
+    if (log !== this.log || (n > 0 && log[n - 1] !== this.last)) n = 0
+    this.log = log
+    this.entries.length = n
+    for (let i = n; i < log.length; i++) this.entries.push(JSON.stringify(log[i]))
+    this.last = log[log.length - 1]
+    const kept =
+      this.entries.length > MAX_LOG_ENTRIES ? this.entries.slice(-MAX_LOG_ENTRIES) : this.entries
+    const rest = JSON.stringify({ ...data, log: undefined }).slice(0, -1)
+    return `${rest}${rest.length > 1 ? ',' : ''}"log":[${kept.join(',')}]}`
+  }
 }
 
 export function clear(storage: StorageLike = localStorage): void {

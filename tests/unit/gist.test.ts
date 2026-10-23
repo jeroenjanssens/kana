@@ -4,6 +4,7 @@ import {
   GIST_FILE,
   GistClient,
   SyncError,
+  nextPage,
   syncWithGist,
 } from '../../src/lib/storage/gist'
 import { emptySave } from '../../src/lib/storage/schema'
@@ -12,7 +13,7 @@ import { recordReview } from '../../src/lib/study/actions'
 const T = new Date(2026, 5, 1, 10).getTime()
 
 /** A tiny in-memory fake of the GitHub Gist API. */
-function fakeGitHub(options: { token?: string; offline?: boolean } = {}) {
+function fakeGitHub(options: { token?: string; offline?: boolean; perPage?: number } = {}) {
   const gists = new Map<
     string,
     { id: string; description: string; files: Record<string, { content: string }> }
@@ -27,7 +28,19 @@ function fakeGitHub(options: { token?: string; offline?: boolean } = {}) {
     const auth = (init.headers as Record<string, string>)?.Authorization
     if (auth !== `Bearer ${options.token ?? 'good'}`) return new Response('', { status: 401 })
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status })
-    if (url.endsWith('/gists?per_page=100')) return json([...gists.values()])
+    const list = url.match(/\/gists\?per_page=100(?:&page=(\d+))?$/)
+    if (list) {
+      // Newest first, a page at a time, like GitHub.
+      const perPage = options.perPage ?? 100
+      const page = Number(list[1] ?? 1)
+      const all = [...gists.values()].reverse()
+      const res = json(all.slice((page - 1) * perPage, page * perPage))
+      if (page * perPage < all.length) {
+        const next = `https://api.github.com/gists?per_page=100&page=${page + 1}`
+        res.headers.set('Link', `<${next}>; rel="next", <${next}>; rel="last"`)
+      }
+      return res
+    }
     if (url.endsWith('/gists') && method === 'POST') {
       const body = JSON.parse(init.body as string)
       const id = `g${gists.size + 1}`
@@ -100,4 +113,25 @@ describe('Gist sync', () => {
     expect(gistId).not.toBe('gone')
     expect(gh.gists.has(gistId)).toBe(true)
   })
+
+  test('a new device finds the gist even behind many newer gists', async () => {
+    const gh = fakeGitHub({ perPage: 2 })
+    const first = await syncWithGist(emptySave(1), new GistClient('good', gh.fetcher))
+    for (let i = 0; i < 5; i++) {
+      const id = `other${i}`
+      gh.gists.set(id, { id, description: 'notes', files: { 'notes.md': { content: '…' } } })
+    }
+    const second = await syncWithGist(emptySave(2), new GistClient('good', gh.fetcher))
+    expect(second.gistId).toBe(first.gistId)
+    expect(gh.gists.size).toBe(6)
+    expect(gh.calls.filter((c) => c.startsWith('GET /gists?'))).toHaveLength(4)
+  })
+})
+
+test('only next-page links to the GitHub API are followed', () => {
+  const next = 'https://api.github.com/gists?per_page=100&page=2'
+  expect(nextPage(`<${next}>; rel="next", <x>; rel="last"`)).toBe(next)
+  expect(nextPage(`<${next}>; rel="prev"`)).toBeUndefined()
+  expect(nextPage('<https://example.com/gists?page=2>; rel="next"')).toBeUndefined()
+  expect(nextPage(null)).toBeUndefined()
 })

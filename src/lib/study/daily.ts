@@ -18,7 +18,11 @@ export function reviewedToday(save: SaveFile, deck: DeckId, now: number = Date.n
   let n = 0
   for (let i = save.log.length - 1; i >= 0; i--) {
     const e = save.log[i]
-    if (dayKey(e.t) !== today) break
+    const day = dayKey(e.t)
+    // Entries from a later day (synced from a device whose clock is ahead) are skipped; the log is
+    // in time order, so the first earlier day ends today's entries.
+    if (day > today) continue
+    if (day < today) break
     if (e.deck === deck && e.grade !== undefined && !e.new) n++
   }
   return n

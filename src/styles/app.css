@@ -147,6 +147,19 @@ select {
   white-space: nowrap;
 }
 
+/* ─── Page headings ──────────────────────────────────────────────────────── */
+
+/** The heading at the top of a page, in white over the background photo. */
+.page-head {
+  color: #fff;
+  text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
+  margin-bottom: 1rem;
+}
+
+.eyebrow.light {
+  color: rgb(255 255 255 / 0.85);
+}
+
 /* ─── Surfaces ───────────────────────────────────────────────────────────── */
 
 /** A frosted panel that sits on top of the background photo. */

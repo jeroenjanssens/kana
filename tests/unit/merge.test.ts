@@ -1,7 +1,12 @@
 import { describe, expect, test } from 'vitest'
 import { grade } from '../../src/lib/srs/scheduler'
-import { mergeLogs, mergeSaves } from '../../src/lib/storage/merge'
-import { emptySave, type ReviewEntry, type SaveFile } from '../../src/lib/storage/schema'
+import { chosenSettings, mergeLogs, mergeSaves } from '../../src/lib/storage/merge'
+import {
+  DEFAULT_SETTINGS,
+  emptySave,
+  type ReviewEntry,
+  type SaveFile,
+} from '../../src/lib/storage/schema'
 import { recordReview, recordWord } from '../../src/lib/study/actions'
 
 const T = new Date(2026, 5, 1, 10).getTime()
@@ -56,6 +61,20 @@ describe('mergeSaves', () => {
       { score: 15, at: 9 },
     ])
     expect(ab.words['ねこ']).toEqual({ seen: 1, correct: 1, last: T + 1 })
+  })
+
+  test('only settings someone chose count as a change', () => {
+    const s = structuredClone(DEFAULT_SETTINGS)
+    const before = chosenSettings(s)
+    // The app rotates the photo by itself every N cards, minutes or days.
+    for (const mode of ['cards', 'minutes', 'daily'] as const) {
+      const rotated = { ...s, photoMode: mode, photoSlug: 'nara-deer', photoDay: '2026-10-23' }
+      expect(chosenSettings(rotated)).toBe(chosenSettings({ ...s, photoMode: mode }))
+    }
+    // In 'fixed' mode the photo shown is the one picked.
+    const fixed = { ...s, photoMode: 'fixed' as const }
+    expect(chosenSettings({ ...fixed, photoSlug: 'nara-deer' })).not.toBe(chosenSettings(fixed))
+    expect(chosenSettings({ ...s, theme: 'dark' })).not.toBe(before)
   })
 
   test('the most recently changed settings win', () => {

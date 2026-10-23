@@ -43,8 +43,10 @@ export function trackErrors(page: Page) {
   }
 }
 
+/** The saved progress. Saving is debounced, so first save now, as the app does when it's hidden. */
 export async function savedData(page: Page) {
-  // Saving is debounced; give it a moment.
-  await page.waitForTimeout(500)
-  return page.evaluate(() => JSON.parse(localStorage.getItem('kana:save') ?? '{}'))
+  return page.evaluate(() => {
+    window.dispatchEvent(new Event('pagehide'))
+    return JSON.parse(localStorage.getItem('kana:save') ?? '{}')
+  })
 }

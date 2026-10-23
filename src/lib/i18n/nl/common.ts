@@ -19,6 +19,7 @@ export default {
   'common.home': 'Start',
   'common.again': 'Opnieuw',
   'common.start': 'Start',
+  'common.romajiAnswer': 'Romaji',
   'common.leave': 'Stoppen (Esc)',
   'common.undo': 'Laatste antwoord ongedaan maken (U)',
   'common.left': 'nog {count}',

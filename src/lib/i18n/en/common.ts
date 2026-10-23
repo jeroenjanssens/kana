@@ -18,6 +18,7 @@ export default {
   'common.home': 'Home',
   'common.again': 'Again',
   'common.start': 'Start',
+  'common.romajiAnswer': 'Romaji',
   'common.leave': 'Leave (Esc)',
   'common.undo': 'Undo last answer (U)',
   'common.left': '{count} left',

@@ -146,15 +146,6 @@
 </div>
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .sections {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

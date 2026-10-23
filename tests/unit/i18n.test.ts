@@ -1,6 +1,9 @@
 import { describe, expect, test } from 'vitest'
 import { format, placeholders, resolveLang } from '../../src/lib/i18n/format'
-import { messages } from '../../src/lib/i18n/messages'
+import { en } from '../../src/lib/i18n/messages'
+import nl from '../../src/lib/i18n/nl'
+
+const messages = { en, nl }
 
 describe('format', () => {
   test('fills in placeholders', () => {

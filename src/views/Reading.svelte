@@ -2,6 +2,7 @@
   import { onDestroy } from 'svelte'
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
+  import SessionTopbar from '../components/SessionTopbar.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import Modal from '../components/Modal.svelte'
   import PaperCard from '../components/PaperCard.svelte'
@@ -20,6 +21,7 @@
   import { cardDone } from '../state/photos.svelte'
   import { ui } from '../state/ui.svelte'
   import { t, lang } from '../state/i18n.svelte'
+  import { timers } from '../lib/ui/timers'
 
   const ROUND = 15
 
@@ -53,7 +55,11 @@
   let startedAt = 0
   let inputEl = $state<HTMLInputElement>()
 
-  onDestroy(() => (ui.focus = false))
+  const later = timers()
+  onDestroy(() => {
+    later.cancel()
+    ui.focus = false
+  })
 
   const current = $derived(queue[index])
   const typed = $derived(s.answerStyle === 'typed')
@@ -80,7 +86,7 @@
     paper = Math.floor(Math.random() * 2 ** 31)
     phase = 'card'
     startedAt = performance.now()
-    setTimeout(() => inputEl?.focus(), 50)
+    later.after(50, () => inputEl?.focus())
   }
 
   function reveal() {
@@ -88,7 +94,7 @@
     flipped = true
     void audio.playSfx('flip')
     const word = current
-    if (s.autoplay) setTimeout(() => current === word && audio.playWord(word.index, voice), 280)
+    if (s.autoplay) later.after(280, () => current === word && audio.playWord(word.index, voice))
     newRules = current.rules.filter((r) => markNoteSeen(store.data, r))
   }
 
@@ -214,18 +220,13 @@
   {/if}
 {:else if phase === 'card' && current}
   <div class="reading">
-    <div class="topbar panel">
-      <button
-        class="btn icon ghost"
-        onclick={() => ((phase = 'overview'), (ui.focus = false))}
-        aria-label={t('common.leave')}
-      >
-        <Icon name="close" />
-      </button>
-      <strong>{t('reading.sessionTitle')}</strong>
-      <span class="bar" style:--p={(index + (flipped ? 1 : 0)) / queue.length}></span>
+    <SessionTopbar
+      title={t('reading.sessionTitle')}
+      onleave={() => ((phase = 'overview'), (ui.focus = false))}
+      progress={(index + (flipped ? 1 : 0)) / queue.length}
+    >
       <span class="muted">{index + 1} / {queue.length}</span>
-    </div>
+    </SessionTopbar>
 
     {#key index}
       <div in:fly={{ y: 20, duration: 380 }}>
@@ -360,15 +361,6 @@
 {/if}
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     max-width: 60ch;
   }
@@ -462,25 +454,6 @@
     flex-direction: column;
     align-items: center;
     gap: 1.25rem;
-  }
-
-  .topbar {
-    width: min(100%, 720px);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
-  }
-
-  .bar {
-    flex: 1;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--shu) calc(var(--p) * 100%),
-      color-mix(in srgb, var(--ink) 10%, transparent) 0
-    );
   }
 
   .hint {

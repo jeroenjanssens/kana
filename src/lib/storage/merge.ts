@@ -1,6 +1,18 @@
 import { SCRIPT_CHOICES } from '../study/scripts'
 import { fasterRace, sprintMinutes, trimSprints } from '../study/records'
-import { DECK_IDS, type CardRecord, type ReviewEntry, type SaveFile } from './schema'
+import { DECK_IDS, type CardRecord, type ReviewEntry, type SaveFile, type Settings } from './schema'
+
+/**
+ * The settings someone chose, as a string to compare: a change to it is what makes settings
+ * "newer" in a merge. The background photo the app rotates to by itself (every N cards, minutes
+ * or days) isn't a choice, except in 'fixed' mode, where the photo shown is the one picked.
+ */
+export function chosenSettings(settings: Settings): string {
+  const chosen: Partial<Settings> = { ...settings }
+  delete chosen.photoDay
+  if (settings.photoMode !== 'fixed') delete chosen.photoSlug
+  return JSON.stringify(chosen)
+}
 
 /**
  * Merge two copies of the progress (e.g. this device and the synced copy) without losing work:

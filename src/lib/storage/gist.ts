@@ -34,16 +34,23 @@ interface Gist {
   files: Record<string, GistFile>
 }
 
+/** The next-page URL from a GitHub `Link` header (only ever on the API itself). */
+export function nextPage(link: string | null): string | undefined {
+  const url = link?.match(/<([^>]+)>;\s*rel="next"/)?.[1]
+  return url?.startsWith(`${API}/`) ? url : undefined
+}
+
 export class GistClient {
   constructor(
     private readonly token: string,
     private readonly fetcher: Fetch = (...args) => fetch(...args),
   ) {}
 
-  private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  /** An API request (a path, or a full API URL such as a next-page link). */
+  private async send(path: string, init: RequestInit = {}): Promise<Response> {
     let res: Response
     try {
-      res = await this.fetcher(`${API}${path}`, {
+      res = await this.fetcher(path.startsWith(API) ? path : `${API}${path}`, {
         ...init,
         // GitHub lets browsers reuse a gist for 60 seconds. A stale copy would be merged and
         // written back, undoing what another device just synced.
@@ -63,13 +70,24 @@ export class GistClient {
       throw new SyncError('The token is not allowed to use gists', 403, 'scope')
     if (res.status === 404) throw new SyncError('The synced gist was not found', 404, 'notfound')
     if (!res.ok) throw new SyncError(`GitHub returned an error (${res.status})`, res.status)
-    return (await res.json()) as T
+    return res
   }
 
-  /** The id of our gist, if it already exists. */
+  private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
+    return (await (await this.send(path, init)).json()) as T
+  }
+
+  /** The id of our gist, if it already exists. Looks through every page of the account's gists. */
   async find(): Promise<string | undefined> {
-    const gists = await this.request<Gist[]>('/gists?per_page=100')
-    return gists.find((g) => GIST_FILE in g.files && g.description === GIST_DESCRIPTION)?.id
+    let path: string | undefined = '/gists?per_page=100'
+    while (path) {
+      const res = await this.send(path)
+      const gists = (await res.json()) as Gist[]
+      const ours = gists.find((g) => GIST_FILE in g.files && g.description === GIST_DESCRIPTION)
+      if (ours) return ours.id
+      path = nextPage(res.headers.get('Link'))
+    }
+    return undefined
   }
 
   async read(id: string): Promise<SaveFile | undefined> {

@@ -66,7 +66,7 @@ export default defineConfig({
       workbox: {
         // App shell, pronunciation, sound effects, fonts and stroke data: everything needed offline.
         globPatterns: [
-          '**/*.{js,css,html,svg,woff2}',
+          '**/*.{js,css,html,svg,woff2,wasm}',
           // Kana for both voices; word audio is cached as you hear it (see runtimeCaching).
           'audio/*/*.mp3',
           'sfx/*.{mp3,json}',

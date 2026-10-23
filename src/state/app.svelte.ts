@@ -1,5 +1,6 @@
 import { AudioEngine } from '../lib/audio/engine'
-import { load, requestPersistence, save } from '../lib/storage/persistence'
+import { chosenSettings } from '../lib/storage/merge'
+import { SaveWriter, load, requestPersistence, save } from '../lib/storage/persistence'
 import type { Grade, SaveFile, Settings } from '../lib/storage/schema'
 import { haptic } from '../lib/ui/haptics'
 
@@ -26,9 +27,15 @@ export function replaceData(data: SaveFile): void {
   store.data = data
 }
 
+const writer = new SaveWriter()
+/** The latest serialised progress, until it has been saved. */
+let unsaved: string | undefined
+
 function flush() {
+  if (unsaved === undefined) return
   try {
-    save($state.snapshot(store.data) as SaveFile)
+    save(unsaved)
+    unsaved = undefined
   } catch (err) {
     console.error('Could not save progress', err)
   }
@@ -38,18 +45,18 @@ function flush() {
 export function startPersistence(): () => void {
   const stop = $effect.root(() => {
     $effect(() => {
-      // Reading the snapshot subscribes to every nested change.
-      $state.snapshot(store.data)
+      // Serialising reads (and so subscribes to) every value that can change.
+      unsaved = writer.serialize(store.data)
       const handle = setTimeout(flush, 300)
       return () => clearTimeout(handle)
     })
 
     // Remember when the settings last changed, so synced copies keep the newest settings.
-    let first = true
+    let chosen: string | undefined
     $effect(() => {
-      $state.snapshot(store.data.settings)
-      if (first) first = false
-      else store.data.settingsUpdatedAt = Date.now()
+      const now = chosenSettings(store.data.settings)
+      if (chosen !== undefined && now !== chosen) store.data.settingsUpdatedAt = Date.now()
+      chosen = now
     })
 
     // Personalised FSRS weights and desired retention apply to every new grade.
@@ -74,10 +81,11 @@ export function startPersistence(): () => void {
   })
 
   const onHide = () => flush()
-  window.addEventListener('pagehide', onHide)
-  document.addEventListener('visibilitychange', () => {
+  const onVisibility = () => {
     if (document.visibilityState === 'hidden') flush()
-  })
+  }
+  window.addEventListener('pagehide', onHide)
+  document.addEventListener('visibilitychange', onVisibility)
 
   // Unlock audio on every interaction (autoplay policy), not just the first: phones suspend audio
   // when the screen locks or the app goes to the background, and voices that play on a timer
@@ -99,6 +107,7 @@ export function startPersistence(): () => void {
   return () => {
     stop()
     window.removeEventListener('pagehide', onHide)
+    document.removeEventListener('visibilitychange', onVisibility)
     for (const type of gestures) window.removeEventListener(type, unlock, { capture: true })
   }
 }

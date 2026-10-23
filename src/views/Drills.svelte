@@ -1,7 +1,9 @@
 <script lang="ts">
   import { washiStyle } from '../lib/ui/washi'
+  import { onDestroy } from 'svelte'
   import { fly } from 'svelte/transition'
   import Icon from '../components/Icon.svelte'
+  import SessionTopbar from '../components/SessionTopbar.svelte'
   import KanaGlyph from '../components/KanaGlyph.svelte'
   import StrokeOrder from '../components/StrokeOrder.svelte'
   import { confusableSets, confusableHint, type ConfusableSet } from '../lib/data/confusables'
@@ -14,6 +16,11 @@
   import { navigate, route } from '../state/router.svelte'
   import { t, lang } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { timers } from '../lib/ui/timers'
+
+  // Pending steps (the next round) stop when you leave.
+  const later = timers()
+  onDestroy(later.cancel)
 
   const mine = $derived(personalSets(confusions(store.data.log, 6)))
   const all = $derived([...mine, ...confusableSets])
@@ -83,15 +90,12 @@
       ms: performance.now() - startedAt,
       answer: kanaOf(char).id,
     })
-    setTimeout(
-      () => {
-        if (index + 1 >= rounds.length) {
-          step = 'result'
-          void audio.playSfx(score === rounds.length ? 'milestone' : 'complete')
-        } else void nextRound(index + 1)
-      },
-      correct ? 650 : 1600,
-    )
+    later.after(correct ? 650 : 1600, () => {
+      if (index + 1 >= rounds.length) {
+        step = 'result'
+        void audio.playSfx(score === rounds.length ? 'milestone' : 'complete')
+      } else void nextRound(index + 1)
+    })
   }
 
   function onKeydown(e: KeyboardEvent) {
@@ -140,20 +144,18 @@
   {/each}
 {:else}
   <div class="drill">
-    <div class="topbar panel">
-      <button
-        class="btn icon ghost"
-        onclick={() => navigate('/drills')}
-        aria-label={t('drills.backLabel')}
-      >
-        <Icon name="left" />
-      </button>
-      <strong lang="ja">{set.title}</strong>
+    <SessionTopbar
+      onleave={() => navigate('/drills')}
+      leaveLabel={t('drills.backLabel')}
+      back
+      wide
+      progress={step === 'quiz' ? (index + (picked ? 1 : 0)) / rounds.length : undefined}
+    >
+      {#snippet title()}<strong lang="ja">{set.title}</strong>{/snippet}
       {#if step === 'quiz'}
-        <span class="progress" style:--p={(index + (picked ? 1 : 0)) / rounds.length}></span>
         <span class="muted count">{index + 1} / {rounds.length}</span>
       {/if}
-    </div>
+    </SessionTopbar>
 
     {#if step === 'compare'}
       <section class="compare" in:fly={{ y: 12 }}>
@@ -231,16 +233,6 @@
 {/if}
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-    margin-bottom: 1rem;
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     max-width: 52ch;
   }
@@ -300,25 +292,6 @@
     flex-direction: column;
     align-items: center;
     gap: 1.25rem;
-  }
-
-  .topbar {
-    width: min(100%, 860px);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
-  }
-
-  .progress {
-    flex: 1;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--shu) calc(var(--p) * 100%),
-      color-mix(in srgb, var(--ink) 10%, transparent) 0
-    );
   }
 
   .count {

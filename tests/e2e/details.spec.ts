@@ -109,14 +109,16 @@ test('a wrong listening answer can be compared and then skipped', async ({ page 
 })
 
 test('a confusable-pairs quiz ends with a score', async ({ page }) => {
+  await page.clock.install()
   await page.goto('./#/drills/ru-ro')
   await page.getByRole('button', { name: 'Test yourself' }).click()
   const group = page.getByRole('group', { name: 'Which one is it?' })
   for (let i = 0; i < 10; i++) {
     await group.getByRole('button').first().click()
-    await page.waitForTimeout(i === 9 ? 100 : 1700)
+    // The next round comes after 0.65 s (right) or 1.6 s (wrong).
+    await page.clock.runFor(1600)
   }
-  await expect(page.getByRole('heading', { name: /\/ 10 correct/ })).toBeVisible({ timeout: 5000 })
+  await expect(page.getByRole('heading', { name: /\/ 10 correct/ })).toBeVisible()
 })
 
 test('after a correct listening answer the next card waits a moment', async ({ page }) => {
@@ -131,6 +133,24 @@ test('after a correct listening answer the next card waits a moment', async ({ p
   await expect(page.locator('.option.right')).toBeVisible()
   await page.clock.runFor(1000)
   await expect(page.locator('.option.right')).toHaveCount(0)
+})
+
+test('leaving during the wait after a listening answer plays nothing on the next page', async ({
+  page,
+}) => {
+  await page.clock.install()
+  await page.goto('./#/listen/hiragana')
+  const group = page.getByRole('group', { name: 'Which kana did you hear?' })
+  await group.getByRole('button').filter({ hasText: 'あ' }).click()
+  await expect(page.locator('.option.right')).toBeVisible()
+  const voices: string[] = []
+  page.on('request', (r) => {
+    if (/\/audio\/(fe)?male\/[^/]+\.mp3$/.test(r.url())) voices.push(r.url())
+  })
+  await page.evaluate(() => (location.hash = '#/table'))
+  await expect(page.getByRole('heading', { name: 'Kana table' })).toBeVisible()
+  await page.clock.runFor(5000)
+  expect(voices).toEqual([])
 })
 
 test('Next skips the wait after a correct listening answer', async ({ page }) => {

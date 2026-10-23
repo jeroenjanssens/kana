@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte'
   import { recordingSupported, startRecording } from '../lib/audio/recorder'
+  import { timers } from '../lib/ui/timers'
   import { audio } from '../state/app.svelte'
   import { t } from '../state/i18n.svelte'
   import Icon from './Icon.svelte'
@@ -17,7 +18,11 @@
   let error = $state('')
   let stopRecording: (() => Promise<Blob>) | undefined
 
-  onDestroy(() => void stopRecording?.())
+  const later = timers()
+  onDestroy(() => {
+    later.cancel()
+    void stopRecording?.()
+  })
 
   async function record() {
     error = ''
@@ -41,7 +46,7 @@
     if (!clip) return
     phase = 'playing'
     await reference()
-    await new Promise((r) => setTimeout(r, 350))
+    await later.wait(350)
     await audio.playRecording(clip)
     phase = 'ready'
   }

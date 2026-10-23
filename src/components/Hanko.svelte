@@ -21,13 +21,7 @@
   aria-label={displayTitle}
 >
   <svg viewBox="0 0 100 100" aria-hidden="true">
-    <defs>
-      <filter id="hanko-rough" x="-10%" y="-10%" width="120%" height="120%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" />
-        <feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.35" />
-        <feComposite in="SourceGraphic" operator="in" />
-      </filter>
-    </defs>
+    <!-- The filter is defined once, in InkDefs. -->
     <g filter="url(#hanko-rough)">
       <rect
         x="6"

@@ -33,6 +33,7 @@
   import { toast, ui } from '../state/ui.svelte'
   import { t, lang } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { timers } from '../lib/ui/timers'
 
   const deckParam = route.segments[1] as StudyDeckId | undefined
   const deck: StudyDeckId = deckParam && STUDY_DECKS.includes(deckParam) ? deckParam : 'hiragana'
@@ -111,7 +112,9 @@
     else phase = 'setup'
   })
 
+  const later = timers()
   onDestroy(() => {
+    later.cancel()
     ui.focus = false
   })
 
@@ -174,7 +177,7 @@
     phase = 'card'
     startedAt = performance.now()
     if (introducing && settings().autoplay)
-      setTimeout(() => current === kana && audio.playVoice(kana.id, voice), 350)
+      later.after(350, () => current === kana && audio.playVoice(kana.id, voice))
     if (mode === 'srs') {
       intervals = previewIntervals(store.data.cards[deck]?.[kana.id])
     }
@@ -200,7 +203,7 @@
     const before = dayStreak(store.data.log.filter((e) => e.t < sessionStart)).current
     const after = dayStreak(store.data.log).current
     if (after > before && isStreakMilestone(after)) {
-      setTimeout(() => void audio.playSfx('milestone'), 900)
+      later.after(900, () => void audio.playSfx('milestone'))
       toast(t('study.toast.streak', { n: String(after) }))
     }
   }
@@ -212,7 +215,7 @@
     const id = current.id
     // Only play if the same card is still showing (a fast grade may already have moved on).
     if (settings().autoplay) {
-      setTimeout(() => current?.id === id && flipped && audio.playVoice(id, voice), 280)
+      later.after(280, () => current?.id === id && flipped && audio.playVoice(id, voice))
     }
   }
 
@@ -254,18 +257,18 @@
     }
     if (result.becameMature) {
       celebrate = true
-      setTimeout(() => void audio.playSfx('stamp'), 120)
-      setTimeout(() => void audio.playSfx('bell'), 520)
+      later.after(120, () => void audio.playSfx('stamp'))
+      later.after(520, () => void audio.playSfx('bell'))
       const row = rowMastered(store.data, deck, current.id)
       if (row) {
         const first = kanaById(row[0])
         const name = deck === 'katakana' ? first.katakana : first.hiragana
-        setTimeout(() => void audio.playSfx('milestone'), 1100)
+        later.after(1100, () => void audio.playSfx('milestone'))
         toast(t('study.toast.rowMastered', { row: name }))
       }
-      await new Promise((r) => setTimeout(r, 1300))
+      await later.wait(1300)
     } else {
-      await new Promise((r) => setTimeout(r, 160))
+      await later.wait(160)
     }
     await showNext()
   }

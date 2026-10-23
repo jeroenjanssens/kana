@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { onDestroy, tick } from 'svelte'
+  import { onDestroy } from 'svelte'
   import { fly } from 'svelte/transition'
   import Hanko from '../components/Hanko.svelte'
-  import Icon from '../components/Icon.svelte'
-  import KanaGlyph from '../components/KanaGlyph.svelte'
+  import SessionTopbar from '../components/SessionTopbar.svelte'
+  import QuizQuestion from '../components/QuizQuestion.svelte'
   import MissedKana from '../components/MissedKana.svelte'
   import RowPicker from '../components/RowPicker.svelte'
   import ScriptPicker from '../components/ScriptPicker.svelte'
@@ -12,7 +12,6 @@
   import { deckKana } from '../lib/srs/queue'
   import type { RaceResult } from '../lib/storage/schema'
   import { logPractice } from '../lib/study/actions'
-  import { kanaForAnswer } from '../lib/study/answer'
   import { chooseOptions } from '../lib/study/distractors'
   import {
     RACE_KANA,
@@ -25,12 +24,13 @@
   } from '../lib/study/race'
   import { rowOptions } from '../lib/study/rows'
   import { kanaOf, type Question, type ScriptChoice } from '../lib/study/scripts'
-  import { PENALTY_MS, answerPool, formatClock, judge } from '../lib/study/sprint'
+  import { PENALTY_MS, formatClock } from '../lib/study/sprint'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { ui } from '../state/ui.svelte'
   import { lang, t } from '../state/i18n.svelte'
   import type { MessageKey } from '../lib/i18n/messages'
+  import { timers } from '../lib/ui/timers'
 
   const s = settings()
   /** Phones and tablets answer with buttons instead of typing. */
@@ -45,7 +45,6 @@
   let current = $state.raw<Question | undefined>()
   let font = $state(s.font)
   let options = $state<Kana[]>([])
-  let input = $state('')
   let mistakes = $state(0)
   /** What went wrong this race, in order, with what was typed or chosen. */
   let missed = $state.raw<{ question: Question; text: string; typed: string }[]>([])
@@ -59,7 +58,6 @@
   let record = $state(false)
   let shownAt = 0
   let timer: ReturnType<typeof setInterval> | undefined
-  let inputEl = $state<HTMLInputElement>()
 
   const setup = $derived({ script: s.raceScript, kana: s.raceKana, rows: s.raceRows })
   const chosen = $derived(raceQuestions(store.data, setup, s.groups))
@@ -69,8 +67,10 @@
   )
   const chosenBest = $derived(chosen.length ? bestRace(store.data, raceKey(chosen)) : undefined)
 
+  const later = timers()
   onDestroy(() => {
     clearInterval(timer)
+    later.cancel()
     ui.focus = false
   })
 
@@ -102,14 +102,12 @@
   function show(q: Question) {
     current = q
     font = nextCardFont(settings(), font)
-    input = ''
     shownAt = performance.now()
     if (touch) {
       // A short race (say, the missed ones) borrows wrong answers from the whole script.
       const own = kanaOf(questions)
       options = chooseOptions(q.kana, own.length >= 4 ? own : deckKana(q.script, s.groups), 4)
     }
-    void tick().then(() => inputEl?.focus())
   }
 
   function next() {
@@ -140,25 +138,16 @@
     if (correct) return next()
     reveal = displayRomaji(current.kana, settings().romaji)
     const wrong = current
-    setTimeout(() => {
+    later.after(800, () => {
       reveal = undefined
       if (phase === 'running' && current === wrong) next()
-    }, 800)
+    })
   }
 
   function stopClock() {
     clearInterval(timer)
     timer = undefined
     elapsed = performance.now() - startedAt + penalty
-  }
-
-  function onInput() {
-    if (!current || reveal) return
-    const verdict = judge(input, current.kana)
-    if (verdict === 'correct') answer(true)
-    else if (verdict === 'wrong') {
-      answer(false, kanaForAnswer(input, answerPool(current.script)), input.trim())
-    }
   }
 
   function finish() {
@@ -264,54 +253,32 @@
   </section>
 {:else}
   <div class="race">
-    <div class="topbar panel">
-      <button class="btn icon ghost" onclick={leave} aria-label={t('common.leave')}>
-        <Icon name="close" />
-      </button>
-      <strong
-        >{t('race.heading')}<span class="title-script">{` · ${scriptLabel(choice)}`}</span></strong
-      >
-      <span class="bar" style:--p={(phase === 'done' ? questions.length : index) / questions.length}
-      ></span>
+    <SessionTopbar
+      onleave={leave}
+      progress={(phase === 'done' ? questions.length : index) / questions.length}
+    >
+      {#snippet title()}
+        <strong
+          >{t('race.heading')}<span class="title-script">{` · ${scriptLabel(choice)}`}</span
+          ></strong
+        >
+      {/snippet}
       <span class="progress" aria-label={t('race.progressLabel')}
         >{Math.min(index + 1, questions.length)} / {questions.length}</span
       >
       <span class="time" aria-label={t('race.timeLabel')}>{formatClock(elapsed / 1000)}</span>
-    </div>
+    </SessionTopbar>
 
     {#if phase === 'running' && current}
-      {#key index}
-        <div class="question washi" in:fly={{ y: 10, duration: 160 }}>
-          <KanaGlyph text={glyph(current.kana, current.script)} {font} size="7rem" />
-          {#if reveal}<span class="reveal">{reveal}</span>{/if}
-        </div>
-      {/key}
-      {#if touch}
-        <div class="options" role="group" aria-label={t('sprint.whichRomaji')}>
-          {#each options as o (o.id)}
-            <button
-              class="btn option"
-              disabled={!!reveal}
-              onclick={() =>
-                answer(o.id === current?.kana.id, o, displayRomaji(o, settings().romaji))}
-              >{displayRomaji(o, settings().romaji)}</button
-            >
-          {/each}
-        </div>
-      {:else}
-        <input
-          bind:this={inputEl}
-          bind:value={input}
-          oninput={onInput}
-          class="answer"
-          type="text"
-          autocomplete="off"
-          autocapitalize="off"
-          spellcheck="false"
-          aria-label="Romaji"
-          disabled={!!reveal}
-        />
-      {/if}
+      <QuizQuestion
+        question={current}
+        round={index}
+        {font}
+        {reveal}
+        {touch}
+        {options}
+        onanswer={answer}
+      />
     {:else if phase === 'done'}
       <section class="panel card" in:fly={{ y: 12 }}>
         {#if record}<div class="seal">
@@ -352,16 +319,6 @@
 {/if}
 
 <style>
-  .page-head {
-    color: #fff;
-    text-shadow: 0 2px 14px rgb(0 0 0 / 0.45);
-    margin-bottom: 1rem;
-  }
-
-  .eyebrow.light {
-    color: rgb(255 255 255 / 0.85);
-  }
-
   .lead {
     max-width: 58ch;
   }
@@ -412,25 +369,6 @@
     gap: 1.25rem;
   }
 
-  .topbar {
-    width: min(100%, 720px);
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.35rem 1rem 0.35rem 0.35rem;
-  }
-
-  .bar {
-    flex: 1;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(
-      to right,
-      var(--shu) calc(var(--p) * 100%),
-      color-mix(in srgb, var(--ink) 10%, transparent) 0
-    );
-  }
-
   .time,
   .progress {
     font-variant-numeric: tabular-nums;
@@ -443,44 +381,6 @@
     text-align: right;
     font-size: 1.3rem;
     font-family: var(--font-heading);
-  }
-
-  .question {
-    position: relative;
-    width: min(70vw, 260px);
-    aspect-ratio: 1;
-    display: grid;
-    place-items: center;
-    border-radius: 20px;
-    box-shadow: var(--shadow);
-  }
-
-  .reveal {
-    position: absolute;
-    bottom: 0.8rem;
-    font-family: var(--font-heading);
-    font-size: 1.6rem;
-    color: var(--shu);
-  }
-
-  .answer {
-    width: min(80vw, 280px);
-    text-align: center;
-    font-size: 1.6rem;
-    border-radius: 999px;
-    box-shadow: var(--shadow-soft);
-  }
-
-  .options {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.6rem;
-    width: min(90vw, 360px);
-  }
-
-  .option {
-    min-height: 60px;
-    font-size: 1.3rem;
   }
 
   .card {

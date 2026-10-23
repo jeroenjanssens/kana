@@ -1,6 +1,10 @@
 /**
  * Generates a seamless washi-paper texture on a canvas: fine grain, long translucent fibres and
- * a few soft cloudy patches. Returned as a data URL for use as a CSS background image.
+ * a few soft cloudy patches. The sheets are used as CSS background images through blob: URLs.
+ *
+ * Not data: URLs. Every textured element resolves the custom property that holds the image, and
+ * Chrome re-parses a data URL (about 500 KB each) for every one of them: on the Table, with 400
+ * textured surfaces, that took a second (four on a phone) of style recalculation.
  */
 
 import { hash, prng } from './random'
@@ -38,7 +42,58 @@ export function washiStyle(seed: number | string): string {
   return `--washi-tex: var(--washi-${texture}); --washi-angle: ${angle}deg; --washi-x: ${x}px; --washi-y: ${y}px`
 }
 
-export function generateWashi(options: WashiOptions = {}): string | undefined {
+/** Draws a sheet of paper, as a PNG (undefined without a canvas, e.g. in jsdom). */
+export async function generateWashi(options: WashiOptions = {}): Promise<Blob | undefined> {
+  const canvas = drawWashi(options)
+  if (!canvas) return undefined
+  return new Promise((resolve) => {
+    try {
+      canvas.toBlob((blob) => resolve(blob ?? undefined), 'image/png')
+    } catch {
+      resolve(undefined)
+    }
+  })
+}
+
+/** Blob URLs of the sheets currently in use, per variant; revoked when a sheet is replaced. */
+const installed = new Map<number, string>()
+
+/**
+ * Draws every paper variant for the theme, one per idle callback so it never blocks the page,
+ * and sets them as `--washi-0`… on `root`. Returns a function that cancels the sheets that
+ * haven't been drawn yet (the ones already shown stay until they are replaced).
+ */
+export function installWashi(
+  root: HTMLElement,
+  dark: boolean,
+  {
+    idle = globalThis.requestIdleCallback ?? ((fn: () => void) => setTimeout(fn, 200)),
+    generate = generateWashi,
+  }: {
+    idle?: (fn: () => Promise<void>) => unknown
+    generate?: (options: WashiOptions) => Promise<Blob | undefined>
+  } = {},
+): () => void {
+  let cancelled = false
+  WASHI_VARIANTS.forEach((variant, i) =>
+    idle(async () => {
+      if (cancelled) return
+      const blob = await generate({ ...variant, dark })
+      if (cancelled) return
+      const url = blob ? URL.createObjectURL(blob) : undefined
+      root.style.setProperty(`--washi-${i}`, url ? `url(${url})` : 'none')
+      const previous = installed.get(i)
+      if (previous) URL.revokeObjectURL(previous)
+      if (url) installed.set(i, url)
+      else installed.delete(i)
+    }),
+  )
+  return () => {
+    cancelled = true
+  }
+}
+
+function drawWashi(options: WashiOptions): HTMLCanvasElement | undefined {
   const size = options.size ?? 384
   const dark = options.dark ?? false
   const rand = prng(options.seed ?? 7)
@@ -120,10 +175,5 @@ export function generateWashi(options: WashiOptions = {}): string | undefined {
     }
   }
   ctx.putImageData(image, 0, 0)
-
-  try {
-    return canvas.toDataURL('image/png')
-  } catch {
-    return undefined
-  }
+  return canvas
 }

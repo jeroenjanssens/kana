@@ -50,6 +50,10 @@ e2e:
 # Run everything CI runs
 ci: lint check test build e2e
 
+# Build, serve and profile the Table page on a desktop and a throttled phone (results in perf-results.jsonl)
+perf label="run":
+    npx tsx scripts/perf.ts {{label}}
+
 # Start the VOICEVOX engine used to generate pronunciation audio (Docker)
 voicevox:
     docker run -d --rm --name voicevox -p 50021:50021 voicevox/voicevox_engine:cpu-latest

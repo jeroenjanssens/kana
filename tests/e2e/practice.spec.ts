@@ -68,7 +68,10 @@ test('cards fit their paper: no scrollbar from the texture', async ({ page }) =>
   expect(await scrolls('.face.front .content')).toBe(false)
   const bar = await page
     .locator('.face.back .content')
-    .evaluate((el) => [getComputedStyle(el).scrollbarWidth, el.offsetWidth - el.clientWidth])
+    .evaluate((el: HTMLElement) => [
+      getComputedStyle(el).scrollbarWidth,
+      el.offsetWidth - el.clientWidth,
+    ])
   expect(bar).toEqual(['none', 0])
 })
 

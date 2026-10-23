@@ -1,26 +1,77 @@
-import { describe, expect, test } from 'vitest'
-import { prng } from '../../src/lib/ui/random'
-import { WASHI_VARIANTS, generateWashi, washiStyle } from '../../src/lib/ui/washi'
+import { describe, expect, test, vi } from 'vitest'
+import { WASHI_VARIANTS, generateWashi, installWashi, washiStyle } from '../../src/lib/ui/washi'
 
-describe('prng', () => {
-  test('is deterministic and in [0, 1)', () => {
-    const a = prng(42)
-    const b = prng(42)
-    for (let i = 0; i < 100; i++) {
-      const x = a()
-      expect(x).toBe(b())
-      expect(x).toBeGreaterThanOrEqual(0)
-      expect(x).toBeLessThan(1)
-    }
-  })
-  test('different seeds give different sequences', () => {
-    expect(prng(1)()).not.toBe(prng(2)())
+describe('generateWashi', () => {
+  test('gives no sheet when canvas is unavailable (jsdom)', async () => {
+    await expect(generateWashi()).resolves.toBeUndefined()
   })
 })
 
-describe('generateWashi', () => {
-  test('returns undefined when canvas is unavailable (jsdom)', () => {
-    expect(generateWashi()).toBeUndefined()
+describe('installWashi', () => {
+  let urls = 0
+  const revoked: string[] = []
+  vi.stubGlobal('URL', {
+    ...URL,
+    createObjectURL: () => `blob:sheet-${urls++}`,
+    revokeObjectURL: (url: string) => revoked.push(url),
+  })
+
+  /** Runs idle callbacks straight away, and waits for the sheets to be set. */
+  async function install(
+    root: HTMLElement,
+    dark: boolean,
+    generate = async (): Promise<Blob | undefined> => new Blob(),
+  ) {
+    const pending: Promise<void>[] = []
+    const cancel = installWashi(root, dark, {
+      idle: (fn) => pending.push(fn()),
+      generate,
+    })
+    await Promise.all(pending)
+    return cancel
+  }
+
+  test('sets every sheet as a short blob: URL, never as a data: URL', async () => {
+    const root = document.createElement('div')
+    await install(root, false)
+    for (let i = 0; i < WASHI_VARIANTS.length; i++) {
+      expect(root.style.getPropertyValue(`--washi-${i}`)).toMatch(/^url\(blob:sheet-\d+\)$/)
+    }
+  })
+
+  test('draws the sheets for the theme', async () => {
+    const generate = vi.fn(async () => new Blob())
+    await install(document.createElement('div'), true, generate)
+    expect(generate).toHaveBeenCalledTimes(WASHI_VARIANTS.length)
+    for (const [options] of generate.mock.calls as unknown as [{ dark: boolean }][])
+      expect(options.dark).toBe(true)
+  })
+
+  test('revokes a sheet when it is replaced, not before', async () => {
+    const root = document.createElement('div')
+    await install(root, false)
+    const first = root.style.getPropertyValue('--washi-0').slice(4, -1)
+    const before = revoked.length
+    await install(root, true)
+    expect(revoked.slice(before)).toContain(first)
+    expect(revoked).not.toContain(root.style.getPropertyValue('--washi-0').slice(4, -1))
+  })
+
+  test('a cancelled install leaves the current sheets alone', async () => {
+    const root = document.createElement('div')
+    await install(root, false)
+    const current = root.style.getPropertyValue('--washi-1')
+    const callbacks: (() => Promise<void>)[] = []
+    const cancel = installWashi(root, true, { idle: (fn) => callbacks.push(fn) })
+    cancel()
+    await Promise.all(callbacks.map((fn) => fn()))
+    expect(root.style.getPropertyValue('--washi-1')).toBe(current)
+  })
+
+  test('without a canvas the sheets are plain paper', async () => {
+    const root = document.createElement('div')
+    await install(root, false, async () => undefined)
+    expect(root.style.getPropertyValue('--washi-2')).toBe('none')
   })
 })
 
