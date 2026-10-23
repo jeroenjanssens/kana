@@ -20,6 +20,24 @@ test('the arrows change the photo, and the choice survives a reload', async ({ p
   await expect.poll(() => currentPhoto(page)).toBe(second)
 })
 
+test('the photo stays the same during a sprint, even in "every minute" mode', async ({ page }) => {
+  await page.clock.install()
+  await quizOnly(page, { settings: { photoMode: 'minutes', photoMinutes: 1, sprintMinutes: 2 } })
+  await page.goto('./#/sprint')
+  await expect(page.locator('.backdrop img').first()).toBeVisible()
+  const before = await currentPhoto(page)
+  await page.getByRole('button', { name: /Start/ }).click()
+  await expect(page.getByLabel('Time left')).toHaveText('2:00')
+  await page.clock.runFor(110_000)
+  await expect(page.getByLabel('Time left')).toHaveText('0:10')
+  expect(await currentPhoto(page)).toBe(before)
+  // Once the sprint is over the photo changes again, a minute later.
+  await page.clock.runFor(10_000)
+  await expect(page.getByRole('heading', { name: /kana in 2 minutes/ })).toBeVisible()
+  await page.clock.runFor(61_000)
+  await expect.poll(() => currentPhoto(page)).not.toBe(before)
+})
+
 test('in fixed mode studying does not change the photo', async ({ page }) => {
   await quizOnly(page, { settings: { photoMode: 'fixed', photoEvery: 3 } })
   await page.goto('./#/study/hiragana?mode=srs')

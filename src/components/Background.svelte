@@ -44,9 +44,12 @@
     return () => clearTimeout(timer)
   })
 
-  // "Every N minutes" mode.
+  /** A sprint or race is running: a changing photo would distract from the clock. */
+  const timed = $derived(ui.focus && ['sprint', 'race'].includes(route.segments[0] ?? ''))
+
+  // "Every N minutes" mode (the minutes start again after a sprint or race).
   $effect(() => {
-    if (!show || s.photoMode !== 'minutes') return
+    if (!show || s.photoMode !== 'minutes' || timed) return
     const timer = setInterval(() => showPhoto(1), Math.max(1, s.photoMinutes) * 60_000)
     return () => clearInterval(timer)
   })
