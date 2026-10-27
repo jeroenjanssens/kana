@@ -12,6 +12,12 @@ export function scriptsOf(choice: ScriptChoice): Script[] {
 export type RaceKana = 'seen' | 'mastered' | 'all' | 'rows'
 export const RACE_KANA: readonly RaceKana[] = ['seen', 'mastered', 'all', 'rows']
 
+/** The size of the squares on a printed worksheet. */
+export type SheetSize = 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge'
+export const SHEET_SIZES: readonly SheetSize[] = ['xsmall', 'small', 'medium', 'large', 'xlarge']
+/** The worksheet "font" that draws kana from the stroke-order data, like the numbered square. */
+export const SHEET_STROKES = 'strokes'
+
 /** A kana as it's asked: in one script. */
 export interface Question {
   kana: Kana

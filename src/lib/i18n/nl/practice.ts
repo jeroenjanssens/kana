@@ -23,6 +23,9 @@ export default {
     'Lees zoveel kana als je kunt voordat de tijd om is, en verbeter je beste score.',
   'practice.raceHeading': 'Race',
   'practice.raceDesc': 'Ga zo snel als je kunt door een reeks kana, elk één keer.',
+  'practice.worksheetHeading': 'Werkblad',
+  'practice.worksheetDesc':
+    'Print een blad om met de hand te oefenen, met de schrijfvolgorde en hulplijnen die vervagen.',
   'practice.readingHeading': 'Leesoefening',
   'practice.readingDesc': 'Echte woorden van kana die je al kent.',
   'practice.readingUnlocked': '{count} woorden vrijgespeeld.',
@@ -204,6 +207,39 @@ export default {
   'race.newRecord': 'Nieuw record! (was {previous})',
   'race.firstTime': 'Je eerste race met deze kana',
   'race.missedAgain': 'Race met de gemiste',
+
+  // ── Worksheet view ──────────────────────────────────────────────────────────
+  'worksheet.eyebrow': 'プリント · Werkblad',
+  'worksheet.heading': 'Werkblad',
+  'worksheet.lead':
+    'Print een blad om met de hand te oefenen. Elke rij begint met de kana en de schrijfvolgorde, gevolgd door hulplijnen die vervagen tot je hem zelf schrijft.',
+  'worksheet.rowsLabel': 'Rijen',
+  'worksheet.sizeLabel': 'Grootte',
+  'worksheet.size.xsmall': 'Extra klein',
+  'worksheet.size.small': 'Klein',
+  'worksheet.size.medium': 'Middel',
+  'worksheet.size.large': 'Groot',
+  'worksheet.size.xlarge': 'Extra groot',
+  'worksheet.sizeNote': 'Vakjes van {mm} mm, {rows} rijen per pagina',
+  'worksheet.fontLabel': 'Lettertype',
+  'worksheet.fontStrokes': 'Schrijfvolgorde (zoals het genummerde vakje)',
+  'worksheet.fontNote':
+    'Voor het eerste vakje en de hulplijnen. Het genummerde vakje toont altijd de schrijfvolgorde.',
+  'worksheet.shuffle': 'Willekeurige volgorde',
+  'worksheet.reshuffle': 'Opnieuw schudden',
+  'worksheet.romaji': 'Romaji tonen',
+  'worksheet.grid': 'Hokjes tonen',
+  'worksheet.colours': 'Streken in kleur',
+  'worksheet.summary': "{count} kana · {pages} {pages|pagina|pagina's}",
+  'worksheet.empty': 'Kies minstens één rij.',
+  'worksheet.print': 'Printen',
+  'worksheet.printHint':
+    'Print op 100% (werkelijke grootte), niet “passend op pagina”, voor de echte maten. Kies “Opslaan als PDF” in het printvenster voor een PDF.',
+  'worksheet.preview': 'Voorbeeld',
+  'worksheet.pageLabel': 'Pagina {page} van {pages}',
+  'worksheet.footer': 'kana · {page} / {pages}',
+  'worksheet.name': 'Naam',
+  'worksheet.date': 'Datum',
 
   // ── WritingPad component ─────────────────────────────────────────────────────
   'writingpad.areaLabel': 'Tekengebied: {count} {count|streek|streken} getekend',

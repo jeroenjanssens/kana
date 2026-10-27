@@ -1,7 +1,15 @@
 import type { KanaGroup } from '../data/kana'
 import type { VoiceSetting } from '../audio/voices'
 import type { PhotoMode } from '../ui/photos'
-import { RACE_KANA, SCRIPT_CHOICES, type RaceKana, type ScriptChoice } from '../study/scripts'
+import {
+  RACE_KANA,
+  SCRIPT_CHOICES,
+  SHEET_SIZES,
+  SHEET_STROKES,
+  type RaceKana,
+  type ScriptChoice,
+  type SheetSize,
+} from '../study/scripts'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
 export const SCHEMA_VERSION = 1
@@ -150,6 +158,16 @@ export interface Settings {
   raceKana: RaceKana
   raceRows: string[]
   raceShuffle: boolean
+  /** The last worksheet setup: script(s), rows, random order, romaji, grid, stroke colours, font and square size. */
+  sheetScript: ScriptChoice
+  sheetRows: string[]
+  sheetShuffle: boolean
+  sheetRomaji: boolean
+  sheetGrid: boolean
+  sheetColours: boolean
+  /** The font of the model and the traces: a font id, or 'strokes' for the stroke-order data. */
+  sheetFont: string
+  sheetSize: SheetSize
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -202,6 +220,14 @@ export const DEFAULT_SETTINGS: Settings = {
   raceKana: 'seen',
   raceRows: ['basic:a', 'basic:k'],
   raceShuffle: true,
+  sheetScript: 'hiragana',
+  sheetRows: ['basic:a', 'basic:k'],
+  sheetShuffle: false,
+  sheetRomaji: true,
+  sheetGrid: true,
+  sheetColours: true,
+  sheetFont: 'klee-one',
+  sheetSize: 'medium',
 }
 
 /** Settings that only take one of a few values; anything else falls back to the default. */
@@ -210,6 +236,9 @@ export const SETTING_CHOICES: Partial<Record<keyof Settings, readonly string[]>>
   sprintScript: SCRIPT_CHOICES,
   raceScript: SCRIPT_CHOICES,
   raceKana: RACE_KANA,
+  sheetScript: SCRIPT_CHOICES,
+  sheetSize: SHEET_SIZES,
+  sheetFont: [SHEET_STROKES, ...FONTS.map((f) => f.id)],
 }
 
 /** A finished sprint. Sprints saved before lengths could be chosen have no `minutes`: they're 1. */

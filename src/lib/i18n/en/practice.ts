@@ -21,6 +21,9 @@ export default {
     'Read as many kana as you can before the time runs out, and beat your best.',
   'practice.raceHeading': 'Race',
   'practice.raceDesc': 'Go through a set of kana, each once, as fast as you can.',
+  'practice.worksheetHeading': 'Worksheet',
+  'practice.worksheetDesc':
+    'Print a sheet to practise writing by hand, with stroke order and traces that fade.',
   'practice.readingHeading': 'Reading practice',
   'practice.readingDesc': 'Real words made of kana you know.',
   'practice.readingUnlocked': '{count} words unlocked.',
@@ -202,6 +205,39 @@ export default {
   'race.newRecord': 'New record! (was {previous})',
   'race.firstTime': 'Your first race with these kana',
   'race.missedAgain': 'Race the missed ones',
+
+  // ── Worksheet view ──────────────────────────────────────────────────────────
+  'worksheet.eyebrow': 'プリント · Worksheet',
+  'worksheet.heading': 'Worksheet',
+  'worksheet.lead':
+    'Print a sheet to practise writing by hand. Each row starts with the kana and its stroke order, followed by traces that fade until you write it on your own.',
+  'worksheet.rowsLabel': 'Rows',
+  'worksheet.sizeLabel': 'Size',
+  'worksheet.size.xsmall': 'Extra small',
+  'worksheet.size.small': 'Small',
+  'worksheet.size.medium': 'Medium',
+  'worksheet.size.large': 'Large',
+  'worksheet.size.xlarge': 'Extra large',
+  'worksheet.sizeNote': 'Squares of {mm} mm, {rows} rows per page',
+  'worksheet.fontLabel': 'Font',
+  'worksheet.fontStrokes': 'Stroke order (like the numbered square)',
+  'worksheet.fontNote':
+    'For the first square and the traces. The numbered square always shows the stroke order.',
+  'worksheet.shuffle': 'Random order',
+  'worksheet.reshuffle': 'Shuffle again',
+  'worksheet.romaji': 'Show romaji',
+  'worksheet.grid': 'Show grid',
+  'worksheet.colours': 'Colour the strokes',
+  'worksheet.summary': '{count} kana · {pages} {pages|page|pages}',
+  'worksheet.empty': 'Choose at least one row.',
+  'worksheet.print': 'Print',
+  'worksheet.printHint':
+    'For the real sizes, print at 100% (actual size), not “fit to page”. To get a PDF, choose “Save as PDF” in the print dialog.',
+  'worksheet.preview': 'Preview',
+  'worksheet.pageLabel': 'Page {page} of {pages}',
+  'worksheet.footer': 'kana · {page} / {pages}',
+  'worksheet.name': 'Name',
+  'worksheet.date': 'Date',
 
   // ── WritingPad component ─────────────────────────────────────────────────────
   'writingpad.areaLabel': 'Drawing area: {count} {count|stroke|strokes} drawn',

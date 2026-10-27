@@ -30,6 +30,7 @@
     sprint: () => import('./views/Sprint.svelte'),
     race: () => import('./views/Race.svelte'),
     trace: () => import('./views/Trace.svelte'),
+    worksheet: () => import('./views/Worksheet.svelte'),
     reading: () => import('./views/Reading.svelte'),
     stats: () => import('./views/Stats.svelte'),
     settings: () => import('./views/Settings.svelte'),

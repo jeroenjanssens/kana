@@ -46,6 +46,11 @@
     <h2>{t('practice.traceHeading')}</h2>
     <p>{t('practice.traceDesc')}</p>
   </a>
+  <a class="card panel" href="#/worksheet">
+    <span class="art fading" lang="ja"><span>あ</span><span>あ</span><span>あ</span></span>
+    <h2>{t('practice.worksheetHeading')}</h2>
+    <p>{t('practice.worksheetDesc')}</p>
+  </a>
   <a class="card panel" href="#/sprint">
     <span class="art"><Icon name="stopwatch" size={40} /></span>
     <h2>{t('practice.sprintHeading')}</h2>
@@ -116,5 +121,22 @@
     font-size: 1.6rem;
     white-space: nowrap;
     background: color-mix(in srgb, var(--ink) 6%, transparent);
+  }
+
+  /* A tiny worksheet: the kana, then fainter and fainter traces. */
+  .fading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.4rem;
+    line-height: normal;
+  }
+
+  .fading span:nth-child(2) {
+    opacity: 0.45;
+  }
+
+  .fading span:nth-child(3) {
+    opacity: 0.18;
   }
 </style>

@@ -80,4 +80,5 @@ test('practice hub links to all practice modes', async ({ page }) => {
   await expect(page.getByRole('link', { name: /Confusable pairs/ })).toBeVisible()
   await expect(page.getByRole('link', { name: /Listening/ })).toBeVisible()
   await expect(page.getByRole('link', { name: /Reading practice/ })).toBeVisible()
+  await expect(page.getByRole('link', { name: /Worksheet/ })).toBeVisible()
 })
