@@ -3,7 +3,7 @@
 **Learn to read hiragana and katakana in your browser** — with spaced repetition, real pronunciation,
 stroke-order animations and flashcards that look like ink on washi paper.
 
-**→ https://jeroenjanssens.github.io/kana/**
+**→ https://kana.jeroenjanssens.com/**
 
 ![kana: a flashcard on washi paper in front of Mount Fuji](docs/screenshot-study.png)
 
@@ -47,7 +47,7 @@ You need Node.js 22+ and [just](https://github.com/casey/just).
 
 ```sh
 just install   # install dependencies
-just dev       # start the dev server at http://localhost:5173/kana/
+just dev       # start the dev server at http://localhost:5173/
 just test      # unit tests (Vitest)
 just e2e       # end-to-end tests (Playwright)
 just ci        # lint, type-check, unit tests, build and e2e — what CI runs

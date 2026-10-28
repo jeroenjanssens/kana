@@ -44,6 +44,6 @@ test('the web app manifest is valid', async ({ page }) => {
   const res = await page.request.get('./manifest.webmanifest')
   expect(res.ok()).toBe(true)
   const manifest = await res.json()
-  expect(manifest).toMatchObject({ short_name: 'kana', start_url: '/kana/', display: 'standalone' })
+  expect(manifest).toMatchObject({ short_name: 'kana', start_url: '/', display: 'standalone' })
   expect(manifest.icons.length).toBeGreaterThanOrEqual(4)
 })

@@ -2,12 +2,12 @@
 
 A polished browser app for learning hiragana and katakana. It uses spaced repetition (like Anki), has an in-order study mode, and includes drills, listening practice, stroke-order animations, reading practice and stats. The visual style is inspired by Japan: flashcards look like ink on washi paper, set against rotating photos of Japan.
 
-Built with Svelte 5, TypeScript and Vite, deployed to GitHub Pages at `https://jeroenjanssens.github.io/kana/`. All progress is stored in the browser, and the app can be installed and used offline as a PWA.
+Built with Svelte 5, TypeScript and Vite, deployed to GitHub Pages at `https://kana.jeroenjanssens.com/`. All progress is stored in the browser, and the app can be installed and used offline as a PWA.
 
 Each design decision below lists a **default** (what I'll build unless you say otherwise) and an **alternative**. Decisions you have already made are marked ✅.
 
 > **Status (2026-10-08): all milestones M0–M12 are implemented** and deployed to
-> https://jeroenjanssens.github.io/kana/. Where the build differs from this plan:
+> https://kana.jeroenjanssens.com/. Where the build differs from this plan:
 >
 > - **Fonts (D10):** instead of `@fontsource` packages (≈124 files per font), `scripts/subset-fonts.ts` downloads the fonts from the google/fonts repository and cuts each one down to kana, Latin and the UI kanji. That's one file per font, 1.7 MB for all 15, and all of them are pre-cached for offline use.
 > - **Pronunciation (D5), revised in round 1:** the Commons recordings were replaced by audio generated with VOICEVOX: every kana (yōon included) and every word, in a female (春日部つむぎ) and a male (青山龍星) voice, with a Female / Male / Random setting. See [docs/plan-improvements-1.md](docs/plan-improvements-1.md).
@@ -304,7 +304,7 @@ D13–D18 are covered in §1–§2 above.
 ```
 kana/
 ├── index.html
-├── vite.config.ts              # base: '/kana/', svelte + PWA plugins
+├── vite.config.ts              # base: '/', svelte + PWA plugins
 ├── svelte.config.js
 ├── public/
 │   ├── audio/                  # 71 × mp3 pronunciation + SOURCES.json

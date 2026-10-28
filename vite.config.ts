@@ -3,7 +3,7 @@ import type { Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
-const BASE = '/kana/'
+const BASE = '/'
 /** The GitHub Actions run number that built this version (set in CI), or "dev". */
 const VERSION = process.env.KANA_VERSION || 'dev'
 

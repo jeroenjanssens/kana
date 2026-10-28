@@ -36,7 +36,7 @@ describe('daily goal', () => {
 describe('calendar reminder', () => {
   const ics = reminderIcs({
     time: '19:30',
-    url: 'https://jeroenjanssens.github.io/kana/',
+    url: 'https://kana.jeroenjanssens.com/',
     now: new Date(2026, 9, 8, 12),
   })
 

@@ -20,7 +20,7 @@ const args = process.argv.slice(2)
 const label = args.find((a) => !a.startsWith('--')) ?? 'run'
 const OUT = join(tmpdir(), 'kana-perf-dist')
 const PORT = 4199
-const URL = `http://localhost:${PORT}/kana/`
+const URL = `http://localhost:${PORT}/`
 
 const now = Date.now()
 const MATURE = {

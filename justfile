@@ -7,7 +7,7 @@ default:
 install:
     npm install
 
-# Start the development server (http://localhost:5173/kana/)
+# Start the development server (http://localhost:5173/)
 dev:
     npm run dev
 
