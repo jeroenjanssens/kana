@@ -257,8 +257,11 @@ export interface RaceResult {
 
 export interface WordProgress {
   seen: number
+  /** Answers that weren't Again. */
   correct: number
   last: number
+  /** The word's FSRS card (words practised before reading had grades get one on first load). */
+  card?: CardRecord
 }
 
 export interface SaveFile {

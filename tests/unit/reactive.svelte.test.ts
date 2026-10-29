@@ -27,8 +27,8 @@ test('actions work on reactive state and survive a snapshot', () => {
   recordReview(store.data, { deck: 'hiragana', id: 'i', grade: 3, ms: 1000, now })
   const r = recordReview(store.data, { deck: 'katakana', id: 'a', grade: 3, ms: 1000, now })
   expect(r.becameMature).toBe(true)
-  recordWord(store.data, 'ねこ', true, now)
-  recordWord(store.data, 'ねこ', false, now)
+  recordWord(store.data, 'ねこ', 3, now)
+  recordWord(store.data, 'ねこ', 1, now)
   markNoteSeen(store.data, 'sokuon')
   logPractice(store.data, { mode: 'order', deck: 'hiragana', id: 'u', correct: true, ms: 1 })
 

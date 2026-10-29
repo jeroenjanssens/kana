@@ -18,7 +18,7 @@ export function chosenSettings(settings: Settings): string {
  * Merge two copies of the progress (e.g. this device and the synced copy) without losing work:
  * - each card: the version reviewed most recently
  * - the review log: the union of both, without duplicates, in time order
- * - word progress: the higher counts
+ * - word progress: the higher counts, and the card reviewed most recently
  * - settings: the copy whose settings were changed most recently
  * The result doesn't depend on the order of the arguments.
  */
@@ -48,13 +48,15 @@ export function mergeSaves(a: SaveFile, b: SaveFile): SaveFile {
   out.words = structuredClone(x.words)
   for (const [word, p] of Object.entries(y.words)) {
     const q = out.words[word]
+    const card = newerCard(p.card, q?.card)
     out.words[word] = q
       ? {
           seen: Math.max(p.seen, q.seen),
           correct: Math.max(p.correct, q.correct),
           last: Math.max(p.last, q.last),
+          ...(card ? { card: structuredClone(card) } : {}),
         }
-      : { ...p }
+      : structuredClone(p)
   }
 
   out.seenNotes = [...new Set([...x.seenNotes, ...y.seenNotes])].sort()

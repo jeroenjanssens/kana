@@ -114,11 +114,19 @@ describe('practice and words', () => {
     })
   })
 
-  test('recordWord tracks seen and correct counts', () => {
+  test('recordWord tracks seen and correct counts, and grades the word', () => {
     const s = emptySave()
-    recordWord(s, 'ねこ', true, NOW)
-    recordWord(s, 'ねこ', false, NOW + 1)
-    expect(s.words['ねこ']).toEqual({ seen: 2, correct: 1, last: NOW + 1 })
+    recordWord(s, 'ねこ', 3, NOW)
+    recordWord(s, 'ねこ', 1, NOW + 1)
+    expect(s.words['ねこ']).toMatchObject({ seen: 2, correct: 1, last: NOW + 1 })
+    expect(s.words['ねこ'].card).toMatchObject({ reps: 2, last_review: NOW + 1 })
+  })
+
+  test('recordWord counts Hard and Easy as read', () => {
+    const s = emptySave()
+    recordWord(s, 'ねこ', 2, NOW)
+    recordWord(s, 'ねこ', 4, NOW + 1)
+    expect(s.words['ねこ']).toMatchObject({ seen: 2, correct: 2 })
   })
 
   test('markNoteSeen returns true only the first time', () => {
@@ -131,7 +139,7 @@ describe('practice and words', () => {
     const s = emptySave()
     s.settings.theme = 'dark'
     recordReview(s, { deck: 'hiragana', id: 'a', grade: 3, ms: 1, now: NOW })
-    recordWord(s, 'あい', true)
+    recordWord(s, 'あい', 3)
     resetProgress(s)
     expect(s.cards).toEqual({})
     expect(s.log).toEqual([])

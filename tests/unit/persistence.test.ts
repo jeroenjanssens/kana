@@ -78,6 +78,26 @@ describe('migrate', () => {
     const save = migrate({ version: 1, log: [ok, { t: 'x' }, null] })
     expect(save.log).toEqual([ok])
   })
+  test("restores a word's card, and drops a broken one", () => {
+    const card = {
+      due: 9,
+      stability: 1,
+      difficulty: 5,
+      scheduled_days: 0,
+      reps: 1,
+      lapses: 0,
+      state: 1,
+    }
+    const save = migrate({
+      version: 1,
+      words: {
+        ねこ: { seen: 1, correct: 1, last: 5, card },
+        いぬ: { seen: 1, correct: 1, last: 5, card: { due: 'x' } },
+      },
+    })
+    expect(save.words['ねこ'].card).toMatchObject(card)
+    expect(save.words['いぬ']).toEqual({ seen: 1, correct: 1, last: 5 })
+  })
   test('restores word progress, notes and celebrations', () => {
     const save = migrate({
       version: 1,

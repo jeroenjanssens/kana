@@ -97,12 +97,14 @@ export function logPractice(save: SaveFile, entry: Omit<ReviewEntry, 't'> & { t?
   save.log.push({ ...entry, t: entry.t ?? Date.now(), ms: Math.round(entry.ms) })
 }
 
-export function recordWord(save: SaveFile, word: string, correct: boolean, now = Date.now()) {
+/** Grade a word in reading practice: its card, and how often it was seen and read. */
+export function recordWord(save: SaveFile, word: string, grade: Grade, now = Date.now()) {
   save.words[word] ??= { seen: 0, correct: 0, last: 0 }
   const p = save.words[word]
   p.seen++
-  if (correct) p.correct++
+  if (grade > 1) p.correct++
   p.last = now
+  p.card = gradeCard(p.card, grade, now)
 }
 
 export function markNoteSeen(save: SaveFile, note: string): boolean {

@@ -44,8 +44,8 @@ describe('mergeSaves', () => {
     const b = device(2)
     recordReview(a, { deck: 'hiragana', id: 'a', grade: 3, ms: 1, now: T })
     recordReview(b, { deck: 'hiragana', id: 'a', grade: 1, ms: 1, now: T + MIN })
-    recordWord(a, 'ねこ', true, T)
-    recordWord(b, 'ねこ', false, T + 1)
+    recordWord(a, 'ねこ', 3, T)
+    recordWord(b, 'ねこ', 1, T + 1)
     b.seenNotes.push('sokuon')
     a.sprints.hiragana = [{ score: 12, at: 5 }]
     b.sprints.hiragana = [
@@ -60,7 +60,18 @@ describe('mergeSaves', () => {
       { score: 12, at: 5 },
       { score: 15, at: 9 },
     ])
-    expect(ab.words['ねこ']).toEqual({ seen: 1, correct: 1, last: T + 1 })
+    expect(ab.words['ねこ']).toMatchObject({ seen: 1, correct: 1, last: T + 1 })
+    // The card reviewed last: the Again on b.
+    expect(ab.words['ねこ'].card).toEqual(b.words['ねこ'].card)
+  })
+
+  test("a word's card is kept when only one copy has it", () => {
+    const a = device(1)
+    const b = device(2)
+    a.words['ねこ'] = { seen: 1, correct: 1, last: T }
+    recordWord(b, 'ねこ', 3, T)
+    expect(mergeSaves(a, b).words['ねこ'].card).toEqual(b.words['ねこ'].card)
+    expect(mergeSaves(b, a).words['ねこ'].card).toEqual(b.words['ねこ'].card)
   })
 
   test('only settings someone chose count as a change', () => {

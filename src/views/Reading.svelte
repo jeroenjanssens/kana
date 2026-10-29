@@ -22,6 +22,7 @@
     wordMeaning,
     wordSize,
   } from '../lib/study/reading'
+  import { migrateWordCards } from '../lib/study/wordReviews'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
@@ -60,6 +61,9 @@
   let score = $state(0)
   let startedAt = 0
   let inputEl = $state<HTMLInputElement>()
+
+  // Words practised before reading had grades get their card from those answers.
+  migrateWordCards(store.data)
 
   const later = timers()
   onDestroy(() => {
@@ -112,11 +116,13 @@
 
   function answer(correct: boolean) {
     if (!current) return
-    recordWord(store.data, current.kana, correct)
+    const grade = correct ? 3 : 1
+    recordWord(store.data, current.kana, grade)
     logPractice(store.data, {
       mode: 'reading',
       id: current.kana,
       correct,
+      grade,
       ms: performance.now() - startedAt,
     })
     if (correct) {

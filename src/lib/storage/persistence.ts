@@ -96,6 +96,7 @@ export function migrate(raw: unknown): SaveFile {
           seen: p.seen,
           correct: p.correct,
           last: typeof p.last === 'number' ? p.last : 0,
+          ...(isCardRecord(p.card) ? { card: sanitizeCard(p.card as unknown as Json) } : {}),
         }
       }
     }
