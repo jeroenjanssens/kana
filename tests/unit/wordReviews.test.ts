@@ -1,8 +1,14 @@
 import { describe, expect, test } from 'vitest'
 import { createScheduler, grade } from '../../src/lib/srs/scheduler'
-import { emptySave, type ReviewEntry } from '../../src/lib/storage/schema'
+import type { Word } from '../../src/lib/data/words'
+import {
+  emptySave,
+  type Grade,
+  type ReviewEntry,
+  type SaveFile,
+} from '../../src/lib/storage/schema'
 import { recordWord } from '../../src/lib/study/actions'
-import { migrateWordCards, readingGrade } from '../../src/lib/study/wordReviews'
+import { migrateWordCards, ReadingSession, readingGrade } from '../../src/lib/study/wordReviews'
 
 const T = new Date(2026, 5, 1, 10).getTime()
 const DAY = 86_400_000
@@ -105,5 +111,141 @@ describe('migrateWordCards', () => {
       return s.words['ねこ'].card
     }
     expect(make()).toEqual(make())
+  })
+})
+
+describe('ReadingSession', () => {
+  const word = (kana: string, index: number): Word => ({
+    kana,
+    romaji: kana,
+    accept: [],
+    meaning: '',
+    script: 'hiragana',
+    rules: [],
+    index,
+  })
+  const pool = ['あい', 'あお', 'あか', 'あき', 'いえ', 'うえ', 'いか', 'いけ'].map(word)
+  /** A card reviewed `days` ago, due `due` days from T (negative: overdue). */
+  const reviewed = (s: SaveFile, kana: string, due: number, stability = 5) => {
+    s.words[kana] = {
+      seen: 1,
+      correct: 1,
+      last: T - DAY,
+      card: {
+        due: T + due * DAY,
+        stability,
+        difficulty: 5,
+        elapsed_days: 0,
+        scheduled_days: 3,
+        learning_steps: 0,
+        reps: 2,
+        lapses: 0,
+        state: 2,
+        last_review: T - DAY,
+      },
+    }
+  }
+  /** Answer `n` words with the same grade; returns what was shown. */
+  const run = (session: ReadingSession, s: SaveFile, n: number, rating: Grade = 3) => {
+    const out: string[] = []
+    for (let i = 0; i < n; i++) {
+      const w = session.next(T)
+      if (!w) break
+      out.push(w.kana)
+      recordWord(s, w.kana, rating, T)
+      session.answer(w, rating)
+    }
+    return out
+  }
+
+  test('new words come shortest first, then in list order', () => {
+    const s = emptySave()
+    const long = word('あいうえお', 0)
+    const session = new ReadingSession([long, ...pool.slice(0, 2)], s, 0)
+    expect(run(session, s, 3)).toEqual(['あい', 'あお', 'あいうえお'])
+  })
+
+  test('due words come first, most overdue first, with a new word after every two', () => {
+    const s = emptySave()
+    reviewed(s, 'いか', -1)
+    reviewed(s, 'いけ', -5)
+    reviewed(s, 'うえ', -3)
+    reviewed(s, 'いえ', 2) // not due
+    const session = new ReadingSession(pool, s, 0)
+    expect(run(session, s, 5)).toEqual(['いけ', 'うえ', 'あい', 'いか', 'あお'])
+  })
+
+  test('a word answered Again comes back after 3 to 5 others', () => {
+    for (const r of [0, 0.5, 0.99]) {
+      const s = emptySave()
+      const session = new ReadingSession(pool, s, 0, () => r)
+      const first = session.next(T)!
+      recordWord(s, first.kana, 1, T)
+      session.answer(first, 1)
+      const after = run(session, s, 7)
+      const gap = after.indexOf(first.kana)
+      expect(gap).toBe(3 + Math.floor(r * 3))
+    }
+  })
+
+  test('only Again brings a word back in the round', () => {
+    const s = emptySave()
+    const session = new ReadingSession(pool, s, 0)
+    const shown = run(session, s, pool.length, 2)
+    expect(new Set(shown).size).toBe(pool.length)
+  })
+
+  test('with nothing else left, a missed word comes back sooner', () => {
+    const s = emptySave()
+    const two = pool.slice(0, 2)
+    const session = new ReadingSession(two, s, 0, () => 0.99)
+    const a = session.next(T)!
+    recordWord(s, a.kana, 1, T)
+    session.answer(a, 1)
+    const b = session.next(T)!
+    recordWord(s, b.kana, 3, T)
+    session.answer(b, 3)
+    expect(session.next(T)!.kana).toBe(a.kana)
+  })
+
+  test('never the same word twice in a row, unless it is the only one', () => {
+    const s = emptySave()
+    const session = new ReadingSession(pool.slice(0, 2), s, 0)
+    const shown = run(session, s, 10, 1)
+    for (let i = 1; i < shown.length; i++) expect(shown[i]).not.toBe(shown[i - 1])
+    const alone = new ReadingSession(pool.slice(0, 1), s, 0)
+    expect(run(alone, s, 3)).toEqual(['あい', 'あい', 'あい'])
+  })
+
+  test('a round never runs out: it practises ahead, unseen and least remembered first', () => {
+    const s = emptySave()
+    reviewed(s, 'あい', 5, 20)
+    reviewed(s, 'あお', 5, 2)
+    const session = new ReadingSession(pool.slice(0, 2), s, 0)
+    expect(run(session, s, 4)).toEqual(['あお', 'あい', 'あお', 'あい'])
+  })
+
+  test('stops at the limit; 0 is no limit', () => {
+    const s = emptySave()
+    const round = new ReadingSession(pool.slice(0, 3), s, 5)
+    expect(run(round, s, 20)).toHaveLength(5)
+    expect(round.done).toBe(true)
+    expect(round.next(T)).toBeUndefined()
+    const endless = new ReadingSession(pool.slice(0, 3), emptySave(), 0)
+    expect(run(endless, emptySave(), 100)).toHaveLength(100)
+    expect(endless.done).toBe(false)
+  })
+
+  test('restores a snapshot (for undo)', () => {
+    const s = emptySave()
+    const session = new ReadingSession(pool, s, 0, () => 0)
+    run(session, s, 2)
+    const snap = session.snapshot()
+    const before = structuredClone(s)
+    const next = run(session, s, 1, 1)
+    session.restore(snap)
+    expect(session.count).toBe(2)
+    Object.assign(s, before)
+    expect(run(session, s, 1)).toEqual(next)
   })
 })
