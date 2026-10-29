@@ -6,6 +6,8 @@ const KNOWN = ['a', 'i', 'u', 'e', 'o', 'ka', 'ki', 'ku', 'ke', 'ko']
 /** The words these kana unlock. */
 const UNLOCKED = words.filter((w) => /^[あいうえおかきくけこ]+$/.test(w.kana))
 const KIKU = words.find((w) => w.kana === 'きく')!
+/** A word read many times, not due for a while: it doesn't come up before new words. */
+const readOften = () => ({ seen: 20, correct: 20, last: 1, card: youngCard() })
 
 test('every word in the list opens its card, with rules, sound and kana', async ({ page }) => {
   const errors = trackErrors(page)
@@ -46,9 +48,9 @@ test('a word to unlock says which kana are still needed', async ({ page }) => {
 })
 
 test('after answering, the back shows the rules in the word', async ({ page }) => {
-  // Every other word has been practised a lot, so きく comes first.
+  // Every other word has been practised a lot and isn't due, so きく comes first.
   const practised = Object.fromEntries(
-    UNLOCKED.filter((w) => w !== KIKU).map((w) => [w.kana, { seen: 20, correct: 20, last: 1 }]),
+    UNLOCKED.filter((w) => w !== KIKU).map((w) => [w.kana, readOften()]),
   )
   await seed(page, {
     settings: { autoplay: false },
@@ -74,7 +76,7 @@ test('a long word fits on the card on a phone, in a wide font', async ({ page })
   await seed(page, {
     settings: { autoplay: false, font: 'dela-gothic-one' },
     cards: { katakana: Object.fromEntries(known.map((id) => [id, youngCard()])) },
-    words: Object.fromEntries(others.map((w) => [w.kana, { seen: 20, correct: 20, last: 1 }])),
+    words: Object.fromEntries(others.map((w) => [w.kana, readOften()])),
   })
   await page.goto('./#/reading')
   await page.getByRole('button', { name: 'Start reading' }).click()

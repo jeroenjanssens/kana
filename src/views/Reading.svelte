@@ -7,22 +7,30 @@
   import Modal from '../components/Modal.svelte'
   import PaperCard from '../components/PaperCard.svelte'
   import RuleList from '../components/RuleList.svelte'
+  import ScriptPicker from '../components/ScriptPicker.svelte'
   import WordCard from '../components/WordCard.svelte'
   import type { VoiceId } from '../lib/audio/voices'
   import { nextCardFont } from '../lib/data/fonts'
   import { segment, type Kana } from '../lib/data/kana'
   import type { RuleId } from '../lib/data/rules'
   import { words, type Word } from '../lib/data/words'
+  import type { MessageKey } from '../lib/i18n/messages'
+  import { formatInterval, previewIntervals } from '../lib/srs/scheduler'
+  import type { Grade } from '../lib/storage/schema'
   import { logPractice, markNoteSeen, recordWord } from '../lib/study/actions'
-  import { checkWord } from '../lib/study/answer'
+  import { checkWord, suggestGrade } from '../lib/study/answer'
   import {
+    READING_COUNTS,
+    inScript,
     missingKana,
-    practiceOrder,
+    readingCount,
     unlockedWords,
+    wordCounts,
+    wordKana,
     wordMeaning,
     wordSize,
   } from '../lib/study/reading'
-  import { migrateWordCards } from '../lib/study/wordReviews'
+  import { migrateWordCards, ReadingSession, WordUndoStack } from '../lib/study/wordReviews'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
@@ -30,8 +38,10 @@
   import { t, lang } from '../state/i18n.svelte'
   import { timers } from '../lib/ui/timers'
 
-  const ROUND = 15
+  // Words practised before reading had grades get their card from those answers.
+  migrateWordCards(store.data)
 
+  const s = $derived(settings())
   const unlocked = $derived(unlockedWords(store.data))
   const locked = $derived(
     words
@@ -39,17 +49,28 @@
       .map((w) => ({ w, missing: missingKana(store.data, w) }))
       .sort((a, b) => a.missing.length - b.missing.length),
   )
-  const s = $derived(settings())
+  /** The unlocked words that match the setup. */
+  const pool = $derived(unlocked.filter((w) => inScript(w, s.readingScript)))
+  const count = $derived(readingCount(s.readingCount))
+  const counts = $derived(wordCounts(store.data, pool))
 
   let phase = $state<'overview' | 'card' | 'done'>('overview')
-  let queue = $state<Word[]>([])
-  let index = $state(0)
+  let session: ReadingSession | undefined
+  let current = $state<Word | undefined>()
+  /** Cards shown so far, to animate each new one in. */
+  let shown = $state(0)
+  let answered = $state(0)
+  let limit = $state(0)
+  /** Every answer in the round, in order. */
+  let results = $state<{ word: Word; grade: Grade }[]>([])
   let flipped = $state(false)
   let input = $state('')
   let verdict = $state<boolean | undefined>()
+  let suggested = $state<Grade | undefined>()
+  let intervals = $state<Record<Grade, number> | undefined>()
   /** Rules met for the first time on this card: their explanation is shown open. */
   let newRules = $state<RuleId[]>([])
-  /** The word whose card is open from the overview. */
+  /** The word whose card is open from the overview or the summary. */
   let opened = $state<{ word: Word; missing: Kana[] } | undefined>()
   let wordOpen = $state(false)
   let font = $state(settings().font)
@@ -58,12 +79,11 @@
   let tilt = $state(0)
   /** Each card gets its own sheet of paper. */
   let paper = $state(0)
-  let score = $state(0)
+  let busy = false
   let startedAt = 0
   let inputEl = $state<HTMLInputElement>()
-
-  // Words practised before reading had grades get their card from those answers.
-  migrateWordCards(store.data)
+  const undoStack = new WordUndoStack()
+  let canUndo = $state(false)
 
   const later = timers()
   onDestroy(() => {
@@ -71,30 +91,48 @@
     ui.focus = false
   })
 
-  const current = $derived(queue[index])
   const typed = $derived(s.answerStyle === 'typed')
+  const score = $derived(results.filter((r) => r.grade > 1).length)
+  /** Words answered Again in this round, each once. */
+  const missed = $derived([
+    ...new Map(results.filter((r) => r.grade === 1).map((r) => [r.word.kana, r.word])).values(),
+  ])
 
   async function start() {
-    queue = practiceOrder(store.data, unlocked).slice(0, ROUND)
-    if (!queue.length) return
-    score = 0
+    if (!pool.length) return
+    limit = count
+    session = new ReadingSession(pool, store.data, limit)
+    results = []
+    answered = 0
+    undoStack.clear()
+    canUndo = false
     ui.focus = true
-    await show(0)
+    await showNext()
   }
 
-  async function show(i: number) {
+  async function showNext() {
+    const word = session?.next()
+    if (!word) return finish()
+    await show(word)
+  }
+
+  async function show(word: Word) {
     const f = nextCardFont(s, font)
     await loadFontWithin(f)
     font = f
     voice = audio.pickVoice()
-    index = i
+    current = word
+    shown++
     flipped = false
     verdict = undefined
+    suggested = undefined
+    intervals = undefined
     input = ''
     newRules = []
     tilt = (Math.random() - 0.5) * 1.2
     paper = Math.floor(Math.random() * 2 ** 31)
     phase = 'card'
+    busy = false
     startedAt = performance.now()
     later.after(50, () => inputEl?.focus())
   }
@@ -102,6 +140,7 @@
   function reveal() {
     if (!current || flipped) return
     flipped = true
+    intervals = previewIntervals(store.data.words[current.kana]?.card)
     void audio.playSfx('flip')
     const word = current
     if (s.autoplay) later.after(280, () => current === word && audio.playWord(word.index, voice))
@@ -111,54 +150,85 @@
   function submit() {
     if (!current || flipped) return
     verdict = checkWord(current, input)
+    suggested = suggestGrade(verdict, performance.now() - startedAt, wordKana(current).length)
     reveal()
   }
 
-  function answer(correct: boolean) {
-    if (!current) return
-    const grade = correct ? 3 : 1
-    recordWord(store.data, current.kana, grade)
+  async function grade(g: Grade) {
+    if (!current || !session || !flipped || busy) return
+    busy = true
+    undoStack.record(store.data, session, current.kana)
+    canUndo = true
+    recordWord(store.data, current.kana, g)
     logPractice(store.data, {
       mode: 'reading',
       id: current.kana,
-      correct,
-      grade,
+      correct: verdict ?? g > 1,
+      grade: g,
       ms: performance.now() - startedAt,
     })
-    if (correct) {
-      score++
-    }
-    // Right or wrong only: right sounds like Good, wrong like Again.
-    feedback(correct ? 3 : 1)
+    session.answer(current, g)
+    answered = session.count
+    results.push({ word: current, grade: g })
+    feedback(g)
     cardDone()
-    if (index + 1 >= queue.length) {
-      phase = 'done'
-      ui.focus = false
-      void audio.playSfx('complete')
-    } else {
-      void show(index + 1)
-    }
+    await later.wait(160)
+    await showNext()
+  }
+
+  /** Undo the last answer: the word, the log and the round go back as they were. */
+  async function undoLast() {
+    if (!session || busy) return
+    const kana = undoStack.undo(store.data, session)
+    if (!kana) return
+    canUndo = undoStack.size > 0
+    answered = session.count
+    results.pop()
+    await show(words.find((w) => w.kana === kana)!)
+  }
+
+  function finish() {
+    phase = 'done'
+    current = undefined
+    ui.focus = false
+    void audio.playSfx('complete')
+  }
+
+  /** Leaving after an answer shows the summary (the only way to end a round without a limit). */
+  function leave() {
+    if (results.length) return finish()
+    phase = 'overview'
+    ui.focus = false
   }
 
   function onKeydown(e: KeyboardEvent) {
-    if (phase !== 'card') return
+    if (phase === 'overview' && e.key === 'Enter' && !wordOpen && e.target === document.body) {
+      e.preventDefault()
+      void start()
+      return
+    }
+    if (phase !== 'card' || !current) return
     const inInput = (e.target as HTMLElement).tagName === 'INPUT'
-    if (e.key === 'Escape') {
-      phase = 'overview'
-      ui.focus = false
+    if (e.key === 'Escape') return leave()
+    if (e.metaKey || e.ctrlKey || e.altKey) {
+      if (e.key === 'z' && !inInput) {
+        e.preventDefault()
+        void undoLast()
+      }
       return
     }
     if (inInput && !flipped) return
-    if ((e.key === ' ' || e.key === 'Enter') && !flipped && !typed) {
+    const key = e.key.toLowerCase()
+    if (key === 'u') void undoLast()
+    else if ((key === ' ' || key === 'enter') && !flipped && !typed) {
       e.preventDefault()
       reveal()
-    } else if (flipped && e.key === 'Enter') {
+    } else if (flipped && key === 'enter') {
       e.preventDefault()
-      answer(verdict ?? true)
-    } else if (flipped && (e.key === 'p' || e.key === 'P')) {
+      void grade(suggested ?? 3)
+    } else if (flipped && key === 'p') {
       void audio.playWord(current.index, voice)
-    } else if (flipped && !typed && e.key === '1') answer(false)
-    else if (flipped && !typed && e.key === '2') answer(true)
+    } else if (flipped && ['1', '2', '3', '4'].includes(key)) void grade(Number(key) as Grade)
   }
 
   const parts = $derived(current ? segment(current.kana) : [])
@@ -178,18 +248,37 @@
     <p class="lead">{t('reading.lead')}</p>
   </header>
 
-  <section class="panel block start">
-    <div>
-      <h2>{t('reading.unlocked', { count: unlocked.length, total: words.length })}</h2>
-      <p class="muted">
-        {unlocked.length
-          ? t('reading.practise', { count: Math.min(ROUND, unlocked.length) })
-          : t('reading.noWords')}
-      </p>
+  <section class="panel block setup">
+    <h2>{t('reading.unlocked', { count: unlocked.length, total: words.length })}</h2>
+    <div class="field">
+      <span class="label">{t('common.scriptLabel')}</span>
+      <ScriptPicker bind:value={s.readingScript} />
     </div>
-    <button class="btn primary" disabled={!unlocked.length} onclick={start}
-      >{t('reading.startBtn')}</button
-    >
+    <div class="field">
+      <span class="label">{t('reading.countLabel')}</span>
+      <div class="segmented" role="group" aria-label={t('reading.countLabel')}>
+        {#each READING_COUNTS as n (n)}
+          <button
+            aria-pressed={count === n}
+            aria-label={n ? undefined : t('reading.noLimit')}
+            title={n ? undefined : t('reading.noLimit')}
+            onclick={() => (s.readingCount = n)}>{n || '∞'}</button
+          >
+        {/each}
+      </div>
+    </div>
+    <div class="go">
+      <span class="muted">
+        {pool.length
+          ? t('reading.counts', { due: counts.due, new: counts.new, count: pool.length })
+          : unlocked.length
+            ? t('reading.noWordsScript')
+            : t('reading.noWords')}
+      </span>
+      <button class="btn primary" disabled={!pool.length} onclick={start}
+        >{t('reading.startBtn')} <kbd>Enter</kbd></button
+      >
+    </div>
   </section>
 
   {#if unlocked.length}
@@ -231,44 +320,56 @@
     </section>
   {/if}
 {:else if phase === 'card' && current}
+  {@const word = current}
   <div class="reading">
     <SessionTopbar
       title={t('reading.sessionTitle')}
-      onleave={() => ((phase = 'overview'), (ui.focus = false))}
-      progress={(index + (flipped ? 1 : 0)) / queue.length}
+      onleave={leave}
+      progress={limit ? (answered + (flipped ? 1 : 0)) / limit : undefined}
     >
-      <span class="muted">{index + 1} / {queue.length}</span>
+      <button
+        class="btn icon ghost"
+        onclick={undoLast}
+        disabled={!canUndo}
+        aria-label={t('common.undo')}
+        title={t('common.undo')}
+      >
+        <Icon name="undo" />
+      </button>
+      <span class="muted"
+        >{limit ? `${answered + 1} / ${limit}` : t('reading.answered', { count: answered })}</span
+      >
     </SessionTopbar>
 
-    {#key index}
+    {#key shown}
       <div in:fly={{ y: 20, duration: 380 }}>
         <PaperCard
           {flipped}
           {tilt}
           {paper}
-          label={flipped ? `${t('reading.cardLabel')}, ${current.romaji}` : t('reading.cardLabel')}
+          label={flipped ? `${t('reading.cardLabel')}, ${word.romaji}` : t('reading.cardLabel')}
           onflip={() => (typed ? inputEl?.focus() : reveal())}
         >
           {#snippet front()}
-            <KanaGlyph text={current.kana} {font} size={wordSize(current.kana, '5rem')} />
+            <KanaGlyph text={word.kana} {font} size={wordSize(word.kana, '5rem')} />
             <span class="muted hint"
-              >{current.script === 'katakana' ? t('reading.kataWord') : t('reading.hiraWord')}</span
+              >{word.script === 'katakana' ? t('reading.kataWord') : t('reading.hiraWord')}</span
             >
           {/snippet}
           {#snippet back()}
-            <KanaGlyph text={current.kana} {font} size={wordSize(current.kana, '2.4rem')} />
+            <KanaGlyph text={word.kana} {font} size={wordSize(word.kana, '2.4rem')} />
             {#if verdict !== undefined}
               <p class="verdict" class:wrong={!verdict}>
                 {verdict ? t('reading.correct') : t('reading.youTyped', { input })}
               </p>
             {/if}
-            <p class="romaji">{current.romaji}</p>
-            <p class="meaning">{wordMeaning(current, lang())}</p>
+            <p class="romaji">{word.romaji}</p>
+            <p class="meaning">{wordMeaning(word, lang())}</p>
             <button
               class="btn small listen"
               onclick={(e) => {
                 e.stopPropagation()
-                audio.playWord(current.index, voice)
+                audio.playWord(word.index, voice)
               }}
               aria-label={t('reading.listenLabel')}
               ><Icon name="play" size={14} filled /> {t('common.listen')}</button
@@ -328,33 +429,50 @@
         <button class="btn primary" onclick={reveal}
           >{t('reading.showReading')} <kbd>Space</kbd></button
         >
-      {:else if typed}
-        <button class="btn primary" onclick={() => answer(verdict ?? false)}
-          >{t('common.next')} <kbd>Enter</kbd></button
-        >
       {:else}
-        <div class="row">
-          <button class="btn missed" onclick={() => answer(false)}
-            >{t('reading.couldntRead')} <kbd>1</kbd></button
-          >
-          <button class="btn got" onclick={() => answer(true)}
-            >{t('reading.readIt')} <kbd>2</kbd></button
-          >
+        <div class="grades" role="group" aria-label={t('study.card.gradeLabel')}>
+          {#each [1, 2, 3, 4] as const as g (g)}
+            <button
+              class="btn grade g{g}"
+              class:suggested={suggested === g}
+              onclick={() => grade(g)}
+            >
+              <span class="label">{t(`grade.${g}` as MessageKey)}</span>
+              {#if intervals}<span class="interval">{formatInterval(intervals[g], lang())}</span
+                >{/if}
+              <kbd>{g}</kbd>
+            </button>
+          {/each}
         </div>
+        {#if suggested}<p class="muted small">{t('study.card.enterHint')}</p>{/if}
       {/if}
     </div>
 
-    {#if flipped && current.rules.length}
+    {#if flipped && word.rules.length}
       <aside class="note panel" in:fly={{ y: 8 }}>
         <h3>{t('reading.rulesHeading')}</h3>
-        <RuleList rules={current.rules} open={newRules} />
+        <RuleList rules={word.rules} open={newRules} />
       </aside>
     {/if}
   </div>
 {:else if phase === 'done'}
   <section class="panel block done">
     <p class="eyebrow">{t('reading.doneEyebrow')}</p>
-    <h2>{t('reading.doneScore', { score, total: queue.length })}</h2>
+    <h2>{t('reading.doneScore', { score, total: results.length })}</h2>
+    {#if missed.length}
+      <h3>{t('reading.missedHeading')}</h3>
+      <ul class="missed-words">
+        {#each missed as w (w.kana)}
+          <li>
+            <button onclick={() => openWord(w)}>
+              <span lang="ja" class="kana">{w.kana}</span>
+              <span class="romaji-small">{w.romaji}</span>
+              <span class="muted">{wordMeaning(w, lang())}</span>
+            </button>
+          </li>
+        {/each}
+      </ul>
+    {/if}
     <div class="row">
       <button class="btn primary" onclick={start}>{t('reading.anotherRound')}</button>
       <button class="btn" onclick={() => (phase = 'overview')}>{t('reading.overview')}</button>
@@ -382,16 +500,37 @@
     font-size: 1.15rem;
   }
 
-  .start {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .setup {
+    display: grid;
     gap: 1rem;
+  }
+
+  .setup h2 {
+    margin: 0;
+  }
+
+  .field {
+    display: grid;
+    gap: 0.4rem;
+    justify-items: start;
+  }
+
+  .field .segmented {
     flex-wrap: wrap;
   }
 
-  .start p {
-    margin: 0;
+  .label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .go {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
   .chips {
@@ -542,8 +681,12 @@
     margin: 0.2rem 0 0.4rem;
   }
 
-  .controls {
-    min-height: 60px;
+  .done h3 {
+    margin: 1rem 0 0.4rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
   }
 
   .typed {
@@ -565,12 +708,110 @@
     flex-wrap: wrap;
   }
 
-  .missed {
-    border-bottom: 3px solid var(--shu);
+  .controls {
+    min-height: 60px;
+    width: min(92vw, 420px);
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
   }
 
-  .got {
+  .grades {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .grade {
+    flex-direction: column;
+    gap: 0.05rem;
+    border-radius: 14px;
+    min-height: 64px;
+    padding: 0.4rem;
+  }
+
+  .grade .label {
+    font-weight: 650;
+    color: inherit;
+    font-size: inherit;
+  }
+
+  .grade .interval {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    font-weight: 500;
+  }
+
+  .grade kbd {
+    display: none;
+  }
+
+  @media (hover: hover) {
+    .grade kbd {
+      display: inline;
+      margin-top: 0.15rem;
+    }
+  }
+
+  .g1 {
+    border-bottom: 3px solid var(--shu);
+  }
+  .g2 {
+    border-bottom: 3px solid var(--level-learning);
+  }
+  .g3 {
     border-bottom: 3px solid var(--level-young);
+  }
+  .g4 {
+    border-bottom: 3px solid var(--ai);
+  }
+
+  .grade.suggested {
+    box-shadow:
+      0 0 0 2px var(--ink),
+      var(--shadow-soft);
+  }
+
+  .small {
+    font-size: 0.8rem;
+    margin: 0;
+  }
+
+  .missed-words {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .missed-words button {
+    display: flex;
+    gap: 0.7rem;
+    align-items: baseline;
+    width: 100%;
+    padding: 0.3rem 0.5rem;
+    border: 0;
+    border-radius: 8px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .missed-words button:hover {
+    background: color-mix(in srgb, var(--ink) 8%, transparent);
+  }
+
+  .missed-words .kana {
+    font-family: var(--font-kana);
+    font-size: 1.25rem;
+  }
+
+  .romaji-small {
+    font-weight: 600;
   }
 
   .done {

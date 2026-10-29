@@ -109,9 +109,14 @@ export default {
   'reading.lead':
     'Echte Japanse woorden, alleen van kana die je al kent. Een woord wordt vrijgespeeld als elke kana erin minstens "jong" is in je decks.',
   'reading.unlocked': '{count} van {total} woorden vrijgespeeld',
-  'reading.practise': 'Oefen een ronde van {count} woorden.',
   'reading.noWords':
     'Leer de eerste rijen (あ い う え お, か き く け こ…) om je eerste woorden vrij te spelen.',
+  'reading.countLabel': 'Kaarten per ronde',
+  'reading.noLimit': 'Geen limiet: tot je stopt',
+  'reading.counts': '{due} te herhalen · {new} nieuw · {count} {count|woord|woorden}',
+  'reading.noWordsScript': 'Nog geen woorden in dit schrift vrijgespeeld.',
+  'reading.answered': '{count} beantwoord',
+  'reading.missedHeading': 'Woorden om nog eens te bekijken',
   'reading.startBtn': 'Begin met lezen',
   'reading.unlockedSection': 'Vrijgespeeld',
   'reading.nextToUnlock': 'Volgende om vrij te spelen',
@@ -124,8 +129,6 @@ export default {
   'reading.listenLabel': 'Woord afspelen (P)',
   'reading.showReading': 'Lezing weergeven',
   'reading.check': 'Controleer',
-  'reading.couldntRead': 'Niet kunnen lezen',
-  'reading.readIt': 'Gelezen',
   'reading.rulesHeading': 'Regels in dit woord',
   'reading.openWord': '{kana}: {romaji}, {meaning}',
 

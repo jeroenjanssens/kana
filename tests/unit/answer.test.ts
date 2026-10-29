@@ -66,6 +66,11 @@ describe('suggestGrade', () => {
   test('fast is Easy', () => expect(suggestGrade(true, FAST_MS)).toBe(4))
   test('normal is Good', () => expect(suggestGrade(true, FAST_MS + 1)).toBe(3))
   test('slow is Hard', () => expect(suggestGrade(true, SLOW_MS + 1)).toBe(2))
+  test('a longer word gets more time: half as much again for each kana after the first', () => {
+    expect(suggestGrade(true, FAST_MS * 2, 3)).toBe(4)
+    expect(suggestGrade(true, FAST_MS * 2 + 1, 3)).toBe(3)
+    expect(suggestGrade(true, SLOW_MS * 2 + 1, 3)).toBe(2)
+  })
 })
 
 describe('kanaForAnswer', () => {

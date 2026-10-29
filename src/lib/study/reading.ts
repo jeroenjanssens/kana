@@ -4,6 +4,32 @@ import { meaningsNl } from '../data/nl/words'
 import { words, type Word } from '../data/words'
 import { atLeast, masteryLevel, type MasteryLevel } from '../srs/queue'
 import type { SaveFile } from '../storage/schema'
+import type { ScriptChoice } from './scripts'
+
+/** Cards in a round of reading practice; 0 is no limit. */
+export const READING_COUNTS = [10, 15, 25, 50, 0] as const
+
+/** The chosen number of cards per round, or the default for anything else. */
+export function readingCount(n: number): number {
+  return (READING_COUNTS as readonly number[]).includes(n) ? n : 15
+}
+
+/** Whether a word is in the chosen script(s). */
+export function inScript(word: Word, choice: ScriptChoice): boolean {
+  return choice === 'both' || word.script === choice
+}
+
+/** How many of these words are due and how many are new (never practised). */
+export function wordCounts(save: SaveFile, list: readonly Word[], now = Date.now()) {
+  let due = 0
+  let fresh = 0
+  for (const w of list) {
+    const card = save.words[w.kana]?.card
+    if (!card || card.state === 0) fresh++
+    else if (card.due <= now) due++
+  }
+  return { due, new: fresh }
+}
 
 /** The kana a word is built from (っ, ー and other marks are skipped). */
 export function wordKana(word: Pick<Word, 'kana'>): Kana[] {

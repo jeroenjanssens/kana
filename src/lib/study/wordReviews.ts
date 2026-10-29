@@ -1,6 +1,6 @@
 import type { Word } from '../data/words'
 import { createScheduler, grade, retrievability } from '../srs/scheduler'
-import type { Grade, ReviewEntry, SaveFile } from '../storage/schema'
+import type { Grade, ReviewEntry, SaveFile, WordProgress } from '../storage/schema'
 
 /** The grade of a reading answer: answers from before there were grades were right or wrong. */
 export function readingGrade(e: Pick<ReviewEntry, 'correct' | 'grade'>): Grade {
@@ -171,5 +171,48 @@ export class ReadingSession {
     return ahead
       .map((w) => ({ w, seen: this.shown.has(w.kana) ? 1 : 0, r: recall(w) }))
       .sort((a, b) => a.seen - b.seen || a.r - b.r)[0].w
+  }
+}
+
+/**
+ * Undo for reading practice. Call `record` right before an answer changes the save file, and
+ * `undo` to put the word, the log and the round back as they were.
+ */
+export class WordUndoStack {
+  private steps: {
+    kana: string
+    progress: WordProgress | undefined
+    logLength: number
+    session: ReadingSnapshot
+  }[] = []
+
+  get size(): number {
+    return this.steps.length
+  }
+
+  record(save: SaveFile, session: ReadingSession, kana: string): void {
+    const p = save.words[kana]
+    this.steps.push({
+      kana,
+      // Copied by hand: the save file may be reactive state, which structuredClone can't copy.
+      progress: p ? { ...p, ...(p.card ? { card: { ...p.card } } : {}) } : undefined,
+      logLength: save.log.length,
+      session: session.snapshot(),
+    })
+  }
+
+  /** Revert the last answer. Returns the word to show again, or undefined if there's nothing. */
+  undo(save: SaveFile, session: ReadingSession): string | undefined {
+    const step = this.steps.pop()
+    if (!step) return undefined
+    if (step.progress) save.words[step.kana] = step.progress
+    else delete save.words[step.kana]
+    save.log.splice(step.logLength)
+    session.restore(step.session)
+    return step.kana
+  }
+
+  clear(): void {
+    this.steps = []
   }
 }

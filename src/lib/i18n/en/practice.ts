@@ -107,9 +107,14 @@ export default {
   'reading.lead':
     'Real Japanese words, built only from kana you already know. A word unlocks when every kana in it is at least "young" in your decks.',
   'reading.unlocked': '{count} of {total} words unlocked',
-  'reading.practise': 'Practise a round of {count} words.',
   'reading.noWords':
     'Learn the first rows (あ い う え お, か き く け こ…) to unlock your first words.',
+  'reading.countLabel': 'Cards per round',
+  'reading.noLimit': 'No limit: until you stop',
+  'reading.counts': '{due} due · {new} new · {count} {count|word|words}',
+  'reading.noWordsScript': 'No words in this script unlocked yet.',
+  'reading.answered': '{count} answered',
+  'reading.missedHeading': 'Words to look at again',
   'reading.startBtn': 'Start reading',
   'reading.unlockedSection': 'Unlocked',
   'reading.nextToUnlock': 'Next to unlock',
@@ -122,8 +127,6 @@ export default {
   'reading.listenLabel': 'Play the word (P)',
   'reading.showReading': 'Show reading',
   'reading.check': 'Check',
-  'reading.couldntRead': "Couldn't read it",
-  'reading.readIt': 'Read it',
   'reading.rulesHeading': 'Rules in this word',
   'reading.openWord': '{kana}: {romaji}, {meaning}',
 

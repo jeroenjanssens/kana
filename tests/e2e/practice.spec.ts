@@ -42,9 +42,9 @@ test('reading practice unlocks words from known kana', async ({ page }) => {
   await expect(page.getByText(/^[1-9]\d* of \d+ words unlocked/)).toBeVisible()
   await page.getByRole('button', { name: 'Start reading' }).click()
   await page.getByRole('button', { name: /Show reading/ }).click()
-  await page.getByRole('button', { name: /Read it/ }).click()
+  await page.getByRole('button', { name: /^Good/ }).click()
   const data = await savedData(page)
-  expect(data.log[0]).toMatchObject({ mode: 'reading', correct: true })
+  expect(data.log[0]).toMatchObject({ mode: 'reading', correct: true, grade: 3 })
   errors.check()
 })
 

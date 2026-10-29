@@ -168,6 +168,9 @@ export interface Settings {
   /** The font of the model and the traces: a font id, or 'strokes' for the stroke-order data. */
   sheetFont: string
   sheetSize: SheetSize
+  /** The last reading setup: script(s), and cards per round (0: no limit). */
+  readingScript: ScriptChoice
+  readingCount: number
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -228,6 +231,8 @@ export const DEFAULT_SETTINGS: Settings = {
   sheetColours: true,
   sheetFont: 'klee-one',
   sheetSize: 'medium',
+  readingScript: 'both',
+  readingCount: 15,
 }
 
 /** Settings that only take one of a few values; anything else falls back to the default. */
@@ -237,6 +242,7 @@ export const SETTING_CHOICES: Partial<Record<keyof Settings, readonly string[]>>
   raceScript: SCRIPT_CHOICES,
   raceKana: RACE_KANA,
   sheetScript: SCRIPT_CHOICES,
+  readingScript: SCRIPT_CHOICES,
   sheetSize: SHEET_SIZES,
   sheetFont: [SHEET_STROKES, ...FONTS.map((f) => f.id)],
 }

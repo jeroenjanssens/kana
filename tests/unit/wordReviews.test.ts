@@ -8,7 +8,12 @@ import {
   type SaveFile,
 } from '../../src/lib/storage/schema'
 import { recordWord } from '../../src/lib/study/actions'
-import { migrateWordCards, ReadingSession, readingGrade } from '../../src/lib/study/wordReviews'
+import {
+  migrateWordCards,
+  ReadingSession,
+  readingGrade,
+  WordUndoStack,
+} from '../../src/lib/study/wordReviews'
 
 const T = new Date(2026, 5, 1, 10).getTime()
 const DAY = 86_400_000
@@ -247,5 +252,47 @@ describe('ReadingSession', () => {
     expect(session.count).toBe(2)
     Object.assign(s, before)
     expect(run(session, s, 1)).toEqual(next)
+  })
+})
+
+describe('WordUndoStack', () => {
+  const w: Word = {
+    kana: 'ねこ',
+    romaji: 'neko',
+    accept: [],
+    meaning: '',
+    script: 'hiragana',
+    rules: [],
+    index: 0,
+  }
+
+  test('puts the word, the log and the round back as they were', () => {
+    const s = emptySave()
+    const session = new ReadingSession([w], s, 5)
+    const undo = new WordUndoStack()
+    recordWord(s, 'ねこ', 3, T)
+    s.log.push({ ...answer('ねこ', T, true), grade: 3 })
+    const before = structuredClone(s.words['ねこ'])
+    session.next(T)
+    undo.record(s, session, 'ねこ')
+    recordWord(s, 'ねこ', 1, T + 1)
+    s.log.push({ ...answer('ねこ', T + 1, false), grade: 1 })
+    session.answer(w, 1)
+    expect(undo.undo(s, session)).toBe('ねこ')
+    expect(s.words['ねこ']).toEqual(before)
+    expect(s.log).toHaveLength(1)
+    expect(session.count).toBe(0)
+    expect(undo.size).toBe(0)
+  })
+
+  test('a word answered for the first time goes back to not practised', () => {
+    const s = emptySave()
+    const session = new ReadingSession([w], s, 0)
+    const undo = new WordUndoStack()
+    undo.record(s, session, 'ねこ')
+    recordWord(s, 'ねこ', 3, T)
+    undo.undo(s, session)
+    expect(s.words).toEqual({})
+    expect(undo.undo(s, session)).toBeUndefined()
   })
 })

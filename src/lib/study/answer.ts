@@ -31,11 +31,15 @@ export function checkWord(word: { romaji: string; accept: readonly string[] }, i
 export const FAST_MS = 2000
 export const SLOW_MS = 6000
 
-/** Suggest an SRS grade from correctness and response time. */
-export function suggestGrade(correct: boolean, ms: number): Grade {
+/**
+ * Suggest an SRS grade from correctness and response time. A word of several kana takes longer
+ * to read: each kana after the first gives half as much time again.
+ */
+export function suggestGrade(correct: boolean, ms: number, kana = 1): Grade {
   if (!correct) return 1
-  if (ms <= FAST_MS) return 4
-  if (ms <= SLOW_MS) return 3
+  const scale = 1 + Math.max(0, kana - 1) / 2
+  if (ms <= FAST_MS * scale) return 4
+  if (ms <= SLOW_MS * scale) return 3
   return 2
 }
 
