@@ -43,6 +43,15 @@ export function missingKana(save: SaveFile, word: Word): Kana[] {
   })
 }
 
+/**
+ * A font size that fits a word on one line of its container (a size container, see PaperCard):
+ * as large as `max`, smaller when the word has too many characters for the width.
+ */
+export function wordSize(text: string, max: string): string {
+  const n = Math.max(1, [...text].length)
+  return `min(${max}, calc(92cqi / ${n}))`
+}
+
 export function wordMeaning(word: Word, lang: Lang = 'en'): string {
   return (lang === 'nl' && meaningsNl[word.kana]) || word.meaning
 }

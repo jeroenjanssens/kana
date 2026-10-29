@@ -10,6 +10,7 @@ import {
   practiceOrder,
   unlockedWords,
   wordKana,
+  wordSize,
 } from '../../src/lib/study/reading'
 import { emptySave, type CardRecord } from '../../src/lib/storage/schema'
 
@@ -143,5 +144,16 @@ describe('order', () => {
     save.words['あい'] = { seen: 10, correct: 10, last: 1 }
     const order = practiceOrder(save, [word('あい'), word('いえ')], () => 0)
     expect(order.map((w) => w.kana)).toEqual(['いえ', 'あい'])
+  })
+})
+
+describe('wordSize', () => {
+  test('is as large as allowed, smaller for long words', () => {
+    expect(wordSize('あい', '5rem')).toBe('min(5rem, calc(92cqi / 2))')
+    expect(wordSize('アイスクリーム', '5rem')).toBe('min(5rem, calc(92cqi / 7))')
+  })
+
+  test('counts characters, not UTF-16 code units', () => {
+    expect(wordSize('ヴァイオリン', '2rem')).toBe('min(2rem, calc(92cqi / 6))')
   })
 })

@@ -15,7 +15,13 @@
   import { words, type Word } from '../lib/data/words'
   import { logPractice, markNoteSeen, recordWord } from '../lib/study/actions'
   import { checkWord } from '../lib/study/answer'
-  import { missingKana, practiceOrder, unlockedWords, wordMeaning } from '../lib/study/reading'
+  import {
+    missingKana,
+    practiceOrder,
+    unlockedWords,
+    wordMeaning,
+    wordSize,
+  } from '../lib/study/reading'
   import { loadFontWithin } from '../lib/ui/fontLoader'
   import { audio, feedback, settings, store } from '../state/app.svelte'
   import { cardDone } from '../state/photos.svelte'
@@ -238,17 +244,13 @@
           onflip={() => (typed ? inputEl?.focus() : reveal())}
         >
           {#snippet front()}
-            <KanaGlyph
-              text={current.kana}
-              {font}
-              size={current.kana.length > 4 ? '3.6rem' : '5rem'}
-            />
+            <KanaGlyph text={current.kana} {font} size={wordSize(current.kana, '5rem')} />
             <span class="muted hint"
               >{current.script === 'katakana' ? t('reading.kataWord') : t('reading.hiraWord')}</span
             >
           {/snippet}
           {#snippet back()}
-            <KanaGlyph text={current.kana} {font} size="2.4rem" />
+            <KanaGlyph text={current.kana} {font} size={wordSize(current.kana, '2.4rem')} />
             {#if verdict !== undefined}
               <p class="verdict" class:wrong={!verdict}>
                 {verdict ? t('reading.correct') : t('reading.youTyped', { input })}

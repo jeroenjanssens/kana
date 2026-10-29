@@ -104,7 +104,9 @@
       inset 0 0 24px rgb(120 95 60 / 0.1);
   }
 
+  /* A size container, so a word can be sized to the width of the card (see wordSize). */
   .content {
+    container-type: inline-size;
     flex: 1 1 auto;
     min-height: 0;
     display: flex;

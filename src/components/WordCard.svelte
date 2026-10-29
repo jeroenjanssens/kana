@@ -3,7 +3,7 @@
   import { FONTS } from '../lib/data/fonts'
   import { segment, type Kana } from '../lib/data/kana'
   import type { Word } from '../lib/data/words'
-  import { wordMeaning } from '../lib/study/reading'
+  import { wordMeaning, wordSize } from '../lib/study/reading'
   import { audio, settings, store } from '../state/app.svelte'
   import { lang, t } from '../state/i18n.svelte'
   import FontGallery from './FontGallery.svelte'
@@ -34,11 +34,7 @@
 
 <article class="word-card" aria-label={word.kana}>
   <div class="head">
-    <KanaGlyph
-      text={word.kana}
-      font={settings().font}
-      size={word.kana.length > 4 ? '2.6rem' : '3.4rem'}
-    />
+    <KanaGlyph text={word.kana} font={settings().font} size={wordSize(word.kana, '3.4rem')} />
     <p class="romaji">{word.romaji}</p>
     <p class="meaning">{wordMeaning(word, lang())}</p>
     <VoiceButtons label={word.kana} play={(voice) => void audio.playWord(word.index, voice)} />
@@ -130,7 +126,9 @@
     gap: 1rem;
   }
 
+  /* A size container, so the word can be sized to fit it (see wordSize). */
   .head {
+    container-type: inline-size;
     display: grid;
     justify-items: center;
     gap: 0.3rem;

@@ -64,3 +64,29 @@ test('after answering, the back shows the rules in the word', async ({ page }) =
   const data = await savedData(page)
   expect(data.seenNotes).toContain('devoicing')
 })
+
+test('a long word fits on the card on a phone, in a wide font', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 })
+  const known = ['a', 'i', 'su', 'ku', 'ri', 'mu']
+  const long = words.find((w) => w.kana === 'アイスクリーム')!
+  // Every other word these kana unlock has been practised a lot, so this one comes first.
+  const others = words.filter((w) => w !== long && /^[アイスクリムー]+$/.test(w.kana))
+  await seed(page, {
+    settings: { autoplay: false, font: 'dela-gothic-one' },
+    cards: { katakana: Object.fromEntries(known.map((id) => [id, youngCard()])) },
+    words: Object.fromEntries(others.map((w) => [w.kana, { seen: 20, correct: 20, last: 1 }])),
+  })
+  await page.goto('./#/reading')
+  await page.getByRole('button', { name: 'Start reading' }).click()
+  const fits = async (selector: string) => {
+    const glyph = page.locator(selector).getByText(long.kana, { exact: true })
+    await expect(glyph).toBeVisible()
+    const content = page.locator(`${selector} .content`)
+    const [g, c] = await Promise.all([glyph.boundingBox(), content.boundingBox()])
+    expect(g!.x).toBeGreaterThanOrEqual(c!.x)
+    expect(g!.x + g!.width).toBeLessThanOrEqual(c!.x + c!.width)
+  }
+  await fits('.front')
+  await page.getByRole('button', { name: /Show reading/ }).click()
+  await fits('.back')
+})
