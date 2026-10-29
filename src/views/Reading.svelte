@@ -108,7 +108,7 @@
   async function start() {
     if (!pool.length) return
     limit = count
-    session = new ReadingSession(pool, store.data, limit)
+    session = new ReadingSession(pool, () => store.data, limit)
     results = []
     answered = 0
     undoStack.clear()

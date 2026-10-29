@@ -75,7 +75,7 @@ export interface ReadingSnapshot {
  * first) after every two; a word answered Again that isn't back yet; and practising ahead, words
  * not shown in this round first, least likely to be remembered first. Never the same word twice
  * in a row, unless it's the only one. Grading is done by the caller (recordWord); the cards are
- * read from the save file.
+ * read from the save file as it is now: a sync replaces it during a round.
  */
 export class ReadingSession {
   private answered = 0
@@ -86,7 +86,7 @@ export class ReadingSession {
 
   constructor(
     private readonly pool: readonly Word[],
-    private readonly save: SaveFile,
+    private readonly save: () => SaveFile,
     /** Answers in the round; 0 for no limit. */
     readonly limit: number,
     private readonly rand: () => number = Math.random,
@@ -149,7 +149,8 @@ export class ReadingSession {
     if (back) return byKana.get(back.kana)!
 
     const free = others.filter((w) => !waiting.has(w.kana))
-    const card = (w: Word) => this.save.words[w.kana]?.card
+    const words = this.save().words
+    const card = (w: Word) => words[w.kana]?.card
     const recall = (w: Word) => retrievability(card(w), now) ?? 0
     const isNew = (w: Word) => !card(w) || card(w)!.state === 0
     const due = free

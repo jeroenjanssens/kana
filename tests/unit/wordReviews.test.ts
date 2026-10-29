@@ -170,7 +170,7 @@ describe('ReadingSession', () => {
   test('new words come shortest first, then in list order', () => {
     const s = emptySave()
     const long = word('あいうえお', 0)
-    const session = new ReadingSession([long, ...pool.slice(0, 2)], s, 0)
+    const session = new ReadingSession([long, ...pool.slice(0, 2)], () => s, 0)
     expect(run(session, s, 3)).toEqual(['あい', 'あお', 'あいうえお'])
   })
 
@@ -180,14 +180,19 @@ describe('ReadingSession', () => {
     reviewed(s, 'いけ', -5)
     reviewed(s, 'うえ', -3)
     reviewed(s, 'いえ', 2) // not due
-    const session = new ReadingSession(pool, s, 0)
+    const session = new ReadingSession(pool, () => s, 0)
     expect(run(session, s, 5)).toEqual(['いけ', 'うえ', 'あい', 'いか', 'あお'])
   })
 
   test('a word answered Again comes back after 3 to 5 others', () => {
     for (const r of [0, 0.5, 0.99]) {
       const s = emptySave()
-      const session = new ReadingSession(pool, s, 0, () => r)
+      const session = new ReadingSession(
+        pool,
+        () => s,
+        0,
+        () => r,
+      )
       const first = session.next(T)!
       recordWord(s, first.kana, 1, T)
       session.answer(first, 1)
@@ -199,7 +204,7 @@ describe('ReadingSession', () => {
 
   test('only Again brings a word back in the round', () => {
     const s = emptySave()
-    const session = new ReadingSession(pool, s, 0)
+    const session = new ReadingSession(pool, () => s, 0)
     const shown = run(session, s, pool.length, 2)
     expect(new Set(shown).size).toBe(pool.length)
   })
@@ -207,7 +212,12 @@ describe('ReadingSession', () => {
   test('with nothing else left, a missed word comes back sooner', () => {
     const s = emptySave()
     const two = pool.slice(0, 2)
-    const session = new ReadingSession(two, s, 0, () => 0.99)
+    const session = new ReadingSession(
+      two,
+      () => s,
+      0,
+      () => 0.99,
+    )
     const a = session.next(T)!
     recordWord(s, a.kana, 1, T)
     session.answer(a, 1)
@@ -219,10 +229,10 @@ describe('ReadingSession', () => {
 
   test('never the same word twice in a row, unless it is the only one', () => {
     const s = emptySave()
-    const session = new ReadingSession(pool.slice(0, 2), s, 0)
+    const session = new ReadingSession(pool.slice(0, 2), () => s, 0)
     const shown = run(session, s, 10, 1)
     for (let i = 1; i < shown.length; i++) expect(shown[i]).not.toBe(shown[i - 1])
-    const alone = new ReadingSession(pool.slice(0, 1), s, 0)
+    const alone = new ReadingSession(pool.slice(0, 1), () => s, 0)
     expect(run(alone, s, 3)).toEqual(['あい', 'あい', 'あい'])
   })
 
@@ -230,24 +240,55 @@ describe('ReadingSession', () => {
     const s = emptySave()
     reviewed(s, 'あい', 5, 20)
     reviewed(s, 'あお', 5, 2)
-    const session = new ReadingSession(pool.slice(0, 2), s, 0)
+    const session = new ReadingSession(pool.slice(0, 2), () => s, 0)
     expect(run(session, s, 4)).toEqual(['あお', 'あい', 'あお', 'あい'])
   })
 
   test('stops at the limit; 0 is no limit', () => {
     const s = emptySave()
-    const round = new ReadingSession(pool.slice(0, 3), s, 5)
+    const round = new ReadingSession(pool.slice(0, 3), () => s, 5)
     expect(run(round, s, 20)).toHaveLength(5)
     expect(round.done).toBe(true)
     expect(round.next(T)).toBeUndefined()
-    const endless = new ReadingSession(pool.slice(0, 3), emptySave(), 0)
-    expect(run(endless, emptySave(), 100)).toHaveLength(100)
+    const other = emptySave()
+    const endless = new ReadingSession(pool.slice(0, 3), () => other, 0)
+    expect(run(endless, other, 100)).toHaveLength(100)
     expect(endless.done).toBe(false)
+  })
+
+  test('reads the save file as it is now: a sync replaces it during a round', () => {
+    const store = { data: emptySave() }
+    const session = new ReadingSession(
+      pool,
+      () => store.data,
+      0,
+      () => 0,
+    )
+    const missed = session.next(T)!
+    recordWord(store.data, missed.kana, 1, T)
+    session.answer(missed, 1)
+    // A sync: the save file is replaced by a merged copy.
+    store.data = structuredClone(store.data)
+    const shown: string[] = []
+    for (let i = 1; i <= 8; i++) {
+      const now = T + i * 2 * 60_000
+      const w = session.next(now)!
+      shown.push(w.kana)
+      recordWord(store.data, w.kana, 4, now)
+      session.answer(w, 4)
+    }
+    // Back once (it was missed), then read with Easy: not again and again.
+    expect(shown.filter((k) => k === missed.kana)).toHaveLength(1)
   })
 
   test('restores a snapshot (for undo)', () => {
     const s = emptySave()
-    const session = new ReadingSession(pool, s, 0, () => 0)
+    const session = new ReadingSession(
+      pool,
+      () => s,
+      0,
+      () => 0,
+    )
     run(session, s, 2)
     const snap = session.snapshot()
     const before = structuredClone(s)
@@ -274,7 +315,7 @@ describe('WordUndoStack', () => {
 
   test('puts the word, the log and the round back as they were', () => {
     const s = emptySave()
-    const session = new ReadingSession([w], s, 5)
+    const session = new ReadingSession([w], () => s, 5)
     const undo = new WordUndoStack()
     recordWord(s, 'ねこ', 3, T)
     s.log.push({ ...answer('ねこ', T, true), grade: 3 })
@@ -293,7 +334,7 @@ describe('WordUndoStack', () => {
 
   test('a word answered for the first time goes back to not practised', () => {
     const s = emptySave()
-    const session = new ReadingSession([w], s, 0)
+    const session = new ReadingSession([w], () => s, 0)
     const undo = new WordUndoStack()
     undo.record(s, session, 'ねこ')
     recordWord(s, 'ねこ', 3, T)
