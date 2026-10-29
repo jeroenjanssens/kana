@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { createScheduler, grade } from '../../src/lib/srs/scheduler'
-import type { Word } from '../../src/lib/data/words'
+import { build, type Word } from '../../src/lib/data/words'
 import {
   emptySave,
   type Grade,
@@ -9,9 +9,11 @@ import {
 } from '../../src/lib/storage/schema'
 import { recordWord } from '../../src/lib/study/actions'
 import {
+  matchesSearch,
   migrateWordCards,
   ReadingSession,
   readingGrade,
+  sortWords,
   WordUndoStack,
 } from '../../src/lib/study/wordReviews'
 
@@ -122,6 +124,8 @@ describe('migrateWordCards', () => {
 describe('ReadingSession', () => {
   const word = (kana: string, index: number): Word => ({
     kana,
+    parts: [kana],
+    kind: 'word',
     romaji: kana,
     accept: [],
     meaning: '',
@@ -258,6 +262,8 @@ describe('ReadingSession', () => {
 describe('WordUndoStack', () => {
   const w: Word = {
     kana: 'ねこ',
+    parts: ['ねこ'],
+    kind: 'word',
     romaji: 'neko',
     accept: [],
     meaning: '',
@@ -294,5 +300,97 @@ describe('WordUndoStack', () => {
     undo.undo(s, session)
     expect(s.words).toEqual({})
     expect(undo.undo(s, session)).toBeUndefined()
+  })
+})
+
+describe('sortWords', () => {
+  const list = [
+    build(['さくら', 'sakura', 'cherry blossom'], 0),
+    build(['あめ', 'ame', 'rain'], 1),
+    build(['かさ', 'kasa', 'umbrella'], 2),
+  ]
+  const kanaOf = (ws: Word[]) => ws.map((w) => w.kana)
+  const card = (due: number, stability: number) => ({
+    due,
+    stability,
+    difficulty: 5,
+    elapsed_days: 0,
+    scheduled_days: 3,
+    learning_steps: 0,
+    reps: 2,
+    lapses: 0,
+    state: 2 as const,
+    last_review: T - DAY,
+  })
+
+  test('list order, or reversed', () => {
+    const s = emptySave()
+    expect(kanaOf(sortWords(list, 'list', false, s))).toEqual(['さくら', 'あめ', 'かさ'])
+    expect(kanaOf(sortWords(list, 'list', true, s))).toEqual(['かさ', 'あめ', 'さくら'])
+  })
+
+  test('kana in あいうえお order, romaji and meaning A–Z', () => {
+    const s = emptySave()
+    expect(kanaOf(sortWords(list, 'kana', false, s))).toEqual(['あめ', 'かさ', 'さくら'])
+    expect(kanaOf(sortWords(list, 'kana', true, s))).toEqual(['さくら', 'かさ', 'あめ'])
+    expect(kanaOf(sortWords(list, 'romaji', false, s))).toEqual(['あめ', 'かさ', 'さくら'])
+    expect(kanaOf(sortWords(list, 'meaning', false, s))).toEqual(['さくら', 'あめ', 'かさ'])
+    expect(kanaOf(sortWords(list, 'meaning', false, s, { lang: 'nl' }))).toEqual([
+      'さくら',
+      'かさ',
+      'あめ',
+    ])
+  })
+
+  test('how you are doing: new first, then least likely to be read; locked last', () => {
+    const s = emptySave()
+    s.words['あめ'] = { seen: 3, correct: 3, last: T, card: card(T + 9 * DAY, 30) }
+    s.words['かさ'] = { seen: 3, correct: 1, last: T, card: card(T + DAY, 1) }
+    const locked = (w: Word) => w.kana === 'さくら'
+    expect(kanaOf(sortWords(list, 'progress', false, s, { locked, now: T }))).toEqual([
+      'かさ',
+      'あめ',
+      'さくら',
+    ])
+    expect(kanaOf(sortWords(list, 'progress', true, s, { locked, now: T }))).toEqual([
+      'あめ',
+      'かさ',
+      'さくら',
+    ])
+    expect(kanaOf(sortWords(list, 'progress', false, s, { now: T }))).toEqual([
+      'さくら',
+      'かさ',
+      'あめ',
+    ])
+  })
+
+  test('due: soonest first, words without a card last', () => {
+    const s = emptySave()
+    s.words['あめ'] = { seen: 1, correct: 1, last: T, card: card(T + 9 * DAY, 30) }
+    s.words['かさ'] = { seen: 1, correct: 1, last: T, card: card(T + DAY, 1) }
+    expect(kanaOf(sortWords(list, 'due', false, s))).toEqual(['かさ', 'あめ', 'さくら'])
+    expect(kanaOf(sortWords(list, 'due', true, s))).toEqual(['あめ', 'かさ', 'さくら'])
+  })
+})
+
+describe('matchesSearch', () => {
+  const eki = build(['えき', 'eki', 'station'], 0)
+  const coffee = build(['コーヒー', 'kōhī', 'coffee'], 1)
+  const toilet = build(
+    ['トイレ は どこ です か', 'toire wa doko desu ka', 'where is the toilet?'],
+    2,
+  )
+
+  test('by kana, romaji (macrons optional, spaces too) or meaning', () => {
+    expect(matchesSearch(eki, '')).toBe(true)
+    expect(matchesSearch(eki, 'えき')).toBe(true)
+    expect(matchesSearch(eki, 'eki')).toBe(true)
+    expect(matchesSearch(eki, 'Station')).toBe(true)
+    expect(matchesSearch(eki, 'station', 'nl')).toBe(true)
+    expect(matchesSearch(coffee, 'kohi')).toBe(true)
+    expect(matchesSearch(coffee, 'koohii')).toBe(true)
+    expect(matchesSearch(toilet, 'doko desu')).toBe(true)
+    expect(matchesSearch(toilet, 'どこ です')).toBe(true)
+    expect(matchesSearch(eki, 'neko')).toBe(false)
   })
 })

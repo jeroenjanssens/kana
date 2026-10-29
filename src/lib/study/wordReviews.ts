@@ -1,6 +1,10 @@
 import type { Word } from '../data/words'
+import type { Lang } from '../i18n/format'
 import { createScheduler, grade, retrievability } from '../srs/scheduler'
 import type { Grade, ReviewEntry, SaveFile, WordProgress } from '../storage/schema'
+import { normalize } from './answer'
+import { wordMeaning } from './reading'
+import type { WordSort } from './scripts'
 
 /** The grade of a reading answer: answers from before there were grades were right or wrong. */
 export function readingGrade(e: Pick<ReviewEntry, 'correct' | 'grade'>): Grade {
@@ -215,4 +219,72 @@ export class WordUndoStack {
   clear(): void {
     this.steps = []
   }
+}
+
+/**
+ * The word list sorted by a column. 'list' is the order of the word list (easiest first);
+ * 'progress' is weakest first: new words, then by how likely you are to read them now, lowest
+ * first; 'due' is soonest first. Words without a card go last for 'due', locked words always
+ * go last for 'progress'. `desc` reverses the order (but not where those go).
+ */
+export function sortWords(
+  list: readonly Word[],
+  sort: WordSort,
+  desc: boolean,
+  save: SaveFile,
+  options: { lang?: Lang; locked?: (w: Word) => boolean; now?: number } = {},
+): Word[] {
+  const { lang = 'en', locked = () => false, now = Date.now() } = options
+  const card = (w: Word) => save.words[w.kana]?.card
+  const sign = desc ? -1 : 1
+  if (sort === 'kana' || sort === 'romaji' || sort === 'meaning') {
+    const collator = new Intl.Collator(sort === 'kana' ? 'ja' : lang, { sensitivity: 'base' })
+    const key = (w: Word) =>
+      sort === 'kana' ? w.kana : sort === 'romaji' ? w.romaji : wordMeaning(w, lang)
+    return [...list].sort((a, b) => sign * collator.compare(key(a), key(b)) || a.index - b.index)
+  }
+  if (sort === 'progress') {
+    // New words are weakest: -1, below any chance of reading them.
+    const score = (w: Word) => {
+      const c = card(w)
+      return !c || c.state === 0 ? -1 : (retrievability(c, now) ?? -1)
+    }
+    const scored = list.map((w) => ({ w, locked: locked(w), s: score(w) }))
+    return scored
+      .sort(
+        (a, b) =>
+          Number(a.locked) - Number(b.locked) || sign * (a.s - b.s) || a.w.index - b.w.index,
+      )
+      .map((x) => x.w)
+  }
+  if (sort === 'due') {
+    const due = (w: Word) => {
+      const c = card(w)
+      return c && c.state !== 0 ? c.due : undefined
+    }
+    return [...list].sort((a, b) => {
+      const da = due(a)
+      const db = due(b)
+      if (da === undefined || db === undefined) {
+        return Number(da === undefined) - Number(db === undefined) || a.index - b.index
+      }
+      return sign * (da - db) || a.index - b.index
+    })
+  }
+  return desc ? [...list].reverse() : [...list]
+}
+
+/** Whether a word matches a search, by its kana, romaji (macrons optional) or meaning. */
+export function matchesSearch(word: Word, query: string, lang: Lang = 'en'): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  if (word.kana.includes(q.replace(/\s+/g, ''))) return true
+  const romaji = normalize(q)
+  if (
+    romaji &&
+    (normalize(word.romaji).includes(romaji) || word.accept.some((a) => a.includes(romaji)))
+  ) {
+    return true
+  }
+  return [wordMeaning(word, lang), word.meaning].some((m) => m.toLowerCase().includes(q))
 }

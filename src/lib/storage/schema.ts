@@ -9,6 +9,10 @@ import {
   type RaceKana,
   type ScriptChoice,
   type SheetSize,
+  READING_KINDS,
+  WORD_SORTS,
+  type ReadingKind,
+  type WordSort,
 } from '../study/scripts'
 import { DEFAULT_FONT_ID, FONTS } from '../data/fonts'
 
@@ -168,9 +172,19 @@ export interface Settings {
   /** The font of the model and the traces: a font id, or 'strokes' for the stroke-order data. */
   sheetFont: string
   sheetSize: SheetSize
-  /** The last reading setup: script(s), and cards per round (0: no limit). */
+  /**
+   * The last reading setup: script(s), words and/or phrases, spaces between the words of a
+   * phrase (also wherever phrases are shown), and cards per round (0: no limit).
+   */
   readingScript: ScriptChoice
+  readingKind: ReadingKind
+  readingSpaces: boolean
   readingCount: number
+  /** The word list on the reading page: its sort, open sections, and whether locked words show. */
+  wordListSort: WordSort
+  wordListDesc: boolean
+  wordListOpen: string[]
+  wordListUnlocked: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -232,7 +246,13 @@ export const DEFAULT_SETTINGS: Settings = {
   sheetFont: 'klee-one',
   sheetSize: 'medium',
   readingScript: 'both',
+  readingKind: 'both',
+  readingSpaces: true,
   readingCount: 15,
+  wordListSort: 'list',
+  wordListDesc: false,
+  wordListOpen: ['hiragana'],
+  wordListUnlocked: true,
 }
 
 /** Settings that only take one of a few values; anything else falls back to the default. */
@@ -243,6 +263,8 @@ export const SETTING_CHOICES: Partial<Record<keyof Settings, readonly string[]>>
   raceKana: RACE_KANA,
   sheetScript: SCRIPT_CHOICES,
   readingScript: SCRIPT_CHOICES,
+  readingKind: READING_KINDS,
+  wordListSort: WORD_SORTS,
   sheetSize: SHEET_SIZES,
   sheetFont: [SHEET_STROKES, ...FONTS.map((f) => f.id)],
 }

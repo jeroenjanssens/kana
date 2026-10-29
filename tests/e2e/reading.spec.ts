@@ -129,3 +129,111 @@ test('typed answers suggest a grade; Enter takes it', async ({ page }) => {
   expect(data.log[0]).toMatchObject({ correct: true })
   expect(data.log[0].grade).toBeGreaterThan(1)
 })
+
+test.describe('the word list', () => {
+  test.beforeEach(async ({ page }) => {
+    await seed(page, {
+      cards: HIRAGANA,
+      words: { あか: { seen: 4, correct: 3, last: 1, card: youngCard() } },
+    })
+    await page.goto('./#/reading')
+  })
+
+  const section = (page: Page, name: RegExp) =>
+    page.locator('section.section').filter({ has: page.getByRole('button', { name }) })
+  const rows = (page: Page, name: RegExp) => section(page, name).locator('tbody tr')
+
+  test('shows unlocked words with their romaji, meaning, voices and progress', async ({ page }) => {
+    const hiragana = rows(page, /^Hiragana words/)
+    await expect(hiragana).toHaveCount(UNLOCKED.length)
+    const aka = hiragana.filter({ hasText: 'aka' }).first()
+    await expect(aka).toContainText('red')
+    await expect(aka).toContainText('3 / 4')
+    await expect(aka).toContainText(/in \d+d/)
+    const file = String(words.find((w) => w.kana === 'あか')!.index).padStart(3, '0')
+    const request = page.waitForRequest(new RegExp(`audio/male/words/${file}\\.mp3$`))
+    await aka.getByRole('button', { name: 'あか · Male' }).click()
+    await request
+    await aka.getByRole('button', { name: /^あか: aka/ }).click()
+    await expect(page.getByRole('article', { name: 'あか' })).toBeVisible()
+  })
+
+  test('sections open and close, and stay that way', async ({ page }) => {
+    const toggle = page.getByRole('button', { name: /^Hiragana words/ })
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+    await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    await expect(rows(page, /^Hiragana words/)).toHaveCount(0)
+    await page.getByRole('button', { name: /^Katakana words/ }).click()
+    const data = await savedData(page)
+    expect(data.settings.wordListOpen).toEqual(['katakana'])
+  })
+
+  const firstWords = async (page: Page) =>
+    (
+      await rows(page, /^Hiragana words/)
+        .locator('td.kana')
+        .allTextContents()
+    ).slice(0, 3)
+  const sorted = [...UNLOCKED.map((w) => w.kana)].sort(new Intl.Collator('ja').compare)
+
+  test('sorts by a column, reversed on a second click', async ({ page, isMobile }) => {
+    test.skip(isMobile, 'no column headings on a phone: see the next test')
+    const heading = page.getByRole('columnheader', { name: /Word/ }).first()
+    await heading.getByRole('button').click()
+    await expect(heading).toHaveAttribute('aria-sort', 'ascending')
+    expect(await firstWords(page)).toEqual(sorted.slice(0, 3))
+    await heading.getByRole('button').click()
+    await expect(heading).toHaveAttribute('aria-sort', 'descending')
+    expect(await firstWords(page)).toEqual([...sorted].reverse().slice(0, 3))
+    // How you're doing: the one practised word last (the others are new).
+    await page
+      .getByRole('columnheader', { name: /How you’re doing/ })
+      .first()
+      .getByRole('button')
+      .click()
+    await expect(rows(page, /^Hiragana words/).last()).toContainText('aka')
+  })
+
+  test('sorts with the menu too, and remembers it', async ({ page }) => {
+    await page
+      .getByRole('combobox', { name: 'Sort by' })
+      .selectOption({ label: 'Word (あいうえお)' })
+    expect(await firstWords(page)).toEqual(sorted.slice(0, 3))
+    await page.getByRole('button', { name: /^Ascending/ }).click()
+    expect(await firstWords(page)).toEqual([...sorted].reverse().slice(0, 3))
+    const data = await savedData(page)
+    expect(data.settings).toMatchObject({ wordListSort: 'kana', wordListDesc: true })
+  })
+
+  test('searches by romaji or meaning; locked words show with Unlocked only off', async ({
+    page,
+  }) => {
+    const search = page.getByRole('searchbox')
+    await search.fill('umbrella')
+    // かさ is locked (さ isn't known yet): not found while only unlocked words show.
+    await expect(page.getByText('No words match.')).toBeVisible()
+    await expect(page.locator('tbody tr')).toHaveCount(0)
+    await page.getByLabel('Unlocked only').uncheck()
+    const kasa = page.locator('tbody tr').filter({
+      has: page.locator('td.kana', { hasText: /^かさ$/ }),
+    })
+    await expect(kasa).toHaveCount(1)
+    await expect(kasa).toHaveClass(/locked/)
+    await expect(kasa).toContainText('さ')
+    await search.fill('aka')
+    await expect(page.locator('tbody tr').filter({ hasText: 'red' })).toHaveCount(1)
+  })
+
+  test('on a phone a word takes two lines, without scrolling sideways', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 })
+    const row = rows(page, /^Hiragana words/).first()
+    const [kana, romaji] = await Promise.all([
+      row.locator('td.kana').boundingBox(),
+      row.locator('td.romaji').boundingBox(),
+    ])
+    expect(romaji!.y).toBeGreaterThan(kana!.y + kana!.height / 2)
+    const wide = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)
+    expect(wide).toBe(false)
+  })
+})

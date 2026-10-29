@@ -1,16 +1,23 @@
-import { segment } from './kana'
+import { scriptOf, segment, type Script } from './kana'
 import { macronVariants, romajiVariants } from './romaji'
 import { RULES, type RuleId } from './rules'
 
 export interface Word {
-  /** The word as normally written in kana: hiragana for native words, katakana for loanwords. */
+  /**
+   * The word as normally written in kana: hiragana for native words, katakana for loanwords. A
+   * phrase is written without spaces, as in Japanese.
+   */
   kana: string
+  /** The words of a phrase (one, for a word), to show with spaces between them. */
+  parts: readonly string[]
+  kind: 'word' | 'phrase'
   /** Modified Hepburn, with macrons for long vowels (gakkō, kōhī) and n' before vowels. */
   romaji: string
   /** Accepted typed answers: plain ASCII, lowercase, no spaces. */
   accept: string[]
   meaning: string
-  script: 'hiragana' | 'katakana'
+  /** 'mixed' for a phrase with both hiragana and katakana words. */
+  script: Script | 'mixed'
   /** The pronunciation rules this word uses (see rules.ts), in the order of the rules page. */
   rules: RuleId[]
   /** Position in the word list; also names the word's audio file. */
@@ -19,9 +26,10 @@ export interface Word {
 
 /**
  * [kana, Hepburn romaji, meaning, rules that can't be detected from the spelling], roughly from
- * easiest to hardest. New words go at the end: a word's place names its recording.
+ * easiest to hardest. New words go at the end: a word's place names its recording. A phrase has
+ * spaces between its words, in the kana and the romaji alike.
  */
-type Entry = [kana: string, romaji: string, meaning: string, rules?: RuleId[]]
+export type Entry = [kana: string, romaji: string, meaning: string, rules?: RuleId[]]
 
 const ENTRIES: Entry[] = [
   // First words: only the あ か さ た な rows.
@@ -603,11 +611,49 @@ export function rulesFor(
   return RULES.map((r) => r.id).filter((r) => rules.has(r))
 }
 
-function build([kana, romaji, meaning, extra]: Entry, index: number): Word {
-  const script = /[\u30a0-\u30ff]/.test(kana) ? 'katakana' : 'hiragana'
-  const accept = [...new Set([...romajiVariants(kana), ...macronVariants(romaji)])]
-  const rules = rulesFor(kana, romaji, script, extra)
-  return { kana, romaji, accept, meaning, script, rules, index }
+/** The particles said differently from how they're written (when they're a word of their own). */
+export const PARTICLES: Readonly<Record<string, string>> = { は: 'wa', へ: 'e', を: 'o' }
+
+/** The script of a word in kana (katakana if it has any: ー and ッ are katakana too). */
+function scriptOfWord(kana: string): Script {
+  return [...kana].some((c) => scriptOf(c) === 'katakana') ? 'katakana' : 'hiragana'
+}
+
+/** At most this many accepted spellings of a phrase (each word multiplies them). */
+const MAX_ACCEPT = 512
+
+export function build([written, romaji, meaning, extra]: Entry, index: number): Word {
+  const parts = written.split(' ')
+  const romajiParts = romaji.split(' ')
+  const kana = parts.join('')
+  const scripts = new Set(parts.map(scriptOfWord))
+  const script = scripts.size > 1 ? 'mixed' : [...scripts][0]
+  // Each word's spellings, from its kana and its romaji; a particle only as it's said.
+  let accept = ['']
+  parts.forEach((part, i) => {
+    const said = PARTICLES[part]
+    const options = said
+      ? [said]
+      : [...new Set([...romajiVariants(part), ...macronVariants(romajiParts[i] ?? '')])]
+    accept = [...new Set(accept.flatMap((a) => options.map((o) => a + o)))].slice(0, MAX_ACCEPT)
+  })
+  accept = [...new Set([...accept, ...macronVariants(romaji)])]
+  const rules = new Set<RuleId>(extra)
+  parts.forEach((part, i) => {
+    if (PARTICLES[part]) rules.add('particles')
+    for (const r of rulesFor(part, romajiParts[i] ?? '', scriptOfWord(part))) rules.add(r)
+  })
+  return {
+    kana,
+    parts,
+    kind: parts.length > 1 ? 'phrase' : 'word',
+    romaji,
+    accept,
+    meaning,
+    script,
+    rules: RULES.map((r) => r.id).filter((r) => rules.has(r)),
+    index,
+  }
 }
 
 export const words: readonly Word[] = ENTRIES.map(build)

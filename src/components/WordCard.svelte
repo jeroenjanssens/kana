@@ -3,22 +3,30 @@
   import { FONTS } from '../lib/data/fonts'
   import { segment, type Kana } from '../lib/data/kana'
   import type { Word } from '../lib/data/words'
-  import { wordMeaning, wordSize } from '../lib/study/reading'
+  import { formatInterval, masteryLevel } from '../lib/srs/queue'
+  import type { MessageKey } from '../lib/i18n/messages'
+  import { glyphsText, wordMeaning, type WordKana } from '../lib/study/reading'
   import { audio, settings, store } from '../state/app.svelte'
   import { lang, t } from '../state/i18n.svelte'
   import FontGallery from './FontGallery.svelte'
   import KanaDetails from './KanaDetails.svelte'
-  import KanaGlyph from './KanaGlyph.svelte'
   import Modal from './Modal.svelte'
   import RuleList from './RuleList.svelte'
   import StrokeOrder from './StrokeOrder.svelte'
   import VoiceButtons from './VoiceButtons.svelte'
+  import WordText from './WordText.svelte'
 
   /** Everything about a practice word: its sound, rules, kana and your progress. */
-  let { word, missing = [] }: { word: Word; missing?: readonly Kana[] } = $props()
+  let { word, missing = [] }: { word: Word; missing?: readonly WordKana[] } = $props()
 
-  const parts = $derived(segment(word.kana))
+  /** The kana of the word; `gap` where a new word of a phrase starts. */
+  const parts = $derived(
+    word.parts.flatMap((part, w) => segment(part).map((p, i) => ({ ...p, gap: w > 0 && i === 0 }))),
+  )
   const progress = $derived(store.data.words[word.kana])
+  const spaces = $derived(settings().readingSpaces)
+  const level = $derived(masteryLevel(progress?.card))
+  const now = Date.now()
   let selected = $state<Kana | undefined>()
   let strokesOpen = $state(false)
   let fontsOpen = $state(false)
@@ -34,7 +42,7 @@
 
 <article class="word-card" aria-label={word.kana}>
   <div class="head">
-    <KanaGlyph text={word.kana} font={settings().font} size={wordSize(word.kana, '3.4rem')} />
+    <WordText {word} font={settings().font} max="3.4rem" phraseMax="2.6rem" {spaces} />
     <p class="romaji">{word.romaji}</p>
     <p class="meaning">{wordMeaning(word, lang())}</p>
     <VoiceButtons label={word.kana} play={(voice) => void audio.playWord(word.index, voice)} />
@@ -44,7 +52,7 @@
     <p class="missing">
       {t('word.needs')}
       <span lang="ja">
-        {missing.map((k) => (word.script === 'katakana' ? k.katakana : k.hiragana)).join(' ')}
+        {glyphsText(missing)}
       </span>
     </p>
   {/if}
@@ -64,6 +72,7 @@
           {@const k = p.kana}
           <button
             class="part"
+            class:gap={p.gap && spaces}
             class:active={selected?.id === k.id}
             aria-pressed={selected?.id === k.id}
             onclick={() => select(k)}
@@ -72,7 +81,7 @@
             <small>{k.romaji}</small>
           </button>
         {:else}
-          <span class="part mark"
+          <span class="part mark" class:gap={p.gap && spaces}
             ><span lang="ja">{p.text}</span><small
               >{p.text === 'ー'
                 ? t('word.long')
@@ -100,7 +109,12 @@
     {progress?.seen
       ? t('word.progress', { seen: progress.seen, correct: progress.correct })
       : t('word.notPractised')}
-    {t('word.greenHint')}
+    {#if progress?.card && level !== 'new'}
+      {t(`study.mastery.${level}` as MessageKey)} ·
+      {progress.card.due <= now
+        ? t('wordList.due')
+        : t('wordList.dueIn', { time: formatInterval(progress.card.due - now, lang()) })}
+    {/if}
   </p>
 </article>
 
@@ -192,6 +206,10 @@
   .part.mark {
     cursor: default;
     opacity: 0.7;
+  }
+
+  .part.gap {
+    margin-left: 0.6rem;
   }
 
   .details {

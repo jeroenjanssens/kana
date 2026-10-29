@@ -18,6 +18,21 @@ export const SHEET_SIZES: readonly SheetSize[] = ['xsmall', 'small', 'medium', '
 /** The worksheet "font" that draws kana from the stroke-order data, like the numbered square. */
 export const SHEET_STROKES = 'strokes'
 
+/** Reading practice: words, phrases, or both. */
+export type ReadingKind = 'words' | 'phrases' | 'both'
+export const READING_KINDS: readonly ReadingKind[] = ['words', 'phrases', 'both']
+
+/** How the word list on the reading page is sorted. */
+export type WordSort = 'list' | 'kana' | 'romaji' | 'meaning' | 'progress' | 'due'
+export const WORD_SORTS: readonly WordSort[] = [
+  'list',
+  'kana',
+  'romaji',
+  'meaning',
+  'progress',
+  'due',
+]
+
 /** A kana as it's asked: in one script. */
 export interface Question {
   kana: Kana
