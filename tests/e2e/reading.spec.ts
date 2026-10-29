@@ -237,3 +237,89 @@ test.describe('the word list', () => {
     expect(wide).toBe(false)
   })
 })
+
+test.describe('phrases', () => {
+  const PHRASE = words.find((w) => w.kana === 'きゅうきゅうしゃをよんでください')!
+  const kana = ['kyu', 'u', 'sha', 'wo', 'yo', 'n', 'de', 'ku', 'da', 'sa', 'i']
+  const cards = { hiragana: Object.fromEntries(kana.map((id) => [id, youngCard()])) }
+  /**
+   * Every other phrase made of these characters has been read and isn't due, so this one comes
+   * first. (Some of them aren't unlocked, as き on its own isn't known: that doesn't matter.)
+   */
+  const others = () =>
+    Object.fromEntries(
+      words
+        .filter(
+          (w) =>
+            w.kind === 'phrase' && w !== PHRASE && /^[きゅうしゃをよんでください]+$/.test(w.kana),
+        )
+        .map((w) => [w.kana, { seen: 5, correct: 5, last: 1, card: youngCard() }]),
+    )
+
+  test('practise only phrases, with spaces between the words', async ({ page }) => {
+    await seed(page, { settings: { autoplay: false }, cards, words: others() })
+    await page.goto('./#/reading')
+    await page
+      .getByRole('group', { name: 'Practise' })
+      .getByRole('button', { name: 'Phrases' })
+      .click()
+    await page.getByRole('button', { name: 'Start reading' }).click()
+    const front = page.locator('.face.front')
+    await expect(front.locator('.phrase.spaces .glyph')).toHaveText(PHRASE.parts as string[])
+    await expect(front.getByText('Phrase', { exact: true })).toBeVisible()
+    await page.getByRole('button', { name: /Show reading/ }).click()
+    await expect(page.locator('.face.back')).toContainText(PHRASE.romaji)
+  })
+
+  test('spaces can be turned off', async ({ page }) => {
+    await seed(page, {
+      settings: { autoplay: false, readingKind: 'phrases', readingSpaces: false },
+      cards,
+      words: others(),
+    })
+    await page.goto('./#/reading')
+    await page.getByRole('button', { name: 'Start reading' }).click()
+    const phrase = page.locator('.face.front .phrase')
+    await expect(phrase).not.toHaveClass(/spaces/)
+    const boxes = await phrase
+      .locator('.glyph')
+      .evaluateAll((els) => els.map((e) => e.getBoundingClientRect()))
+    // Words on the same line touch. (The card is tilted a little, so a line isn't quite level.)
+    const sameLine = (i: number) => Math.abs(boxes[i].top - boxes[i - 1].top) < boxes[i].height / 2
+    const pairs = boxes.map((_, i) => i).filter((i) => i > 0 && sameLine(i))
+    expect(pairs.length).toBeGreaterThan(0)
+    for (const i of pairs) expect(Math.abs(boxes[i].left - boxes[i - 1].right)).toBeLessThan(3)
+  })
+
+  test('a long phrase wraps between its words on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 740 })
+    await seed(page, {
+      settings: { autoplay: false, readingKind: 'phrases', font: 'dela-gothic-one' },
+      cards,
+      words: others(),
+    })
+    await page.goto('./#/reading')
+    await page.getByRole('button', { name: 'Start reading' }).click()
+    const content = await page.locator('.face.front .content').boundingBox()
+    const glyphs = page.locator('.face.front .phrase .glyph')
+    await expect(glyphs).toHaveCount(PHRASE.parts.length)
+    const boxes = await glyphs.evaluateAll((els) =>
+      els.map((e) => ({ ...e.getBoundingClientRect().toJSON(), lines: e.getClientRects().length })),
+    )
+    for (const b of boxes) {
+      expect(b.left).toBeGreaterThanOrEqual(content!.x)
+      expect(b.right).toBeLessThanOrEqual(content!.x + content!.width)
+      expect(b.lines).toBe(1)
+    }
+    // More than one line (not just the tilt of the card).
+    expect(boxes.some((b, i) => i > 0 && b.top - boxes[i - 1].top > b.height / 2)).toBe(true)
+  })
+
+  test('phrases have their own section in the word list', async ({ page }) => {
+    await seed(page, { cards, words: others() })
+    await page.goto('./#/reading')
+    await page.getByRole('button', { name: /^Phrases .*unlocked/ }).click()
+    const row = page.locator('tbody tr').filter({ hasText: PHRASE.romaji })
+    await expect(row.locator('td.kana')).toHaveText(PHRASE.parts.join(' '))
+  })
+})

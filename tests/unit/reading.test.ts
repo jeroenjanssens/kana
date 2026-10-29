@@ -72,7 +72,7 @@ describe('word list', () => {
     expect(w.script).toBe(partScripts.size > 1 ? 'mixed' : [...partScripts][0])
     if (w.kind === 'phrase') {
       expect(w.parts.length).toBeGreaterThanOrEqual(2)
-      expect(w.parts.length).toBeLessThanOrEqual(5)
+      expect(w.parts.length).toBeLessThanOrEqual(6)
       expect(w.romaji.split(' ')).toHaveLength(w.parts.length)
     } else {
       expect(w.parts).toHaveLength(1)
@@ -92,8 +92,11 @@ describe('word list', () => {
   })
 
   test.each(words.map((w) => [w.kana, w] as const))('%s: romaji matches the kana', (_, w) => {
-    // A particle は at the end (こんにちは) is said wa.
-    const spoken = w.rules.includes('particles') ? w.kana.replace(/は$/, 'わ') : w.kana
+    // A particle は at the end (こんにちは) is said wa; in a phrase は, へ and を on their own too.
+    const said: Record<string, string> = { は: 'わ', へ: 'え', を: 'お' }
+    const spoken = w.parts
+      .map((p) => said[p] ?? (w.rules.includes('particles') ? p.replace(/は$/, 'わ') : p))
+      .join('')
     const fromKana = romajiVariants(spoken)
     expect(
       macronVariants(w.romaji).some((v) => fromKana.includes(v)),

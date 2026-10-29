@@ -229,7 +229,7 @@ async function generate(only?: string) {
     }
     for (const [i, word] of words.entries()) {
       encodeMp3(
-        await synthesize(word.kana, voice.speaker, false),
+        await synthesize(WORD_READINGS[word.kana] ?? word.kana, voice.speaker, false),
         join('public', wordAudioPath(voice.id, i)),
       )
     }
@@ -290,6 +290,16 @@ const RULE_READINGS: Record<string, string> = {
   kinen: '記念',
 }
 
+/**
+ * What VOICEVOX reads for practice words it would read wrongly from the kana alone (keyed by the
+ * kana, without spaces): in kanji, so は is a particle and not part of a word.
+ */
+const WORD_READINGS: Record<string, string> = {
+  はち: '八',
+  ふくろはいりません: '袋は要りません',
+  ほかのいろはありますか: 'ほかの色はありますか',
+}
+
 /** Record the pronunciation-rule examples that aren't practice words, in every voice. */
 async function generateRules(only?: string) {
   for (const voice of loadVoices().filter((v) => !only || v.id === only)) {
@@ -314,7 +324,7 @@ async function generateNewWords(only?: string) {
     for (const [i, word] of words.entries()) {
       const file = join('public', wordAudioPath(voice.id, i))
       if (existsSync(file)) continue
-      encodeMp3(await synthesize(word.kana, voice.speaker, false), file)
+      encodeMp3(await synthesize(WORD_READINGS[word.kana] ?? word.kana, voice.speaker, false), file)
       made++
     }
     console.log(`${voice.id}: ${made} new words (${voice.character})`)

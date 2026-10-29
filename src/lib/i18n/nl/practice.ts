@@ -107,7 +107,7 @@ export default {
   'reading.eyebrow': '読む練習 · Lezen',
   'reading.heading': 'Leesoefening',
   'reading.lead':
-    'Echte Japanse woorden, alleen van kana die je al kent. Een woord wordt vrijgespeeld als elke kana erin minstens "jong" is in je decks.',
+    'Echte Japanse woorden en zinnetjes, veel ervan handig op reis, alleen van kana die je al kent. Een woord wordt vrijgespeeld als elke kana erin minstens "jong" is in je decks.',
   'reading.unlocked': '{count} van {total} woorden vrijgespeeld',
   'reading.noWords':
     'Leer de eerste rijen (あ い う え お, か き く け こ…) om je eerste woorden vrij te spelen.',

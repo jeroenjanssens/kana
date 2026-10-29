@@ -83,7 +83,8 @@ export default defineConfig({
             handler: 'CacheFirst',
             options: {
               cacheName: 'kana-word-audio',
-              expiration: { maxEntries: 1000 },
+              // About 1,000 words in two voices, plus the rule examples.
+              expiration: { maxEntries: 3000 },
             },
           },
           {

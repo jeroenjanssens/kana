@@ -105,7 +105,7 @@ export default {
   'reading.eyebrow': '読む練習 · Reading',
   'reading.heading': 'Reading practice',
   'reading.lead':
-    'Real Japanese words, built only from kana you already know. A word unlocks when every kana in it is at least "young" in your decks.',
+    'Real Japanese words and phrases, many of them handy when travelling, built only from kana you already know. A word unlocks when every kana in it is at least "young" in your decks.',
   'reading.unlocked': '{count} of {total} words unlocked',
   'reading.noWords':
     'Learn the first rows (あ い う え お, か き く け こ…) to unlock your first words.',

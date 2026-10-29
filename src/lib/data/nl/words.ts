@@ -1,3 +1,5 @@
+import { travelNl } from './travel'
+
 /** Dutch meanings of the reading-practice words, keyed by the word in kana. */
 export const meaningsNl: Record<string, string> = {
   あい: 'liefde',
@@ -507,4 +509,5 @@ export const meaningsNl: Record<string, string> = {
   ずっと: 'de hele tijd; veel (meer)',
   やっぱり: 'toch, zoals verwacht',
   ちゃいろ: 'bruin',
+  ...travelNl,
 }

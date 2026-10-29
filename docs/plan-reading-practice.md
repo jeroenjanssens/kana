@@ -1,5 +1,13 @@
 # Reading practice: plan
 
+> **Status (2026-10-29): implemented.** Differences from this plan:
+>
+> - The word list also has a "Sort by" menu with a button to reverse the order: on a phone the column headings are hidden, and it's the only way to sort by due date. Clicking a heading a third time goes back to the list order.
+> - Phrases have up to six words: in "えいご の メニュー は あります か" the particles and です/か count as words too.
+> - VOICEVOX misread three of the 500 new items from the kana (はち as "wachi", and いろは and はいりません as words); they're recorded from kanji instead (`WORD_READINGS` in `scripts/generate-audio.ts`, next to the readings for the rule examples), not `say` on the word. The readings of all 500 were checked against VOICEVOX's own reading of them.
+> - The new words and phrases live in `src/lib/data/travel.ts` (Dutch: `nl/travel.ts`), after the first 507.
+> - On the back of the card, a phrase's romaji is smaller, so it doesn't take three lines.
+
 Changes to reading practice (`#/reading`):
 
 1. Long words and phrases fit on the card, on phones too.

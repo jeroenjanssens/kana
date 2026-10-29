@@ -1,6 +1,7 @@
 import { scriptOf, segment, type Script } from './kana'
 import { macronVariants, romajiVariants } from './romaji'
 import { RULES, type RuleId } from './rules'
+import { TRAVEL } from './travel'
 
 export interface Word {
   /**
@@ -656,4 +657,4 @@ export function build([written, romaji, meaning, extra]: Entry, index: number): 
   }
 }
 
-export const words: readonly Word[] = ENTRIES.map(build)
+export const words: readonly Word[] = [...ENTRIES, ...TRAVEL].map(build)

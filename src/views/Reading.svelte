@@ -387,7 +387,7 @@
                 {verdict ? t('reading.correct') : t('reading.youTyped', { input })}
               </p>
             {/if}
-            <p class="romaji">{word.romaji}</p>
+            <p class="romaji" class:phrase={word.kind === 'phrase'}>{word.romaji}</p>
             <p class="meaning">{wordMeaning(word, lang())}</p>
             <button
               class="btn small listen"
@@ -614,6 +614,10 @@
     font-size: 2.6rem;
     margin: 0.4rem 0 0;
     line-height: 1.1;
+  }
+
+  .romaji.phrase {
+    font-size: 1.6rem;
   }
 
   .meaning {
